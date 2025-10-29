@@ -74,3 +74,15 @@ function renderCards(data) {
     container.appendChild(card);
   });
 }
+
+// === Spinner logic ===
+
+document.getElementById('viewStatus').addEventListener('click', function () {
+  const spinner = this.querySelector('.spinner');
+  spinner.style.display = 'inline-block';
+
+  // Simulate loading (e.g., fetch or timeout)
+  setTimeout(() => {
+    spinner.style.display = 'none';
+  }, 2000); // Adjust duration as needed
+});
