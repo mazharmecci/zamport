@@ -128,7 +128,7 @@ button:hover {
 
 #submitSku {
   background-color: 6CBDE9; /* Light blue */
-  color: Black;
+  color: White;
   border: none;
   padding: 10px 20px;
   font-size: 14px;
@@ -141,7 +141,7 @@ button:hover {
 /* Prevent color change on click */
 #submitSku:active {
   background-color: 6CBDE9;
-  color: Black;
+  color: White;
 }
 
 #viewStatus:hover {
