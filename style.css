@@ -194,3 +194,20 @@ button:hover {
   color: black; /* optional: improves contrast */
 }
 
+@media (max-width: 600px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr); /* Two cards per row */
+  }
+}
+
+@media (max-width: 600px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+}
+
