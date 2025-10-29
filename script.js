@@ -77,12 +77,23 @@ function renderCards(data) {
 
 // === Spinner logic ===
 
-document.getElementById('viewStatus').addEventListener('click', function () {
-  const spinner = this.querySelector('.spinner');
-  spinner.style.display = 'inline-block';
+const viewStatusBtn = document.getElementById('viewStatus');
 
-  // Simulate loading (e.g., fetch or timeout)
-  setTimeout(() => {
-    spinner.style.display = 'none';
-  }, 2000); // Adjust duration as needed
+function showSpinner(button) {
+  const spinner = button.querySelector('.spinner');
+  if (spinner) {
+    spinner.style.display = 'inline-block';
+    button.disabled = true;
+
+    // Simulate loading
+    setTimeout(() => {
+      spinner.style.display = 'none';
+      button.disabled = false;
+    }, 3000); // Adjust duration as needed
+  }
+}
+
+viewStatusBtn.addEventListener('click', () => {
+  showSpinner(viewStatusBtn);
 });
+
