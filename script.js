@@ -8,11 +8,10 @@ document.getElementById('scanBox').addEventListener('click', () => {
   const qr = new Html5Qrcode("qr-reader");
   qr.start(
     { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
+    { fps: 10, qrbox: 300 },
     (decodedText) => {
       document.getElementById('skuInput').value = decodedText;
-      qr.stop();
-      scannerActive = false;
+      setTimeout(() => qr.stop(), 500); // slight delay
     },
     (errorMessage) => {
       console.warn(errorMessage);
