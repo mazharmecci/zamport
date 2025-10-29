@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Status Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>📦 Order Status Dashboard</h2>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button id="viewStatus">View Pending Orders</button>
+      <button id="scanBox">Scan</button>
+    </div>
+
+    <!-- Scan + Manual Input -->
+    <div class="scan-area">
+      <div id="qr-reader" style="width: 300px;"></div>
+      <input type="text" id="skuInput" placeholder="Enter SKU manually if scan fails" />
+      <button id="submitSku">Submit</button>
+    </div>
+
+    <!-- Pending Orders -->
+    <div id="pendingOrdersContainer" class="card-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
