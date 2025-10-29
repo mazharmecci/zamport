@@ -60,6 +60,13 @@ button:hover {
   width: 40%;
   border: 1px solid #ccc;
   border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+#skuInput:focus {
+  width: 60%;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
 .card-container {
