@@ -21,8 +21,9 @@ h2 {
   justify-content: center;
   gap: 12px;
 }
+
 button {
-  flex: 1 1 120px;
+  flex: 1 1 60px;
   text-align: center;
 }
 
@@ -130,20 +131,6 @@ button:hover {
 
 .stock-form button:hover {
   background-color: #0056b3;
-}
-
-#submitSku {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 4px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  width: fit-content;
-  min-width: 100px;
-  display: inline-block;
 }
 
 #submitSku:hover {
