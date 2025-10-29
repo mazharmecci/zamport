@@ -164,7 +164,7 @@ button:hover {
 
 #viewStatus {
   background-color: orange;
-  color: white;
+  color: Black;
   border: none;
   padding: 10px 20px;
   font-size: 14px;
@@ -180,7 +180,7 @@ button:hover {
 
 #scanBox {
   background-color: orange; /* default color */
-  color: white;
+  color: Black;
   border: none;
   padding: 10px 20px;
   font-size: 14px;
@@ -211,3 +211,19 @@ button:hover {
   }
 }
 
+.spinner {
+  border: 2px solid #fff;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
