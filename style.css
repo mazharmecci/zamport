@@ -172,16 +172,19 @@ button:hover {
   justify-content: center; /* Centers them horizontally */
 }
 
+#scanBox {
+  background-color: orange; /* default color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Hover effect: light green */
 #scanBox:hover {
-  background-color: darkorange; /* subtle hover effect */
+  background-color: lightgreen;
+  color: black; /* optional: improves contrast */
 }
 
-#scanBox:active {
-  background-color: orange; /* or whatever your default color is */
-  color: white; /* match your default text color */
-}
-
-.scan-area {
-  text-align: center;
-  margin-bottom: 30px;
-}
