@@ -7,30 +7,38 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-  
+
 <body>
-  <div class="container">
-    <div class="logo-container">
-      <img src="zamport.png" alt="Zamport Logo" class="logo" />
-    </div>
-    <h2>ZAMPORT</h2>
+  <main class="container">
+
+    <!-- Logo + Title -->
+    <header class="logo-header">
+      <div class="logo-container">
+        <img src="zamport.png" alt="Zamport Logo" class="logo" />
+      </div>
+      <h2>ZAMPORT</h2>
+    </header>
 
     <!-- Action Buttons -->
-    <div class="actions">
+    <section class="actions">
       <button id="viewStatus">View Pending Orders</button>
       <button id="scanBox">Scan</button>
-    </div>
+    </section>
 
     <!-- Scan + Manual Input -->
-    <div class="scan-area">
+    <section class="scan-area">
       <div id="qr-reader" style="width: 300px;"></div>
-      <input type="text" id="skuInput" placeholder="Enter SKU manually if scan fails" />
-      <button id="submitSku">Submit</button>
-    </div>
+      <form class="stock-form" onsubmit="event.preventDefault();">
+        <label for="skuInput">Enter SKU</label>
+        <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
+        <button type="submit" id="submitSku">Submit</button>
+      </form>
+    </section>
 
     <!-- Pending Orders -->
-    <div id="pendingOrdersContainer" class="card-container"></div>
-  </div>
+    <section id="pendingOrdersContainer" class="card-container"></section>
+
+  </main>
 
   <script src="script.js"></script>
 </body>
