@@ -142,6 +142,16 @@ button:hover {
   white-space: nowrap; /* Prevents text from wrapping */
 }
 
+#viewStatus {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
   gap: 10px; /* Adds spacing between buttons */
