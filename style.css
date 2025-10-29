@@ -47,15 +47,6 @@ button:hover {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-#scanBox:hover {
-  background-color: #e68900;
-}
-
-.scan-area {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -181,3 +172,16 @@ button:hover {
   justify-content: center; /* Centers them horizontally */
 }
 
+#scanBox:hover {
+  background-color: darkorange; /* subtle hover effect */
+}
+
+#scanBox:active {
+  background-color: orange; /* or whatever your default color is */
+  color: white; /* match your default text color */
+}
+
+.scan-area {
+  text-align: center;
+  margin-bottom: 30px;
+}
