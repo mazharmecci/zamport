@@ -135,7 +135,13 @@ button:hover {
   border-radius: 6px;
   cursor: pointer;
   display: block;
-  margin: 20px auto; /* Centers the button horizontally */
+  margin: 20px auto;
+}
+
+/* Prevent color change on click */
+#submitSku:active {
+  background-color: #add8e6;
+  color: black;
 }
 
 #submitSku:hover {
