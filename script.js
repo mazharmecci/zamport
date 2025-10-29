@@ -1,23 +1,48 @@
 // === QR Scanner Setup ===
 let scannerActive = false;
+let qrInstance = null;
 
-document.getElementById('scanBox').addEventListener('click', () => {
+const scanBtn = document.getElementById('scanBox');
+const closeBtn = document.getElementById('closeScanner');
+const qrReader = document.getElementById('qr-reader');
+const skuInput = document.getElementById('skuInput');
+
+scanBtn.addEventListener('click', () => {
   if (scannerActive) return;
   scannerActive = true;
 
-  const qr = new Html5Qrcode("qr-reader");
-  qr.start(
+  qrReader.style.display = 'block';
+  closeBtn.style.display = 'inline-block';
+
+  qrInstance = new Html5Qrcode("qr-reader");
+  qrInstance.start(
     { facingMode: "environment" },
     { fps: 10, qrbox: 300 },
     (decodedText) => {
-      document.getElementById('skuInput').value = decodedText;
-      setTimeout(() => qr.stop(), 500); // slight delay
+      skuInput.value = decodedText;
+      setTimeout(() => stopScanner(), 500); // slight delay
     },
     (errorMessage) => {
       console.warn(errorMessage);
     }
   );
 });
+
+closeBtn.addEventListener('click', stopScanner);
+
+function stopScanner() {
+  if (qrInstance) {
+    qrInstance.stop().then(() => {
+      qrReader.style.display = 'none';
+      closeBtn.style.display = 'none';
+      scannerActive = false;
+      qrInstance.clear();
+      qrInstance = null;
+    }).catch(err => {
+      console.error("Failed to stop scanner:", err);
+    });
+  }
+}
 
 // === View Pending Orders ===
 document.getElementById('viewStatus').addEventListener('click', fetchPendingOrders);
