@@ -124,6 +124,18 @@ button:hover {
   background-color: #0056b3;
 }
 
+#submitSku {
+  background-color: #add8e6; /* Light blue */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto; /* Centers the button horizontally */
+}
+
 #submitSku:hover {
   background-color: #0056b3;
   transform: scale(1.02);
