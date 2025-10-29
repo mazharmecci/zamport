@@ -127,7 +127,7 @@ button:hover {
 }
 
 #submitSku {
-  background-color: #add8e6; /* Light blue */
+  background-color: 6CBDE9; /* Light blue */
   color: Black;
   border: none;
   padding: 10px 20px;
@@ -140,7 +140,7 @@ button:hover {
 
 /* Prevent color change on click */
 #submitSku:active {
-  background-color: #add8e6;
+  background-color: 6CBDE9;
   color: Black;
 }
 
