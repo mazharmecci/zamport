@@ -73,6 +73,10 @@ button:hover {
 .logo-container {
   max-width: 150px; /* Or whatever fits your layout */
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
 }
 
 .logo {
@@ -80,6 +84,13 @@ button:hover {
   height: auto; /* Maintains aspect ratio */
   display: block;
   margin: 0 auto; /* Optional: centers the logo */
+}
+
+.logo-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .stock-form {
