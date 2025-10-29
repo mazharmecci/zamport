@@ -148,3 +148,17 @@ button:hover {
   transform: scale(1.02);
 }
 
+#viewStatus {
+  background-color: #8bc34a;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#viewStatus:hover {
+  background-color: #689f38;
+}
