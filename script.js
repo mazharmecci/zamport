@@ -72,33 +72,43 @@ async function fetchPendingOrders() {
 
 // === Submit SKU ===
 
+// Bind the click event early
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
 async function submitSku() {
+  const skuInput = document.getElementById('skuInput');
   const sku = skuInput.value.trim();
-  if (!sku) return alert("Enter or scan a SKU first");
+  if (!sku) {
+    alert("Enter or scan a SKU first");
+    return;
+  }
 
   const submitBtn = document.getElementById('submitSku');
   const spinner = submitBtn.querySelector('.spinner');
 
-  // Show spinner
+  // Show spinner and disable button
   spinner.style.display = 'inline-block';
   submitBtn.disabled = true;
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec', {
-      method: 'POST',
-      body: new URLSearchParams({ sku })
-    });
-    const result = await res.json();
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec',
+      {
+        method: 'POST',
+        body: new URLSearchParams({ sku }),
+      }
+    );
 
+    const result = await response.json();
     showToast(result.message || result);
+
     if (result.labelLink) {
       const printWindow = window.open(result.labelLink, '_blank');
       if (printWindow) {
         printWindow.onload = () => {
           printWindow.print();
           showToast("Label sent to printer!");
+          skuInput.value = ""; // Clear input after print dialog opens
         };
       } else {
         showToast("Popup blocked. Please allow popups.");
@@ -110,7 +120,7 @@ async function submitSku() {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
   } finally {
-    // Hide spinner
+    // Hide spinner and re-enable button
     spinner.style.display = 'none';
     submitBtn.disabled = false;
   }
