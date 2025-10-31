@@ -79,7 +79,7 @@ async function submitSku() {
   if (!sku) return alert("Enter or scan a SKU first");
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec/exec', {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec', {
       method: 'POST',
       body: new URLSearchParams({ sku })
     });
