@@ -260,3 +260,9 @@ button:hover {
   to { bottom: 0; opacity: 0; }
 }
 
+@media print {
+  @page {
+    size: portrait;
+  }
+}
+
