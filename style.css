@@ -221,6 +221,11 @@ button:hover {
   display: inline-block;
 }
 
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db; /* Blue spinner */
+}
+
 #closeScanner {
   background-color: #f44336; /* Red */
   color: white;
@@ -269,4 +274,10 @@ button:hover {
     size: portrait;
   }
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 
