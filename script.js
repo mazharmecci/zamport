@@ -169,3 +169,49 @@ function showToast(message) {
     toast.className = toast.className.replace("show", "");
   }, 3000);
 }
+
+// === 3PL Summary ===
+
+async function load3PLSummary() {
+  const tableBody = document.getElementById('threePLTableBody');
+  tableBody.innerHTML = ''; // Clear previous rows
+
+  try {
+    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?mode=3pl');
+    const summary = await response.json();
+
+    let grandTotal = 0;
+
+    summary.forEach(item => {
+      const row = document.createElement('tr');
+
+      const sheetIdCell = document.createElement('td');
+      sheetIdCell.textContent = item.sheetId;
+
+      const sheetNameCell = document.createElement('td');
+      sheetNameCell.textContent = item.sheetName;
+
+      const costCell = document.createElement('td');
+      costCell.textContent = item.total3PLCost.toFixed(2);
+
+      row.appendChild(sheetIdCell);
+      row.appendChild(sheetNameCell);
+      row.appendChild(costCell);
+
+      tableBody.appendChild(row);
+
+      grandTotal += item.total3PLCost;
+    });
+
+    // Add Grand Total row
+    const totalRow = document.createElement('tr');
+    totalRow.innerHTML = `
+      <td colspan="2"><strong>Grand Total</strong></td>
+      <td><strong>${grandTotal.toFixed(2)}</strong></td>
+    `;
+    tableBody.appendChild(totalRow);
+  } catch (error) {
+    console.error('Error loading 3PL summary:', error);
+    showToast('Failed to load 3PL cost summary.');
+  }
+}
