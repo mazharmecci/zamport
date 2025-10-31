@@ -217,6 +217,10 @@ button:hover {
   visibility: visible;
 }
 
+.spinner.active {
+  display: inline-block;
+}
+
 #closeScanner {
   background-color: #f44336; /* Red */
   color: white;
