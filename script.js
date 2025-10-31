@@ -52,7 +52,7 @@ async function fetchPendingOrders() {
   showSpinner(viewStatusBtn);
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec');
+    const res = await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec/exec');
     const data = await res.json();
     renderCards(data);
   } catch (error) {
@@ -75,7 +75,7 @@ async function submitSku() {
   if (!sku) return alert("Enter or scan a SKU first");
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+    const res = await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec/exec', {
       method: 'POST',
       body: new URLSearchParams({ sku })
     });
