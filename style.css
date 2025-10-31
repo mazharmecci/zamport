@@ -205,12 +205,12 @@ button:hover {
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top-color: #333;
+  border-top-color: black; /* ✅ Black spinner */
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   margin-right: 6px;
   vertical-align: middle;
-  visibility: hidden; /* Use visibility toggle for smoother layout */
+  visibility: hidden; /* Keeps layout stable */
 }
 
 .spinner.active {
