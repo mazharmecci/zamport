@@ -78,6 +78,13 @@ async function submitSku() {
   const sku = skuInput.value.trim();
   if (!sku) return alert("Enter or scan a SKU first");
 
+  const submitBtn = document.getElementById('submitSku');
+  const spinner = submitBtn.querySelector('.spinner');
+
+  // Show spinner
+  spinner.style.display = 'inline-block';
+  submitBtn.disabled = true;
+
   try {
     const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec', {
       method: 'POST',
@@ -102,6 +109,10 @@ async function submitSku() {
   } catch (error) {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
+  } finally {
+    // Hide spinner
+    spinner.style.display = 'none';
+    submitBtn.disabled = false;
   }
 }
 
