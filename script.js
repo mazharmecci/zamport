@@ -52,8 +52,9 @@ async function fetchPendingOrders() {
   showSpinner(viewStatusBtn);
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec/exec');
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
     const data = await res.json();
+    console.log("Fetched data:", data);
     renderCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
