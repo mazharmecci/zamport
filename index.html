@@ -34,7 +34,10 @@
       <form class="stock-form" onsubmit="event.preventDefault();">
         <label for="skuInput">Enter SKU</label>
         <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
-        <button type="submit" id="submitSku">Submit</button>
+        <button type="submit" id="submitSku">
+        <span class="spinner" style="display: none;"></span>
+        Submit
+      </button>
       </form>
     </section>
 
