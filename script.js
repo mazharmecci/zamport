@@ -158,3 +158,32 @@ fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUn
   console.error("Error:", err);
   alert("Failed to fetch label link.");
 });
+
+// JavaScript with Print
+
+fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec', {
+  method: 'POST',
+  body: new URLSearchParams({ sku: scannedSku })
+})
+.then(res => res.json())
+.then(data => {
+  if (data.labelLink) {
+    const printWindow = window.open(data.labelLink, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+
+        // Show toast after print is triggered
+        showToast("Label sent to printer!");
+      };
+    } else {
+      showToast("Popup blocked. Please allow popups.");
+    }
+  } else {
+    showToast("Label link not found.");
+  }
+})
+.catch(err => {
+  console.error("Error:", err);
+  showToast("Failed to update status or fetch label.");
+});
