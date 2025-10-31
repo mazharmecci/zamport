@@ -176,23 +176,33 @@ async function load3PLSummary() {
   const tableBody = document.getElementById('threePLTableBody');
   tableBody.innerHTML = ''; // Clear previous rows
 
+  const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=3pl';
+
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
+    const response = await fetch(endpoint);
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+
     const summary = await response.json();
+    if (!Array.isArray(summary)) {
+      throw new Error('Invalid data format received');
+    }
 
     let grandTotal = 0;
 
-    summary.forEach(item => {
+    summary.forEach(({ sheetId, sheetName, total3PLCost }) => {
       const row = document.createElement('tr');
 
       const sheetIdCell = document.createElement('td');
-      sheetIdCell.textContent = item.sheetId;
+      sheetIdCell.textContent = sheetId;
 
       const sheetNameCell = document.createElement('td');
-      sheetNameCell.textContent = item.sheetName;
+      sheetNameCell.textContent = sheetName;
 
       const costCell = document.createElement('td');
-      costCell.textContent = item.total3PLCost.toFixed(2);
+      costCell.textContent = parseFloat(total3PLCost).toFixed(2);
 
       row.appendChild(sheetIdCell);
       row.appendChild(sheetNameCell);
@@ -200,7 +210,7 @@ async function load3PLSummary() {
 
       tableBody.appendChild(row);
 
-      grandTotal += item.total3PLCost;
+      grandTotal += parseFloat(total3PLCost) || 0;
     });
 
     // Add Grand Total row
@@ -212,6 +222,6 @@ async function load3PLSummary() {
     tableBody.appendChild(totalRow);
   } catch (error) {
     console.error('Error loading 3PL summary:', error);
-    showToast('Failed to load 3PL cost summary.');
+    showToast(`Failed to load 3PL cost summary: ${error.message}`);
   }
 }
