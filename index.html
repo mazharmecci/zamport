@@ -28,7 +28,9 @@
     <!-- Scan + Manual Input -->
     <section class="scan-area">
       <button id="closeScanner" style="display: none;">❌ Close Scanner</button>
-      <div id="qr-reader" style="width: 300px;"></div>
+      <div id="qr-reader" style="width: 300px;">
+        <noscript>Please enable JavaScript to use the QR scanner.</noscript>
+      </div>
       <form class="stock-form" onsubmit="event.preventDefault();">
         <label for="skuInput">Enter SKU</label>
         <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
@@ -40,17 +42,10 @@
     <section id="pendingOrdersContainer" class="card-container"></section>
   
     <!-- Toast Notification -->
-    <div id="toast" class="toast hidden">Status updated successfully!</div>
-  
-    <!-- Loading Spinner -->
-    <div id="spinner" class="spinner hidden"></div>
+    <div id="toast" class="toast hidden"></div>
 
-    <!-- Toast -->
-    <div id="toast"></div>
+  </main>
 
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
