@@ -1,4 +1,5 @@
 // === QR Scanner Setup ===
+
 let scannerActive = false;
 let qrInstance = null;
 
@@ -45,6 +46,7 @@ function stopScanner() {
 }
 
 // === View Pending Orders ===
+
 const viewStatusBtn = document.getElementById('viewStatus');
 viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
@@ -69,6 +71,7 @@ async function fetchPendingOrders() {
 }
 
 // === Submit SKU ===
+
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
 async function submitSku() {
@@ -103,6 +106,7 @@ async function submitSku() {
 }
 
 // === Render Cards ===
+
 function renderCards(data) {
   const container = document.getElementById('pendingOrdersContainer');
   container.innerHTML = '';
@@ -117,13 +121,15 @@ function renderCards(data) {
     card.className = 'card';
     card.innerHTML = `
       <strong>SKU:</strong> ${order.sku}<br/>
-      <strong>Status:</strong> ${order.status}
+      <strong>Status:</strong> ${order.status}<br/>
+      <strong>Sheet:</strong> ${order.sheetName}
     `;
     container.appendChild(card);
   });
 }
 
 // === Spinner logic ===
+
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -133,6 +139,7 @@ function showSpinner(button) {
 }
 
 // === Toast Notification ===
+
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
