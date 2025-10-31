@@ -177,7 +177,7 @@ async function load3PLSummary() {
   tableBody.innerHTML = ''; // Clear previous rows
 
   try {
-    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?mode=3pl');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
     const summary = await response.json();
 
     let grandTotal = 0;
