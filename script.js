@@ -87,7 +87,7 @@ async function submitSku() {
   const spinner = submitBtn.querySelector('.spinner');
 
   // Show spinner and disable button
-  spinner.style.display = 'inline-block';
+  spinner.classList.add('active');
   submitBtn.disabled = true;
 
   try {
@@ -121,7 +121,7 @@ async function submitSku() {
     showToast("Failed to update order status.");
   } finally {
     // Hide spinner and re-enable button
-    spinner.style.display = 'none';
+    spinner.classList.remove('active');
     submitBtn.disabled = false;
   }
 }
