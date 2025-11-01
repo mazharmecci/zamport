@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,16 +44,21 @@
         
       <button onclick="load3PLSummary()">Load 3PL Summary</button>
         
-      <table id="threePLSummaryTable">
-        <thead>
-          <tr>
-            <th>Sheet ID</th>
-            <th>Sheet Name</th>
-            <th>Total 3PL Cost</th>
-          </tr>
-        </thead>
-        <tbody id="threePLTableBody"></tbody>
-      </table>
+      <div class="collapsible-container">
+        <button class="collapsible" onclick="toggle3PLTable()">📦 3PL Cost Summary</button>
+        <div id="threePLWrapper" class="content" style="display: none;">
+          <table id="threePLSummaryTable">
+            <thead>
+              <tr>
+                <th>Sheet</th>
+                <th>Sheet Name</th>
+                <th>Total 3PL Cost</th>
+              </tr>
+            </thead>
+            <tbody id="threePLTableBody"></tbody>
+          </table>
+        </div>
+      </div>
 
       </form>
     </section>
