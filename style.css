@@ -338,24 +338,48 @@ button:hover {
 
 /* Table styling */
 
+/* 3PL Summary Section */
+.threepl-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Orange Button */
+#threePLSummaryBtn {
+  display: block;
+  margin: 0 auto 16px;
+  padding: 12px 24px;
+  background-color: #f39c12;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#threePLSummaryBtn:hover {
+  background-color: #e67e22;
+}
+
+/* Slide-down wrapper */
 #threePLWrapper {
-  visibility: hidden;
-  height: 0;
-  overflow-x: auto;
-  max-width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
   margin-top: 10px;
-  transition: all 0.3s ease;
 }
 
 #threePLWrapper.active {
-  visibility: visible;
-  height: auto;
+  max-height: 500px; /* Adjust based on expected content height */
 }
 
+/* Table styling */
 #threePLSummaryTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* Enforces fixed column widths */
+  table-layout: fixed;
 }
 
 #threePLSummaryTable th,
@@ -368,7 +392,7 @@ button:hover {
   text-overflow: ellipsis;
 }
 
-/* Column widths based on percentage */
+/* Fixed column widths */
 #threePLSummaryTable th:nth-child(1),
 #threePLSummaryTable td:nth-child(1) {
   width: 10%;
@@ -399,11 +423,3 @@ button:hover {
   font-weight: bold;
 }
 
-#threePLSummaryTable .alt-row {
-  background-color: #f9f9f9;
-}
-
-#threePLSummaryTable .grand-total {
-  background-color: #e8f6f3;
-  font-weight: bold;
-}
