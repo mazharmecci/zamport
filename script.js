@@ -237,3 +237,20 @@ async function load3PLSummary() {
   <option value="Widget B">Widget B</option>
   <!-- Add more dynamically if needed -->
 </select>
+
+async function loadFilteredOrders() {
+  const selectedProduct = document.getElementById('productFilter').value;
+  const endpoint = selectedProduct
+    ? `https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?product=${encodeURIComponent(selectedProduct)}`
+    : `https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec`;
+
+  try {
+    const response = await fetch(endpoint);
+    const orders = await response.json();
+
+    renderPendingCards(orders); // Your existing card rendering logic
+  } catch (error) {
+    console.error('Error loading filtered orders:', error);
+    showToast('Failed to load filtered orders.');
+  }
+}
