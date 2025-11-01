@@ -224,6 +224,7 @@ function toggle3PLTable() {
 
 
 // === Product Filter ===
+
 async function loadFilteredOrders() {
   const selectedProduct = document.getElementById('productFilter').value;
   const baseUrl = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
@@ -241,23 +242,49 @@ async function loadFilteredOrders() {
   }
 }
 
+
+// Load Product Dropdown logic with evenlistener
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProductDropdown();
+});
+
 async function loadProductDropdown() {
   const dropdown = document.getElementById('productFilter');
+  if (!dropdown) {
+    console.warn('Product filter dropdown not found.');
+    return;
+  }
+
   dropdown.innerHTML = '<option value="">All Products</option>';
 
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=products');
+    const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=products';
+    const response = await fetch(endpoint);
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+
     const products = await response.json();
+    if (!Array.isArray(products)) {
+      throw new Error('Invalid product data format');
+    }
 
     products.sort().forEach(product => {
-      const option = document.createElement('option');
-      option.value = product;
-      option.textContent = product;
-      dropdown.appendChild(option);
+      if (product && typeof product === 'string') {
+        const option = document.createElement('option');
+        option.value = product;
+        option.textContent = product;
+        dropdown.appendChild(option);
+      }
     });
+
+    console.log('Product dropdown loaded:', products);
   } catch (error) {
     console.error('Error loading products:', error);
     showToast('Failed to load product list.');
   }
 }
+
 
