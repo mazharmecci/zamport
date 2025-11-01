@@ -229,3 +229,11 @@ async function load3PLSummary() {
   }
 }
 
+// Filter code
+
+<select id="productFilter" onchange="loadFilteredOrders()">
+  <option value="">All Products</option>
+  <option value="Widget A">Widget A</option>
+  <option value="Widget B">Widget B</option>
+  <!-- Add more dynamically if needed -->
+</select>
