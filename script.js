@@ -244,3 +244,23 @@ async function loadFilteredOrders() {
     showToast('Failed to load filtered orders.');
   }
 }
+
+async function loadProductDropdown() {
+  const dropdown = document.getElementById('productFilter');
+  dropdown.innerHTML = '<option value="">All Products</option>';
+
+  try {
+    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?mode=products');
+    const products = await response.json();
+
+    products.sort().forEach(product => {
+      const option = document.createElement('option');
+      option.value = product;
+      option.textContent = product;
+      dropdown.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Error loading products:', error);
+    showToast('Failed to load product list.');
+  }
+}
