@@ -352,7 +352,7 @@ button:hover {
 #threePLSummaryTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto; /* Allows columns to size based on content */
+  table-layout: fixed; /* Enforces fixed column widths */
 }
 
 #threePLSummaryTable th,
@@ -360,9 +360,25 @@ button:hover {
   padding: 10px 12px;
   text-align: center;
   border: 1px solid #ddd;
-  white-space: nowrap; /* Prevents wrapping */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Column widths based on percentage */
+#threePLSummaryTable th:nth-child(1),
+#threePLSummaryTable td:nth-child(1) {
+  width: 10%;
+}
+
+#threePLSummaryTable th:nth-child(2),
+#threePLSummaryTable td:nth-child(2) {
+  width: 30%;
+}
+
+#threePLSummaryTable th:nth-child(3),
+#threePLSummaryTable td:nth-child(3) {
+  width: 18%;
 }
 
 #threePLSummaryTable th {
@@ -371,17 +387,15 @@ button:hover {
   font-weight: bold;
 }
 
-#threePLSummaryTable td:nth-child(1) {
-  min-width: 100px; /* Sheet */
+#threePLSummaryTable .alt-row {
+  background-color: #f9f9f9;
 }
 
-#threePLSummaryTable td:nth-child(2) {
-  min-width: 140px; /* Sheet Name */
+#threePLSummaryTable .grand-total {
+  background-color: #e8f6f3;
+  font-weight: bold;
 }
 
-#threePLSummaryTable td:nth-child(3) {
-  min-width: 120px; /* Total 3PL Cost */
-}
 
 #threePLSummaryTable .alt-row {
   background-color: #f9f9f9;
