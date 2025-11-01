@@ -339,9 +339,12 @@ button:hover {
 /* Table styling */
 
 #threePLWrapper {
+  visibility: hidden;
+  height: 0;
   overflow-x: auto;
   max-width: 100%;
   margin-top: 10px;
+  transition: all 0.3s ease;
 }
 
 #threePLWrapper.active {
@@ -395,7 +398,6 @@ button:hover {
   background-color: #e8f6f3;
   font-weight: bold;
 }
-
 
 #threePLSummaryTable .alt-row {
   background-color: #f9f9f9;
