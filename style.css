@@ -337,24 +337,43 @@ button:hover {
 }
 
 /* Table styling */
+
+#threePLWrapper {
+  overflow-x: auto;
+}
+
 #threePLSummaryTable {
-  width: 120%;
+  width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
-  font-family: Arial, sans-serif;
+  table-layout: auto; /* Allows columns to size based on content */
+}
+
+#threePLSummaryTable th,
+#threePLSummaryTable td {
+  padding: 10px 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  white-space: nowrap; /* Prevents wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #threePLSummaryTable th {
   background-color: #2980b9;
   color: white;
-  padding: 10px;
-  text-align: center;
+  font-weight: bold;
 }
 
-#threePLSummaryTable td {
-  padding: 8px;
-  text-align: center;
-  border: 1px solid #ddd;
+#threePLSummaryTable td:nth-child(1) {
+  min-width: 100px; /* Sheet */
+}
+
+#threePLSummaryTable td:nth-child(2) {
+  min-width: 140px; /* Sheet Name */
+}
+
+#threePLSummaryTable td:nth-child(3) {
+  min-width: 120px; /* Total 3PL Cost */
 }
 
 #threePLSummaryTable .alt-row {
