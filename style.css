@@ -345,12 +345,13 @@ button:hover {
 }
 
 /* Orange Button */
+
 #threePLSummaryBtn {
   display: block;
   margin: 0 auto 16px;
   padding: 12px 24px;
-  background-color: #f39c12;
-  color: white;
+  background-color: #f39c12; /* Orange background */
+  color: black;              /* Black text */
   font-size: 16px;
   font-weight: bold;
   border: none;
