@@ -1,5 +1,4 @@
 // === QR Scanner Setup ===
-
 let scannerActive = false;
 let qrInstance = null;
 
@@ -46,7 +45,6 @@ function stopScanner() {
 }
 
 // === View Pending Orders ===
-
 const viewStatusBtn = document.getElementById('viewStatus');
 viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
@@ -56,27 +54,19 @@ async function fetchPendingOrders() {
   try {
     const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
     const data = await res.json();
-    console.log("Fetched data:", data);
-    renderCards(data);
+    renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
-    alert('Failed to load pending orders.');
+    showToast('Failed to load pending orders.');
   } finally {
-    const spinner = viewStatusBtn.querySelector('.spinner');
-    if (spinner) {
-      spinner.style.display = 'none';
-      viewStatusBtn.disabled = false;
-    }
+    hideSpinner(viewStatusBtn);
   }
 }
 
 // === Submit SKU ===
-
-// Bind the click event early
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
 async function submitSku() {
-  const skuInput = document.getElementById('skuInput');
   const sku = skuInput.value.trim();
   if (!sku) {
     alert("Enter or scan a SKU first");
@@ -86,9 +76,7 @@ async function submitSku() {
   const submitBtn = document.getElementById('submitSku');
   const spinner = submitBtn.querySelector('.spinner');
 
-  // Show spinner and disable button
-  spinner.classList.add('active');
-  submitBtn.disabled = true;
+  showSpinner(submitBtn);
 
   try {
     const response = await fetch(
@@ -108,7 +96,7 @@ async function submitSku() {
         printWindow.onload = () => {
           printWindow.print();
           showToast("Label sent to printer!");
-          skuInput.value = ""; // Clear input after print dialog opens
+          skuInput.value = "";
         };
       } else {
         showToast("Popup blocked. Please allow popups.");
@@ -120,15 +108,12 @@ async function submitSku() {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
   } finally {
-    // Hide spinner and re-enable button
-    spinner.classList.remove('active');
-    submitBtn.disabled = false;
+    hideSpinner(submitBtn);
   }
 }
 
 // === Render Cards ===
-
-function renderCards(data) {
+function renderPendingCards(data) {
   const container = document.getElementById('pendingOrdersContainer');
   container.innerHTML = '';
 
@@ -142,6 +127,7 @@ function renderCards(data) {
     card.className = 'card';
     card.innerHTML = `
       <strong>SKU:</strong> ${order.sku}<br/>
+      <strong>Product:</strong> ${order.product || 'N/A'}<br/>
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}
     `;
@@ -150,7 +136,6 @@ function renderCards(data) {
 }
 
 // === Spinner logic ===
-
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -159,8 +144,15 @@ function showSpinner(button) {
   }
 }
 
-// === Toast Notification ===
+function hideSpinner(button) {
+  const spinner = button.querySelector('.spinner');
+  if (spinner) {
+    spinner.style.display = 'none';
+    button.disabled = false;
+  }
+}
 
+// === Toast Notification ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -170,6 +162,7 @@ function showToast(message) {
   }, 3000);
 }
 
+// === 3PL Summary ===
 function toggle3PLTable() {
   const wrapper = document.getElementById('threePLWrapper');
   wrapper.style.display = wrapper.style.display === 'none' ? 'block' : 'none';
@@ -177,7 +170,7 @@ function toggle3PLTable() {
 
 async function load3PLSummary() {
   const tableBody = document.getElementById('threePLTableBody');
-  tableBody.innerHTML = ''; // Clear previous rows
+  tableBody.innerHTML = '';
 
   const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=3pl';
 
@@ -215,7 +208,6 @@ async function load3PLSummary() {
       grandTotal += parseFloat(item.total3PLCost) || 0;
     });
 
-    // Add Grand Total row
     const totalRow = document.createElement('tr');
     totalRow.classList.add('grand-total');
     totalRow.innerHTML = `
@@ -229,26 +221,18 @@ async function load3PLSummary() {
   }
 }
 
-// Filter code
-
-<select id="productFilter" onchange="loadFilteredOrders()">
-  <option value="">All Products</option>
-  <option value="Widget A">Widget A</option>
-  <option value="Widget B">Widget B</option>
-  <!-- Add more dynamically if needed -->
-</select>
-
+// === Product Filter ===
 async function loadFilteredOrders() {
   const selectedProduct = document.getElementById('productFilter').value;
+  const baseUrl = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
   const endpoint = selectedProduct
-    ? `https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?product=${encodeURIComponent(selectedProduct)}`
-    : `https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec`;
+    ? `${baseUrl}?product=${encodeURIComponent(selectedProduct)}`
+    : baseUrl;
 
   try {
     const response = await fetch(endpoint);
     const orders = await response.json();
-
-    renderPendingCards(orders); // Your existing card rendering logic
+    renderPendingCards(orders);
   } catch (error) {
     console.error('Error loading filtered orders:', error);
     showToast('Failed to load filtered orders.');
