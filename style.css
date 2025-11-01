@@ -339,7 +339,14 @@ button:hover {
 /* Table styling */
 
 #threePLWrapper {
-  overflow-x: auto;
+  visibility: hidden;
+  height: 0;
+  transition: all 0.3s ease;
+}
+
+#threePLWrapper.active {
+  visibility: visible;
+  height: auto;
 }
 
 #threePLSummaryTable {
