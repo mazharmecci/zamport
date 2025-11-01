@@ -264,3 +264,4 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
+
