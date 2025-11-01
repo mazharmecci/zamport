@@ -201,24 +201,21 @@ button:hover {
 }
 
 .spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top-color: black; /* ✅ Black spinner */
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  margin-right: 6px;
-  vertical-align: middle;
-  visibility: hidden; /* Keeps layout stable */
-}
-
-.spinner.active {
-  visibility: visible;
+  animation: spin 1s linear infinite;
 }
 
 .spinner.active {
   display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .spinner {
@@ -273,11 +270,6 @@ button:hover {
   @page {
     size: portrait;
   }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 #threePLSummaryTable {
