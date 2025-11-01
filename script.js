@@ -250,7 +250,7 @@ async function loadProductDropdown() {
   dropdown.innerHTML = '<option value="">All Products</option>';
 
   try {
-    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?mode=products');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=products');
     const products = await response.json();
 
     products.sort().forEach(product => {
