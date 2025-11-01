@@ -63,6 +63,12 @@
       </form>
     </section>
 
+  <select id="productFilter" onchange="loadFilteredOrders()">
+    <option value="">All Products</option>
+    <option value="Widget A">Widget A</option>
+    <option value="Widget B">Widget B</option>
+  </select>
+
     <!-- Pending Orders -->
     <section id="pendingOrdersContainer" class="card-container"></section>
   
