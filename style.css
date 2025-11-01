@@ -298,3 +298,51 @@ button:hover {
 }
 
 
+/* Collapsible toggle */
+.collapsible {
+  background-color: #2c3e50;
+  color: white;
+  cursor: pointer;
+  padding: 10px 16px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.collapsible:hover {
+  background-color: #34495e;
+}
+
+/* Table styling */
+#threePLSummaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+}
+
+#threePLSummaryTable th {
+  background-color: #2980b9;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+#threePLSummaryTable td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+#threePLSummaryTable .alt-row {
+  background-color: #f9f9f9;
+}
+
+#threePLSummaryTable .grand-total {
+  background-color: #e8f6f3;
+  font-weight: bold;
+}
