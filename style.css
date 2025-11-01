@@ -444,3 +444,10 @@ button:hover {
   color: #333;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+.dropdown-caption {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
