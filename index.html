@@ -10,6 +10,8 @@
 </head>
 
   <body onload="load3PLSummary()">
+  <body onload="loadProductDropdown(); load3PLSummary();">
+
   <main class="container">    
     <!-- Logo + Title -->
     <header class="logo-header">
@@ -67,8 +69,6 @@
     <!-- Product Filter -->
     <select id="productFilter" onchange="loadFilteredOrders()">
       <option value="">All Products</option>
-      <option value="Widget A">Widget A</option>
-      <option value="Widget B">Widget B</option>
     </select>
 
     <!-- Pending Orders -->
