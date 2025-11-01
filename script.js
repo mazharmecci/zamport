@@ -221,6 +221,11 @@ async function load3PLSummary() {
   }
 }
 
+function toggle3PLTable() {
+  const wrapper = document.getElementById('threePLWrapper');
+  wrapper.classList.toggle('active');
+}
+
 // === Product Filter ===
 async function loadFilteredOrders() {
   const selectedProduct = document.getElementById('productFilter').value;
