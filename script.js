@@ -164,11 +164,6 @@ function showToast(message) {
 
 // === 3PL Summary ===
 
-function toggle3PLTable() {
-  const wrapper = document.getElementById('threePLWrapper');
-  wrapper.style.display = wrapper.style.display === 'none' ? 'block' : 'none';
-}
-
 async function load3PLSummary() {
   const tableBody = document.getElementById('threePLTableBody');
   tableBody.innerHTML = '';
@@ -190,23 +185,23 @@ async function load3PLSummary() {
 
       const sheetLinkCell = document.createElement('td');
       const link = document.createElement('a');
-      link.href = `https://docs.google.com/spreadsheets/d/${item.sheetId}`;
+      link.href = item.sheetId ? `https://docs.google.com/spreadsheets/d/${item.sheetId}` : '#';
       link.target = '_blank';
       link.textContent = `Sheet ${index + 1}`;
       sheetLinkCell.appendChild(link);
 
       const sheetNameCell = document.createElement('td');
-      sheetNameCell.textContent = item.sheetName;
+      sheetNameCell.textContent = item.sheetName || 'Unnamed';
 
       const costCell = document.createElement('td');
-      costCell.textContent = `$${parseFloat(item.total3PLCost).toFixed(2)}`;
+      costCell.textContent = item.total3PLCost ? `$${Number(item.total3PLCost).toFixed(2)}` : '$0.00';
 
       row.appendChild(sheetLinkCell);
       row.appendChild(sheetNameCell);
       row.appendChild(costCell);
       tableBody.appendChild(row);
 
-      grandTotal += parseFloat(item.total3PLCost) || 0;
+      grandTotal += Number(item.total3PLCost) || 0;
     });
 
     const totalRow = document.createElement('tr');
@@ -226,6 +221,7 @@ function toggle3PLTable() {
   const wrapper = document.getElementById('threePLWrapper');
   wrapper.classList.toggle('active');
 }
+
 
 // === Product Filter ===
 async function loadFilteredOrders() {
