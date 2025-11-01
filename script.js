@@ -170,7 +170,10 @@ function showToast(message) {
   }, 3000);
 }
 
-// === 3PL Summary ===
+function toggle3PLTable() {
+  const wrapper = document.getElementById('threePLWrapper');
+  wrapper.style.display = wrapper.style.display === 'none' ? 'block' : 'none';
+}
 
 async function load3PLSummary() {
   const tableBody = document.getElementById('threePLTableBody');
@@ -180,44 +183,44 @@ async function load3PLSummary() {
 
   try {
     const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
 
     const summary = await response.json();
-    if (!Array.isArray(summary)) {
-      throw new Error('Invalid data format received');
-    }
+    if (!Array.isArray(summary)) throw new Error('Invalid data format received');
 
     let grandTotal = 0;
 
-    summary.forEach(({ sheetId, sheetName, total3PLCost }) => {
+    summary.forEach((item, index) => {
       const row = document.createElement('tr');
+      if (index % 2 === 1) row.classList.add('alt-row');
 
-      const sheetIdCell = document.createElement('td');
-      sheetIdCell.textContent = sheetId;
+      const sheetLinkCell = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = `https://docs.google.com/spreadsheets/d/${item.sheetId}`;
+      link.target = '_blank';
+      link.textContent = `Sheet ${index + 1}`;
+      sheetLinkCell.appendChild(link);
 
       const sheetNameCell = document.createElement('td');
-      sheetNameCell.textContent = sheetName;
+      sheetNameCell.textContent = item.sheetName;
 
       const costCell = document.createElement('td');
-      costCell.textContent = parseFloat(total3PLCost).toFixed(2);
+      costCell.textContent = `$${parseFloat(item.total3PLCost).toFixed(2)}`;
 
-      row.appendChild(sheetIdCell);
+      row.appendChild(sheetLinkCell);
       row.appendChild(sheetNameCell);
       row.appendChild(costCell);
-
       tableBody.appendChild(row);
 
-      grandTotal += parseFloat(total3PLCost) || 0;
+      grandTotal += parseFloat(item.total3PLCost) || 0;
     });
 
     // Add Grand Total row
     const totalRow = document.createElement('tr');
+    totalRow.classList.add('grand-total');
     totalRow.innerHTML = `
       <td colspan="2"><strong>Grand Total</strong></td>
-      <td><strong>${grandTotal.toFixed(2)}</strong></td>
+      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
     `;
     tableBody.appendChild(totalRow);
   } catch (error) {
@@ -225,3 +228,4 @@ async function load3PLSummary() {
     showToast(`Failed to load 3PL cost summary: ${error.message}`);
   }
 }
+
