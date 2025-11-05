@@ -23,9 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
     showLoader();
-    await load3PLSummary();
-    hideLoader();
-    hideSpinner(selectors.threePLSummaryBtn);
+    try {
+      await load3PLSummary();
+    } finally {
+      hideLoader();
+      hideSpinner(selectors.threePLSummaryBtn);
+    }
   });
   loadProductDropdown();
 });
@@ -64,7 +67,7 @@ async function submitSku() {
     });
 
     const result = await response.json();
-    showToast(result.message || result);
+    showToast(result.message || 'Update complete');
 
     if (result.labelLink) {
       const printWindow = window.open(result.labelLink, '_blank');
@@ -92,7 +95,7 @@ async function submitSku() {
 function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     selectors.pendingContainer.innerHTML = '<p>No pending orders found.</p>';
     return;
   }
@@ -111,7 +114,6 @@ function renderPendingCards(data) {
 }
 
 // === Spinner Logic ===
-
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -133,12 +135,11 @@ function showToast(message) {
   selectors.toast.textContent = message;
   selectors.toast.className = "show";
   setTimeout(() => {
-    selectors.toast.className = selectors.toast.className.replace("show", "");
+    selectors.toast.classList.remove("show");
   }, 3000);
 }
 
 // === 3PL Summary ===
-
 async function load3PLSummary() {
   selectors.threePLTableBody.innerHTML = '';
 
@@ -184,18 +185,14 @@ function toggle3PLTable() {
 }
 
 function showLoader() {
-  const loader = document.getElementById('threePLLoader');
-  if (loader) loader.classList.remove('hidden');
+  selectors.threePLLoader?.classList.remove('hidden');
 }
 
 function hideLoader() {
-  const loader = document.getElementById('threePLLoader');
-  if (loader) loader.classList.add('hidden');
+  selectors.threePLLoader?.classList.add('hidden');
 }
 
-
 // === Product Filter ===
-
 async function loadFilteredOrders() {
   const selectedProduct = selectors.productFilter.value;
   const endpoint = selectedProduct
@@ -213,10 +210,7 @@ async function loadFilteredOrders() {
 }
 
 async function loadProductDropdown() {
-  if (!selectors.productFilter) {
-    console.warn('Product filter dropdown not found.');
-    return;
-  }
+  if (!selectors.productFilter) return;
 
   selectors.productFilter.innerHTML = '<option value="">All Products</option>';
 
