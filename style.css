@@ -351,8 +351,8 @@ button {
   margin-top: 10px;
 }
 
-#threePLWrapper.active {
-  max-height: 500px; /* Adjust based on expected content height */
+#threePLWrapper {
+  position: relative;
 }
 
 /* Table styling */
