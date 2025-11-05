@@ -20,14 +20,8 @@
       <h2>ZAMPORT</h2>
     </header>
 
-    <!-- Action Buttons -->
-    <section class="actions">
-      <button id="viewStatus">
-        <span class="spinner"></span> 📦 Pending Orders
-      </button>
-    </section>
-
     <!-- SKU Submission Form -->
+    
     <form class="stock-form" onsubmit="event.preventDefault();">
       <label for="skuInput">Enter SKU</label>
       <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
@@ -37,7 +31,16 @@
       </button>
     </form>
 
+    <!-- Action Buttons -->
+    
+    <section class="actions">
+      <button id="viewStatus">
+        <span class="spinner"></span> 📦 Pending Orders
+      </button>
+    </section>
+    
     <!-- 3PL Summary -->
+    
     <section class="threepl-section">
       <button id="threePLSummaryBtn" onclick="toggle3PLTable(); load3PLSummary();">
         📊 3PL Cost Summary
