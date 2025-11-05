@@ -223,6 +223,9 @@ async function loadProductDropdown() {
 selectors.threePLSummaryBtn?.addEventListener('click', async () => {
   toggle3PLTable();
   showSpinner(selectors.threePLSummaryBtn);
+  showLoader();
   await load3PLSummary();
+  hideLoader();
   hideSpinner(selectors.threePLSummaryBtn);
 });
+
