@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('orderDate');
   const today = new Date().toISOString().split('T')[0];
   dateInput.value = today;
-  dateInput.addEventListener('change', fetchPendingOrders);
 
+  dateInput.addEventListener('change', fetchPendingOrders);
   loadProductDropdown();
 });
 
@@ -22,8 +22,10 @@ async function fetchPendingOrders() {
     return;
   }
 
+  // Format date to MM/DD/YYYY for backend compatibility
   const selectedDateObj = new Date(selectedDateRaw);
-  const selectedDate = `${selectedDateObj.getMonth() + 1}/${selectedDateObj.getDate()}/${selectedDateObj.getFullYear()}`; // MM/DD/YYYY
+  const selectedDate = `${selectedDateObj.getMonth() + 1}/${selectedDateObj.getDate()}/${selectedDateObj.getFullYear()}`;
+  console.log("Formatted date sent to backend:", selectedDate);
 
   document.getElementById('pendingOrdersContainer').innerHTML = ''; // Clear old cards
 
@@ -100,7 +102,7 @@ async function submitSku() {
       }
     }
 
-    fetchPendingOrders();
+    fetchPendingOrders(); // Refresh cards after update
   } catch (error) {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
