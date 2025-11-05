@@ -111,6 +111,7 @@ function renderPendingCards(data) {
 }
 
 // === Spinner Logic ===
+
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -137,6 +138,7 @@ function showToast(message) {
 }
 
 // === 3PL Summary ===
+
 async function load3PLSummary() {
   selectors.threePLTableBody.innerHTML = '';
 
@@ -182,14 +184,18 @@ function toggle3PLTable() {
 }
 
 function showLoader() {
-  selectors.threePLLoader?.classList.remove('hidden');
+  const loader = document.getElementById('threePLLoader');
+  if (loader) loader.classList.remove('hidden');
 }
 
 function hideLoader() {
-  selectors.threePLLoader?.classList.add('hidden');
+  const loader = document.getElementById('threePLLoader');
+  if (loader) loader.classList.add('hidden');
 }
 
+
 // === Product Filter ===
+
 async function loadFilteredOrders() {
   const selectedProduct = selectors.productFilter.value;
   const endpoint = selectedProduct
