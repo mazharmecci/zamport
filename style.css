@@ -155,13 +155,11 @@ button {
   background-color: #689f38;
 }
 
-#viewStatus,
-
 #viewStatus {
   display: block;
   margin: 0 auto 16px;
   padding: 12px 24px;
-  background-color: #f39c12; /* Orange background */
+  background-color: #ffe4cd; /* Orange background */
   color: black;              /* Black text */
   font-size: 16px;
   border: none;
