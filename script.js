@@ -45,16 +45,31 @@ function stopScanner() {
 }
 
 // === View Pending Orders ===
+
 const viewStatusBtn = document.getElementById('viewStatus');
 viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
 async function fetchPendingOrders() {
   showSpinner(viewStatusBtn);
 
+  const selectedDate = document.getElementById('orderDate').value;
+  if (!selectedDate) {
+    showToast("Please select a date first.");
+    hideSpinner(viewStatusBtn);
+    return;
+  }
+
   try {
     const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
     const data = await res.json();
-    renderPendingCards(data);
+
+    // Filter orders by selected date
+    const filtered = data.filter(order => {
+      const orderDate = order.date?.split('T')[0]; // assuming ISO format
+      return orderDate === selectedDate;
+    });
+
+    renderPendingCards(filtered);
   } catch (error) {
     console.error('Error fetching orders:', error);
     showToast('Failed to load pending orders.');
@@ -64,6 +79,7 @@ async function fetchPendingOrders() {
 }
 
 // === Submit SKU ===
+
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
 async function submitSku() {
