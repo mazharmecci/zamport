@@ -60,16 +60,9 @@ async function fetchPendingOrders() {
   }
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=pendingByDate&date=${selectedDate}`);
     const data = await res.json();
-
-    // Filter orders by selected date
-    const filtered = data.filter(order => {
-      const orderDate = order.date?.split('T')[0]; // assuming ISO format
-      return orderDate === selectedDate;
-    });
-
-    renderPendingCards(filtered);
+    renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
     showToast('Failed to load pending orders.');
@@ -77,6 +70,7 @@ async function fetchPendingOrders() {
     hideSpinner(viewStatusBtn);
   }
 }
+
 
 // === Submit SKU ===
 
@@ -129,6 +123,7 @@ async function submitSku() {
 }
 
 // === Render Cards ===
+
 function renderPendingCards(data) {
   const container = document.getElementById('pendingOrdersContainer');
   container.innerHTML = '';
