@@ -219,3 +219,10 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
+
+selectors.threePLSummaryBtn?.addEventListener('click', async () => {
+  toggle3PLTable();
+  showSpinner(selectors.threePLSummaryBtn);
+  await load3PLSummary();
+  hideSpinner(selectors.threePLSummaryBtn);
+});
