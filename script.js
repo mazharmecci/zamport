@@ -12,8 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   dateInput.value = new Date().toISOString().split('T')[0];
   dateInput.addEventListener('change', fetchPendingOrders);
   viewStatusBtn.addEventListener('click', fetchPendingOrders);
-  submitBtn.addEventListener('click', submitSku);
-  loadProductDropdown(); // Optional external function
+  submitBtn.addEventListener('click', submitSku);  
 });
 
 // === Fetch Pending Orders ===
