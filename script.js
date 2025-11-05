@@ -1,55 +1,10 @@
-// === QR Scanner Setup ===
-let scannerActive = false;
-let qrInstance = null;
-
-const scanBtn = document.getElementById('scanBox');
-const closeBtn = document.getElementById('closeScanner');
-const qrReader = document.getElementById('qr-reader');
-const skuInput = document.getElementById('skuInput');
-
-scanBtn.addEventListener('click', () => {
-  if (scannerActive) return;
-  scannerActive = true;
-
-  qrReader.style.display = 'block';
-  closeBtn.style.display = 'inline-block';
-
-  qrInstance = new Html5Qrcode("qr-reader");
-  qrInstance.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 300 },
-    (decodedText) => {
-      skuInput.value = decodedText;
-      setTimeout(() => stopScanner(), 500);
-    },
-    (errorMessage) => {
-      console.warn(errorMessage);
-    }
-  );
-});
-
-closeBtn.addEventListener('click', stopScanner);
-
-function stopScanner() {
-  if (qrInstance) {
-    qrInstance.stop().then(() => {
-      qrReader.style.display = 'none';
-      closeBtn.style.display = 'none';
-      scannerActive = false;
-      qrInstance.clear();
-      qrInstance = null;
-    }).catch(err => {
-      console.error("Failed to stop scanner:", err);
-    });
-  }
-}
-
 // === View Pending Orders ===
 
 document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('orderDate');
   const today = new Date().toISOString().split('T')[0];
   dateInput.value = today;
+
   dateInput.addEventListener('change', fetchPendingOrders);
 });
 
@@ -59,12 +14,14 @@ viewStatusBtn.addEventListener('click', fetchPendingOrders);
 async function fetchPendingOrders() {
   showSpinner(viewStatusBtn);
 
-  const selectedDate = document.getElementById('orderDate').value;
-  if (!selectedDate) {
+  const selectedDateRaw = document.getElementById('orderDate').value;
+  if (!selectedDateRaw) {
     showToast("Please select a date first.");
     hideSpinner(viewStatusBtn);
     return;
   }
+
+  const selectedDate = new Date(selectedDateRaw).toLocaleDateString('en-US'); // MM/DD/YYYY
 
   try {
     const res = await fetch(`https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=pendingByDate&date=${selectedDate}`);
@@ -78,7 +35,27 @@ async function fetchPendingOrders() {
   }
 }
 
-// === Submit SKU ===
+function renderPendingCards(data) {
+  const container = document.getElementById('pendingOrdersContainer');
+  container.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    container.innerHTML = '<p>No pending orders found.</p>';
+    return;
+  }
+
+  data.forEach(order => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <strong>SKU:</strong> ${order.sku}<br/>
+      <strong>Product:</strong> ${order.product || 'N/A'}<br/>
+      <strong>Status:</strong> ${order.status}<br/>
+      <strong>Sheet:</strong> ${order.sheetName}
+    `;
+    container.appendChild(card);
+  });
+}
 
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
@@ -90,8 +67,6 @@ async function submitSku() {
   }
 
   const submitBtn = document.getElementById('submitSku');
-  const spinner = submitBtn.querySelector('.spinner');
-
   showSpinner(submitBtn);
 
   try {
@@ -128,31 +103,6 @@ async function submitSku() {
   }
 }
 
-// === Render Cards ===
-
-function renderPendingCards(data) {
-  const container = document.getElementById('pendingOrdersContainer');
-  container.innerHTML = '';
-
-  if (!data || data.length === 0) {
-    container.innerHTML = '<p>No pending orders found.</p>';
-    return;
-  }
-
-  data.forEach(order => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <strong>SKU:</strong> ${order.sku}<br/>
-      <strong>Product:</strong> ${order.product || 'N/A'}<br/>
-      <strong>Status:</strong> ${order.status}<br/>
-      <strong>Sheet:</strong> ${order.sheetName}
-    `;
-    container.appendChild(card);
-  });
-}
-
-// === Spinner logic ===
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -169,7 +119,6 @@ function hideSpinner(button) {
   }
 }
 
-// === Toast Notification ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -178,6 +127,7 @@ function showToast(message) {
     toast.className = toast.className.replace("show", "");
   }, 3000);
 }
+
 
 // === 3PL Summary ===
 
