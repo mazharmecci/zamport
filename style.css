@@ -128,21 +128,22 @@ button:hover {
 
 #submitSku {
   background-color: #836953; /* Pastel brown */
-  color: White;
+  color: white;
   border: none;
-  font-size: 0.75rem;       /* Smaller text */
-  padding: 4px 8px;         /* Reduced padding */
-  transform: scale(0.85);   /* Slight visual shrink */
+  font-size: 0.75rem;
+  padding: 6px 6px;           /* Increased height, reduced width */
+  transform: scale(0.85);     /* Slight visual shrink */
   border-radius: 4px;
   cursor: pointer;
   display: block;
   margin: 20px auto;
+  min-width: 100px;           /* Optional: enforce reduced width */
 }
 
 /* Prevent color change on click */
 #submitSku:active {
-  background-color: 6CBDE9;
-  color: White;
+  background-color: #836953;
+  color: white;
 }
 
 #viewStatus:hover {
