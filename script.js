@@ -1,62 +1,124 @@
-// === Constants ===
-const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
+// === QR Scanner Setup ===
+let scannerActive = false;
+let qrInstance = null;
 
-const selectors = {
-  dateInput: document.getElementById('orderDate'),
-  viewStatusBtn: document.getElementById('viewStatus'),
-  submitBtn: document.getElementById('submitSku'),
-  skuInput: document.getElementById('skuInput'),
-  pendingContainer: document.getElementById('pendingOrdersContainer'),
-  toast: document.getElementById('toast'),
-};
+const scanBtn = document.getElementById('scanBox');
+const closeBtn = document.getElementById('closeScanner');
+const qrReader = document.getElementById('qr-reader');
+const skuInput = document.getElementById('skuInput');
 
-// === Initialization ===
-document.addEventListener('DOMContentLoaded', () => {
-  selectors.dateInput.value = new Date().toISOString().split('T')[0];
-  selectors.dateInput.addEventListener('change', fetchPendingOrders);
-  selectors.viewStatusBtn.addEventListener('click', fetchPendingOrders);
-  selectors.submitBtn.addEventListener('click', submitSku); 
+scanBtn.addEventListener('click', () => {
+  if (scannerActive) return;
+  scannerActive = true;
+
+  qrReader.style.display = 'block';
+  closeBtn.style.display = 'inline-block';
+
+  qrInstance = new Html5Qrcode("qr-reader");
+  qrInstance.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 300 },
+    (decodedText) => {
+      skuInput.value = decodedText;
+      setTimeout(() => stopScanner(), 500);
+    },
+    (errorMessage) => {
+      console.warn(errorMessage);
+    }
+  );
 });
 
-// === Fetch Pending Orders ===
-async function fetchPendingOrders() {
-  showSpinner(selectors.viewStatusBtn);
+closeBtn.addEventListener('click', stopScanner);
 
-  const rawDate = selectors.dateInput.value;
-  if (!rawDate) {
-    showToast("Please select a date first.");
-    hideSpinner(selectors.viewStatusBtn);
-    return;
+function stopScanner() {
+  if (qrInstance) {
+    qrInstance.stop().then(() => {
+      qrReader.style.display = 'none';
+      closeBtn.style.display = 'none';
+      scannerActive = false;
+      qrInstance.clear();
+      qrInstance = null;
+    }).catch(err => {
+      console.error("Failed to stop scanner:", err);
+    });
   }
+}
 
-  const formattedDate = formatDateForBackend(rawDate);
-  console.log("Formatted date sent to backend:", formattedDate);
+// === View Pending Orders ===
+const viewStatusBtn = document.getElementById('viewStatus');
+viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
-  selectors.pendingContainer.innerHTML = '';
+async function fetchPendingOrders() {
+  showSpinner(viewStatusBtn);
 
   try {
-    const res = await fetch(`${API_BASE}?mode=pendingByDate&date=${formattedDate}`);
+    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
     showToast('Failed to load pending orders.');
   } finally {
-    hideSpinner(selectors.viewStatusBtn);
+    hideSpinner(viewStatusBtn);
   }
 }
 
-function formatDateForBackend(dateStr) {
-  const dateObj = new Date(dateStr);
-  return `${dateObj.getMonth() + 1}/${dateObj.getDate()}/${dateObj.getFullYear()}`;
+// === Submit SKU ===
+document.getElementById('submitSku').addEventListener('click', submitSku);
+
+async function submitSku() {
+  const sku = skuInput.value.trim();
+  if (!sku) {
+    alert("Enter or scan a SKU first");
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitSku');
+  const spinner = submitBtn.querySelector('.spinner');
+
+  showSpinner(submitBtn);
+
+  try {
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec',
+      {
+        method: 'POST',
+        body: new URLSearchParams({ sku }),
+      }
+    );
+
+    const result = await response.json();
+    showToast(result.message || result);
+
+    if (result.labelLink) {
+      const printWindow = window.open(result.labelLink, '_blank');
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+          showToast("Label sent to printer!");
+          skuInput.value = "";
+        };
+      } else {
+        showToast("Popup blocked. Please allow popups.");
+      }
+    }
+
+    fetchPendingOrders();
+  } catch (error) {
+    console.error('Error submitting SKU:', error);
+    showToast("Failed to update order status.");
+  } finally {
+    hideSpinner(submitBtn);
+  }
 }
 
-// === Render Pending Order Cards ===
+// === Render Cards ===
 function renderPendingCards(data) {
-  selectors.pendingContainer.innerHTML = '';
+  const container = document.getElementById('pendingOrdersContainer');
+  container.innerHTML = '';
 
   if (!data || data.length === 0) {
-    selectors.pendingContainer.innerHTML = '<p>No pending orders found.</p>';
+    container.innerHTML = '<p>No pending orders found.</p>';
     return;
   }
 
@@ -69,52 +131,11 @@ function renderPendingCards(data) {
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}
     `;
-    selectors.pendingContainer.appendChild(card);
+    container.appendChild(card);
   });
 }
 
-// === Submit SKU ===
-async function submitSku() {
-  const sku = selectors.skuInput.value.trim();
-  if (!sku) {
-    alert("Enter or scan a SKU first");
-    return;
-  }
-
-  showSpinner(selectors.submitBtn);
-
-  try {
-    const response = await fetch(API_BASE, {
-      method: 'POST',
-      body: new URLSearchParams({ sku }),
-    });
-
-    const result = await response.json();
-    showToast(result.message || result);
-
-    if (result.labelLink) {
-      const printWindow = window.open(result.labelLink, '_blank');
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-          showToast("Label sent to printer!");
-          selectors.skuInput.value = "";
-        };
-      } else {
-        showToast("Popup blocked. Please allow popups.");
-      }
-    }
-
-    fetchPendingOrders(); // Refresh after update
-  } catch (error) {
-    console.error('Error submitting SKU:', error);
-    showToast("Failed to update order status.");
-  } finally {
-    hideSpinner(selectors.submitBtn);
-  }
-}
-
-// === Spinner Logic ===
+// === Spinner logic ===
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -133,9 +154,137 @@ function hideSpinner(button) {
 
 // === Toast Notification ===
 function showToast(message) {
-  selectors.toast.textContent = message;
-  selectors.toast.className = "show";
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "show";
   setTimeout(() => {
-    selectors.toast.className = selectors.toast.className.replace("show", "");
+    toast.className = toast.className.replace("show", "");
   }, 3000);
 }
+
+// === 3PL Summary ===
+
+async function load3PLSummary() {
+  const tableBody = document.getElementById('threePLTableBody');
+  tableBody.innerHTML = '';
+
+  const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=3pl';
+
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+    const summary = await response.json();
+    if (!Array.isArray(summary)) throw new Error('Invalid data format received');
+
+    let grandTotal = 0;
+
+    summary.forEach((item, index) => {
+      const row = document.createElement('tr');
+      if (index % 2 === 1) row.classList.add('alt-row');
+
+      const sheetLinkCell = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = item.sheetId ? `https://docs.google.com/spreadsheets/d/${item.sheetId}` : '#';
+      link.target = '_blank';
+      link.textContent = `Sheet ${index + 1}`;
+      sheetLinkCell.appendChild(link);
+
+      const sheetNameCell = document.createElement('td');
+      sheetNameCell.textContent = item.sheetName || 'Unnamed';
+
+      const costCell = document.createElement('td');
+      costCell.textContent = item.total3PLCost ? `$${Number(item.total3PLCost).toFixed(2)}` : '$0.00';
+
+      row.appendChild(sheetLinkCell);
+      row.appendChild(sheetNameCell);
+      row.appendChild(costCell);
+      tableBody.appendChild(row);
+
+      grandTotal += Number(item.total3PLCost) || 0;
+    });
+
+    const totalRow = document.createElement('tr');
+    totalRow.classList.add('grand-total');
+    totalRow.innerHTML = `
+      <td colspan="2"><strong>Grand Total</strong></td>
+      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
+    `;
+    tableBody.appendChild(totalRow);
+  } catch (error) {
+    console.error('Error loading 3PL summary:', error);
+    showToast(`Failed to load 3PL cost summary: ${error.message}`);
+  }
+}
+
+function toggle3PLTable() {
+  const wrapper = document.getElementById('threePLWrapper');
+  wrapper.classList.toggle('active');
+}
+
+
+// === Product Filter ===
+
+async function loadFilteredOrders() {
+  const selectedProduct = document.getElementById('productFilter').value;
+  const baseUrl = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
+  const endpoint = selectedProduct
+    ? `${baseUrl}?product=${encodeURIComponent(selectedProduct)}`
+    : baseUrl;
+
+  try {
+    const response = await fetch(endpoint);
+    const orders = await response.json();
+    renderPendingCards(orders);
+  } catch (error) {
+    console.error('Error loading filtered orders:', error);
+    showToast('Failed to load filtered orders.');
+  }
+}
+
+
+// Load Product Dropdown logic with evenlistener
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProductDropdown();
+});
+
+async function loadProductDropdown() {
+  const dropdown = document.getElementById('productFilter');
+  if (!dropdown) {
+    console.warn('Product filter dropdown not found.');
+    return;
+  }
+
+  dropdown.innerHTML = '<option value="">All Products</option>';
+
+  try {
+    const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=products';
+    const response = await fetch(endpoint);
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+
+    const products = await response.json();
+    if (!Array.isArray(products)) {
+      throw new Error('Invalid product data format');
+    }
+
+    products.sort().forEach(product => {
+      if (product && typeof product === 'string') {
+        const option = document.createElement('option');
+        option.value = product;
+        option.textContent = product;
+        dropdown.appendChild(option);
+      }
+    });
+
+    console.log('Product dropdown loaded:', products);
+  } catch (error) {
+    console.error('Error loading products:', error);
+    showToast('Failed to load product list.');
+  }
+}
+
+
