@@ -1,45 +1,49 @@
 // === Constants ===
 const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
-const dateInput = document.getElementById('orderDate');
-const viewStatusBtn = document.getElementById('viewStatus');
-const submitBtn = document.getElementById('submitSku');
-const skuInput = document.getElementById('skuInput');
-const pendingContainer = document.getElementById('pendingOrdersContainer');
-const toast = document.getElementById('toast');
+
+const selectors = {
+  dateInput: document.getElementById('orderDate'),
+  viewStatusBtn: document.getElementById('viewStatus'),
+  submitBtn: document.getElementById('submitSku'),
+  skuInput: document.getElementById('skuInput'),
+  pendingContainer: document.getElementById('pendingOrdersContainer'),
+  toast: document.getElementById('toast'),
+};
 
 // === Initialization ===
 document.addEventListener('DOMContentLoaded', () => {
-  dateInput.value = new Date().toISOString().split('T')[0];
-  dateInput.addEventListener('change', fetchPendingOrders);
-  viewStatusBtn.addEventListener('click', fetchPendingOrders);
-  submitBtn.addEventListener('click', submitSku);  
+  selectors.dateInput.value = new Date().toISOString().split('T')[0];
+  selectors.dateInput.addEventListener('change', fetchPendingOrders);
+  selectors.viewStatusBtn.addEventListener('click', fetchPendingOrders);
+  selectors.submitBtn.addEventListener('click', submitSku);
+  loadProductDropdown(); // Optional external function
 });
 
 // === Fetch Pending Orders ===
 async function fetchPendingOrders() {
-  showSpinner(viewStatusBtn);
+  showSpinner(selectors.viewStatusBtn);
 
-  const selectedDateRaw = dateInput.value;
-  if (!selectedDateRaw) {
+  const rawDate = selectors.dateInput.value;
+  if (!rawDate) {
     showToast("Please select a date first.");
-    hideSpinner(viewStatusBtn);
+    hideSpinner(selectors.viewStatusBtn);
     return;
   }
 
-  const selectedDate = formatDateForBackend(selectedDateRaw);
-  console.log("Formatted date sent to backend:", selectedDate);
+  const formattedDate = formatDateForBackend(rawDate);
+  console.log("Formatted date sent to backend:", formattedDate);
 
-  pendingContainer.innerHTML = '';
+  selectors.pendingContainer.innerHTML = '';
 
   try {
-    const res = await fetch(`${API_BASE}?mode=pendingByDate&date=${selectedDate}`);
+    const res = await fetch(`${API_BASE}?mode=pendingByDate&date=${formattedDate}`);
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
     showToast('Failed to load pending orders.');
   } finally {
-    hideSpinner(viewStatusBtn);
+    hideSpinner(selectors.viewStatusBtn);
   }
 }
 
@@ -48,12 +52,12 @@ function formatDateForBackend(dateStr) {
   return `${dateObj.getMonth() + 1}/${dateObj.getDate()}/${dateObj.getFullYear()}`;
 }
 
-// === Render Cards ===
+// === Render Pending Order Cards ===
 function renderPendingCards(data) {
-  pendingContainer.innerHTML = '';
+  selectors.pendingContainer.innerHTML = '';
 
   if (!data || data.length === 0) {
-    pendingContainer.innerHTML = '<p>No pending orders found.</p>';
+    selectors.pendingContainer.innerHTML = '<p>No pending orders found.</p>';
     return;
   }
 
@@ -66,19 +70,19 @@ function renderPendingCards(data) {
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}
     `;
-    pendingContainer.appendChild(card);
+    selectors.pendingContainer.appendChild(card);
   });
 }
 
 // === Submit SKU ===
 async function submitSku() {
-  const sku = skuInput.value.trim();
+  const sku = selectors.skuInput.value.trim();
   if (!sku) {
     alert("Enter or scan a SKU first");
     return;
   }
 
-  showSpinner(submitBtn);
+  showSpinner(selectors.submitBtn);
 
   try {
     const response = await fetch(API_BASE, {
@@ -95,7 +99,7 @@ async function submitSku() {
         printWindow.onload = () => {
           printWindow.print();
           showToast("Label sent to printer!");
-          skuInput.value = "";
+          selectors.skuInput.value = "";
         };
       } else {
         showToast("Popup blocked. Please allow popups.");
@@ -107,7 +111,7 @@ async function submitSku() {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
   } finally {
-    hideSpinner(submitBtn);
+    hideSpinner(selectors.submitBtn);
   }
 }
 
@@ -130,9 +134,9 @@ function hideSpinner(button) {
 
 // === Toast Notification ===
 function showToast(message) {
-  toast.textContent = message;
-  toast.className = "show";
+  selectors.toast.textContent = message;
+  selectors.toast.className = "show";
   setTimeout(() => {
-    toast.className = toast.className.replace("show", "");
+    selectors.toast.className = selectors.toast.className.replace("show", "");
   }, 3000);
 }
