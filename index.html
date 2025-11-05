@@ -6,6 +6,8 @@
   <title>ZAMPORT</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body onload="loadProductDropdown();">
@@ -20,7 +22,12 @@
 
     <!-- Action Buttons -->
     
-    <input type="date" id="orderDate" />
+     <div class="date-picker-row">
+      <label for="orderDate">
+        <i class="fa-solid fa-calendar-days"></i>
+      </label>
+        <input type="date" id="orderDate" />
+    </div>
     <button id="viewStatus"><span class="spinner"></span> 📦 Pending Orders</button>
 
     <section class="actions">      
