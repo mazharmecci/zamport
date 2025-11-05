@@ -46,6 +46,13 @@ function stopScanner() {
 
 // === View Pending Orders ===
 
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.getElementById('orderDate');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.value = today;
+  dateInput.addEventListener('change', fetchPendingOrders);
+});
+
 const viewStatusBtn = document.getElementById('viewStatus');
 viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
@@ -70,7 +77,6 @@ async function fetchPendingOrders() {
     hideSpinner(viewStatusBtn);
   }
 }
-
 
 // === Submit SKU ===
 
