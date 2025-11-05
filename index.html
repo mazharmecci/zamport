@@ -10,7 +10,6 @@
 </head>
 
 <body>
-  <body onload="loadProductDropdown();">
   <main class="container">
     <!-- Logo + Title -->
     <header class="logo-header">
@@ -21,7 +20,6 @@
     </header>
 
     <!-- SKU Submission Form -->
-    
     <form class="stock-form" onsubmit="event.preventDefault();">
       <label for="skuInput">Enter SKU</label>
       <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
@@ -32,24 +30,28 @@
     </form>
 
     <hr class="subtle-divider" />
-    
+
     <!-- Action Buttons -->
-    
-    <button id="viewStatus" class="action-btn">
-      <span class="spinner"></span>
-      📦 Pending Orders
-    </button>    
-   
+    <section class="actions">
+      <button id="viewStatus" class="action-btn">
+        <span class="spinner"></span>
+        📦 Pending Orders
+      </button>
+    </section>
+
     <!-- 3PL Summary -->
-    
     <section class="threepl-section">
       <button id="threePLSummaryBtn" class="action-btn">
         <span class="spinner"></span>
         📊 3PL Cost Summary
       </button>
-    </section>
 
       <div id="threePLWrapper">
+        <div id="threePLLoader" class="loader-overlay hidden">
+          <div class="loader-spinner"></div>
+          <p>Loading summary...</p>
+        </div>
+
         <table id="threePLSummaryTable">
           <thead>
             <tr>
@@ -66,10 +68,12 @@
     <hr class="subtle-divider" />
 
     <!-- Product Filter -->
-    <label for="productFilter" class="dropdown-caption">🔍 Filter cards based on specific product</label>
-    <select id="productFilter" onchange="loadFilteredOrders()">
-      <option value="">All Products</option>
-    </select>
+    <section class="product-filter">
+      <label for="productFilter" class="dropdown-caption">🔍 Filter cards based on specific product</label>
+      <select id="productFilter">
+        <option value="">All Products</option>
+      </select>
+    </section>
 
     <!-- Pending Orders -->
     <section id="pendingOrdersContainer" class="card-container"></section>
