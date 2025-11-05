@@ -468,6 +468,14 @@ button:hover {
   justify-content: center;
 }
 
+.calendar-caption {
+  font-size: 12px;
+  color: #666;
+  margin-top: -8px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 .date-picker-row i {
   font-size: 20px;
   color: #555;
