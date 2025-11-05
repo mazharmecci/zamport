@@ -10,6 +10,8 @@ const selectors = {
   productFilter: document.getElementById('productFilter'),
   threePLTableBody: document.getElementById('threePLTableBody'),
   threePLWrapper: document.getElementById('threePLWrapper'),
+  threePLSummaryBtn: document.getElementById('threePLSummaryBtn'),
+  threePLLoader: document.getElementById('threePLLoader'),
 };
 
 // === Initialization ===
@@ -17,6 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   selectors.submitBtn?.addEventListener('click', submitSku);
   selectors.viewStatusBtn?.addEventListener('click', fetchPendingOrders);
   selectors.productFilter?.addEventListener('change', loadFilteredOrders);
+  selectors.threePLSummaryBtn?.addEventListener('click', async () => {
+    toggle3PLTable();
+    showSpinner(selectors.threePLSummaryBtn);
+    showLoader();
+    await load3PLSummary();
+    hideLoader();
+    hideSpinner(selectors.threePLSummaryBtn);
+  });
   loadProductDropdown();
 });
 
@@ -129,9 +139,9 @@ function showToast(message) {
 // === 3PL Summary ===
 async function load3PLSummary() {
   selectors.threePLTableBody.innerHTML = '';
-  const endpoint = `${API_BASE}?mode=3pl`;
 
   try {
+    const endpoint = `${API_BASE}?mode=3pl`;
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
 
@@ -169,6 +179,14 @@ async function load3PLSummary() {
 
 function toggle3PLTable() {
   selectors.threePLWrapper.classList.toggle('active');
+}
+
+function showLoader() {
+  selectors.threePLLoader?.classList.remove('hidden');
+}
+
+function hideLoader() {
+  selectors.threePLLoader?.classList.add('hidden');
 }
 
 // === Product Filter ===
@@ -219,13 +237,3 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
-
-selectors.threePLSummaryBtn?.addEventListener('click', async () => {
-  toggle3PLTable();
-  showSpinner(selectors.threePLSummaryBtn);
-  showLoader();
-  await load3PLSummary();
-  hideLoader();
-  hideSpinner(selectors.threePLSummaryBtn);
-});
-
