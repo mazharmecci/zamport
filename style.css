@@ -343,9 +343,16 @@ h2 {
   background-color: #34495e;
 }
 
+.action-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px auto;
+  max-width: 600px;
+}
+
 .action-row .action-btn {
   flex: 1;
-  max-width: 240px;
   padding: 10px 16px;
   font-size: 16px;
   border-radius: 6px;
@@ -356,9 +363,11 @@ h2 {
   justify-content: center;
   gap: 6px;
   transition: background-color 0.3s ease;
+  min-width: 140px;
+  max-width: 240px;
 }
 
-/* Individual button styles */
+/* Individual button colors */
 #viewStatus {
   background-color: #ffe4cd;
   color: black;
@@ -390,4 +399,5 @@ h2 {
     max-width: none;
   }
 }
+
 
