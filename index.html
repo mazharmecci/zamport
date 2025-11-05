@@ -24,20 +24,22 @@
     
 <form class="stock-form" onsubmit="event.preventDefault();">
   <!-- Date Picker + Pending Orders -->
-  <div class="date-picker-row">
-    <label for="orderDate">
+  <div class="date-row">
+    <label for="orderDate" class="calendar-label">
       <i class="fa-solid fa-calendar-days"></i>
     </label>
     <input type="date" id="orderDate" />
-    <p class="calendar-caption">Choose date & click on Pending Orders button</p>
     <button type="button" id="viewStatus">
       <span class="spinner"></span> 📦 Pending Orders
     </button>
   </div>
 
+  <!-- Caption -->
+  <p class="calendar-caption">Choose date & click on Pending Orders button</p>
+
   <!-- SKU Input Section -->
   <div class="sku-input-row">
-    <label for="skuInput">Enter SKU</label>
+    <label for="skuInput" class="sku-label">Enter SKU</label>
     <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
     <button type="submit" id="submitSku">
       <span class="spinner"></span>
@@ -45,6 +47,7 @@
     </button>
   </div>
 </form>
+
 
 <!-- 3PL Summary -->
     <section class="threepl-section">
