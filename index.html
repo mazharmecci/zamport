@@ -48,35 +48,9 @@
   </div>
 </form>
 
-<!-- 3PL Summary -->
-    <section class="threepl-section">
-      <button id="threePLSummaryBtn" onclick="toggle3PLTable(); load3PLSummary();">
-        📊 3PL Cost Summary
-      </button>
+<hr class="subtle-divider" />
 
-      <div id="threePLWrapper">
-        <table id="threePLSummaryTable">
-          <thead>
-            <tr>
-              <th>📄 Sheet</th>
-              <th>📘 Sheet Name</th>
-              <th>💰 Total 3PL Cost</th>
-            </tr>
-          </thead>
-          <tbody id="threePLTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <hr class="subtle-divider" />
-
-    <!-- Product Filter -->
-    <select id="productFilter" onchange="loadFilteredOrders()">
-      <option value="">All Products</option>
-      <p class="dropdown-caption">🔍 Filter cards based on specific product</p>      
-    </select>
-
-    <!-- Pending Orders -->
+<!-- Pending Orders -->
     <section id="pendingOrdersContainer" class="card-container"></section>
 
     <!-- Toast + Container -->
