@@ -1,36 +1,39 @@
-// === DOMContentLoaded Initialization ===
-document.addEventListener('DOMContentLoaded', () => {
-  const dateInput = document.getElementById('orderDate');
-  const today = new Date().toISOString().split('T')[0];
-  dateInput.value = today;
+// === Constants ===
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
+const dateInput = document.getElementById('orderDate');
+const viewStatusBtn = document.getElementById('viewStatus');
+const submitBtn = document.getElementById('submitSku');
+const skuInput = document.getElementById('skuInput');
+const pendingContainer = document.getElementById('pendingOrdersContainer');
+const toast = document.getElementById('toast');
 
+// === Initialization ===
+document.addEventListener('DOMContentLoaded', () => {
+  dateInput.value = new Date().toISOString().split('T')[0];
   dateInput.addEventListener('change', fetchPendingOrders);
-  loadProductDropdown();
+  viewStatusBtn.addEventListener('click', fetchPendingOrders);
+  submitBtn.addEventListener('click', submitSku);
+  loadProductDropdown(); // Optional external function
 });
 
-// === View Pending Orders ===
-const viewStatusBtn = document.getElementById('viewStatus');
-viewStatusBtn.addEventListener('click', fetchPendingOrders);
-
+// === Fetch Pending Orders ===
 async function fetchPendingOrders() {
   showSpinner(viewStatusBtn);
 
-  const selectedDateRaw = document.getElementById('orderDate').value;
+  const selectedDateRaw = dateInput.value;
   if (!selectedDateRaw) {
     showToast("Please select a date first.");
     hideSpinner(viewStatusBtn);
     return;
   }
 
-  // Format date to MM/DD/YYYY for backend compatibility
-  const selectedDateObj = new Date(selectedDateRaw);
-  const selectedDate = `${selectedDateObj.getMonth() + 1}/${selectedDateObj.getDate()}/${selectedDateObj.getFullYear()}`;
+  const selectedDate = formatDateForBackend(selectedDateRaw);
   console.log("Formatted date sent to backend:", selectedDate);
 
-  document.getElementById('pendingOrdersContainer').innerHTML = ''; // Clear old cards
+  pendingContainer.innerHTML = '';
 
   try {
-    const res = await fetch(`https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=pendingByDate&date=${selectedDate}`);
+    const res = await fetch(`${API_BASE}?mode=pendingByDate&date=${selectedDate}`);
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
@@ -41,12 +44,17 @@ async function fetchPendingOrders() {
   }
 }
 
+function formatDateForBackend(dateStr) {
+  const dateObj = new Date(dateStr);
+  return `${dateObj.getMonth() + 1}/${dateObj.getDate()}/${dateObj.getFullYear()}`;
+}
+
+// === Render Cards ===
 function renderPendingCards(data) {
-  const container = document.getElementById('pendingOrdersContainer');
-  container.innerHTML = '';
+  pendingContainer.innerHTML = '';
 
   if (!data || data.length === 0) {
-    container.innerHTML = '<p>No pending orders found.</p>';
+    pendingContainer.innerHTML = '<p>No pending orders found.</p>';
     return;
   }
 
@@ -59,32 +67,25 @@ function renderPendingCards(data) {
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}
     `;
-    container.appendChild(card);
+    pendingContainer.appendChild(card);
   });
 }
 
 // === Submit SKU ===
-document.getElementById('submitSku').addEventListener('click', submitSku);
-
 async function submitSku() {
-  const skuInput = document.getElementById('skuInput');
   const sku = skuInput.value.trim();
   if (!sku) {
     alert("Enter or scan a SKU first");
     return;
   }
 
-  const submitBtn = document.getElementById('submitSku');
   showSpinner(submitBtn);
 
   try {
-    const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec',
-      {
-        method: 'POST',
-        body: new URLSearchParams({ sku }),
-      }
-    );
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      body: new URLSearchParams({ sku }),
+    });
 
     const result = await response.json();
     showToast(result.message || result);
@@ -102,7 +103,7 @@ async function submitSku() {
       }
     }
 
-    fetchPendingOrders(); // Refresh cards after update
+    fetchPendingOrders(); // Refresh after update
   } catch (error) {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
@@ -111,7 +112,7 @@ async function submitSku() {
   }
 }
 
-// === Spinner logic ===
+// === Spinner Logic ===
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -130,7 +131,6 @@ function hideSpinner(button) {
 
 // === Toast Notification ===
 function showToast(message) {
-  const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.className = "show";
   setTimeout(() => {
