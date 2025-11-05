@@ -452,16 +452,20 @@ button:hover {
   margin-bottom: 6px;
 }
 
-.date-picker-row {
+.stock-form {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 12px;
+  gap: 16px;
 }
 
-.date-picker-row i {
-  font-size: 20px;
-  color: #555;
+.date-picker-row,
+.sku-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
+
 
