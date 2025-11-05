@@ -1,13 +1,14 @@
-// === View Pending Orders ===
-
+// === DOMContentLoaded Initialization ===
 document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('orderDate');
   const today = new Date().toISOString().split('T')[0];
   dateInput.value = today;
-
   dateInput.addEventListener('change', fetchPendingOrders);
+
+  loadProductDropdown();
 });
 
+// === View Pending Orders ===
 const viewStatusBtn = document.getElementById('viewStatus');
 viewStatusBtn.addEventListener('click', fetchPendingOrders);
 
@@ -23,6 +24,8 @@ async function fetchPendingOrders() {
 
   const selectedDateObj = new Date(selectedDateRaw);
   const selectedDate = `${selectedDateObj.getMonth() + 1}/${selectedDateObj.getDate()}/${selectedDateObj.getFullYear()}`; // MM/DD/YYYY
+
+  document.getElementById('pendingOrdersContainer').innerHTML = ''; // Clear old cards
 
   try {
     const res = await fetch(`https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=pendingByDate&date=${selectedDate}`);
@@ -58,9 +61,11 @@ function renderPendingCards(data) {
   });
 }
 
+// === Submit SKU ===
 document.getElementById('submitSku').addEventListener('click', submitSku);
 
 async function submitSku() {
+  const skuInput = document.getElementById('skuInput');
   const sku = skuInput.value.trim();
   if (!sku) {
     alert("Enter or scan a SKU first");
@@ -104,6 +109,7 @@ async function submitSku() {
   }
 }
 
+// === Spinner logic ===
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -120,6 +126,7 @@ function hideSpinner(button) {
   }
 }
 
+// === Toast Notification ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -129,9 +136,7 @@ function showToast(message) {
   }, 3000);
 }
 
-
 // === 3PL Summary ===
-
 async function load3PLSummary() {
   const tableBody = document.getElementById('threePLTableBody');
   tableBody.innerHTML = '';
@@ -190,9 +195,7 @@ function toggle3PLTable() {
   wrapper.classList.toggle('active');
 }
 
-
 // === Product Filter ===
-
 async function loadFilteredOrders() {
   const selectedProduct = document.getElementById('productFilter').value;
   const baseUrl = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
@@ -210,13 +213,7 @@ async function loadFilteredOrders() {
   }
 }
 
-
-// Load Product Dropdown logic with evenlistener
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadProductDropdown();
-});
-
+// === Product Dropdown Loader ===
 async function loadProductDropdown() {
   const dropdown = document.getElementById('productFilter');
   if (!dropdown) {
@@ -243,16 +240,4 @@ async function loadProductDropdown() {
       if (product && typeof product === 'string') {
         const option = document.createElement('option');
         option.value = product;
-        option.textContent = product;
-        dropdown.appendChild(option);
-      }
-    });
-
-    console.log('Product dropdown loaded:', products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    showToast('Failed to load product list.');
-  }
-}
-
-
+        option.textContent = product
