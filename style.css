@@ -467,11 +467,12 @@ button:hover {
 }
 
 /* Date row with button beside calendar */
+
 .date-row {
   display: flex;
   align-items: center;
-  gap: 12px;
   justify-content: center;
+  gap: 12px;
   margin-bottom: 4px; /* 1 line gap */
 }
 
