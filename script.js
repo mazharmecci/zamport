@@ -21,7 +21,8 @@ async function fetchPendingOrders() {
     return;
   }
 
-  const selectedDate = new Date(selectedDateRaw).toLocaleDateString('en-US'); // MM/DD/YYYY
+  const selectedDateObj = new Date(selectedDateRaw);
+  const selectedDate = `${selectedDateObj.getMonth() + 1}/${selectedDateObj.getDate()}/${selectedDateObj.getFullYear()}`; // MM/DD/YYYY
 
   try {
     const res = await fetch(`https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=pendingByDate&date=${selectedDate}`);
