@@ -1,91 +1,57 @@
-// === QR Scanner Setup ===
-let scannerActive = false;
-let qrInstance = null;
+// === Constants ===
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
 
-const scanBtn = document.getElementById('scanBox');
-const closeBtn = document.getElementById('closeScanner');
-const qrReader = document.getElementById('qr-reader');
-const skuInput = document.getElementById('skuInput');
+const selectors = {
+  skuInput: document.getElementById('skuInput'),
+  submitBtn: document.getElementById('submitSku'),
+  viewStatusBtn: document.getElementById('viewStatus'),
+  pendingContainer: document.getElementById('pendingOrdersContainer'),
+  toast: document.getElementById('toast'),
+  productFilter: document.getElementById('productFilter'),
+  threePLTableBody: document.getElementById('threePLTableBody'),
+  threePLWrapper: document.getElementById('threePLWrapper'),
+};
 
-scanBtn.addEventListener('click', () => {
-  if (scannerActive) return;
-  scannerActive = true;
-
-  qrReader.style.display = 'block';
-  closeBtn.style.display = 'inline-block';
-
-  qrInstance = new Html5Qrcode("qr-reader");
-  qrInstance.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 300 },
-    (decodedText) => {
-      skuInput.value = decodedText;
-      setTimeout(() => stopScanner(), 500);
-    },
-    (errorMessage) => {
-      console.warn(errorMessage);
-    }
-  );
+// === Initialization ===
+document.addEventListener('DOMContentLoaded', () => {
+  selectors.submitBtn?.addEventListener('click', submitSku);
+  selectors.viewStatusBtn?.addEventListener('click', fetchPendingOrders);
+  selectors.productFilter?.addEventListener('change', loadFilteredOrders);
+  loadProductDropdown();
 });
 
-closeBtn.addEventListener('click', stopScanner);
-
-function stopScanner() {
-  if (qrInstance) {
-    qrInstance.stop().then(() => {
-      qrReader.style.display = 'none';
-      closeBtn.style.display = 'none';
-      scannerActive = false;
-      qrInstance.clear();
-      qrInstance = null;
-    }).catch(err => {
-      console.error("Failed to stop scanner:", err);
-    });
-  }
-}
-
-// === View Pending Orders ===
-const viewStatusBtn = document.getElementById('viewStatus');
-viewStatusBtn.addEventListener('click', fetchPendingOrders);
-
+// === Fetch Pending Orders ===
 async function fetchPendingOrders() {
-  showSpinner(viewStatusBtn);
+  showSpinner(selectors.viewStatusBtn);
+  selectors.pendingContainer.innerHTML = '';
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec');
+    const res = await fetch(API_BASE);
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
     showToast('Failed to load pending orders.');
   } finally {
-    hideSpinner(viewStatusBtn);
+    hideSpinner(selectors.viewStatusBtn);
   }
 }
 
 // === Submit SKU ===
-document.getElementById('submitSku').addEventListener('click', submitSku);
-
 async function submitSku() {
-  const sku = skuInput.value.trim();
+  const sku = selectors.skuInput.value.trim();
   if (!sku) {
     alert("Enter or scan a SKU first");
     return;
   }
 
-  const submitBtn = document.getElementById('submitSku');
-  const spinner = submitBtn.querySelector('.spinner');
-
-  showSpinner(submitBtn);
+  showSpinner(selectors.submitBtn);
 
   try {
-    const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec',
-      {
-        method: 'POST',
-        body: new URLSearchParams({ sku }),
-      }
-    );
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      body: new URLSearchParams({ sku }),
+    });
 
     const result = await response.json();
     showToast(result.message || result);
@@ -96,7 +62,7 @@ async function submitSku() {
         printWindow.onload = () => {
           printWindow.print();
           showToast("Label sent to printer!");
-          skuInput.value = "";
+          selectors.skuInput.value = "";
         };
       } else {
         showToast("Popup blocked. Please allow popups.");
@@ -108,17 +74,16 @@ async function submitSku() {
     console.error('Error submitting SKU:', error);
     showToast("Failed to update order status.");
   } finally {
-    hideSpinner(submitBtn);
+    hideSpinner(selectors.submitBtn);
   }
 }
 
 // === Render Cards ===
 function renderPendingCards(data) {
-  const container = document.getElementById('pendingOrdersContainer');
-  container.innerHTML = '';
+  selectors.pendingContainer.innerHTML = '';
 
   if (!data || data.length === 0) {
-    container.innerHTML = '<p>No pending orders found.</p>';
+    selectors.pendingContainer.innerHTML = '<p>No pending orders found.</p>';
     return;
   }
 
@@ -131,11 +96,11 @@ function renderPendingCards(data) {
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}
     `;
-    container.appendChild(card);
+    selectors.pendingContainer.appendChild(card);
   });
 }
 
-// === Spinner logic ===
+// === Spinner Logic ===
 function showSpinner(button) {
   const spinner = button.querySelector('.spinner');
   if (spinner) {
@@ -154,21 +119,17 @@ function hideSpinner(button) {
 
 // === Toast Notification ===
 function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.className = "show";
+  selectors.toast.textContent = message;
+  selectors.toast.className = "show";
   setTimeout(() => {
-    toast.className = toast.className.replace("show", "");
+    selectors.toast.className = selectors.toast.className.replace("show", "");
   }, 3000);
 }
 
 // === 3PL Summary ===
-
 async function load3PLSummary() {
-  const tableBody = document.getElementById('threePLTableBody');
-  tableBody.innerHTML = '';
-
-  const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=3pl';
+  selectors.threePLTableBody.innerHTML = '';
+  const endpoint = `${API_BASE}?mode=3pl`;
 
   try {
     const response = await fetch(endpoint);
@@ -183,24 +144,13 @@ async function load3PLSummary() {
       const row = document.createElement('tr');
       if (index % 2 === 1) row.classList.add('alt-row');
 
-      const sheetLinkCell = document.createElement('td');
-      const link = document.createElement('a');
-      link.href = item.sheetId ? `https://docs.google.com/spreadsheets/d/${item.sheetId}` : '#';
-      link.target = '_blank';
-      link.textContent = `Sheet ${index + 1}`;
-      sheetLinkCell.appendChild(link);
+      row.innerHTML = `
+        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
+        <td>${item.sheetName || 'Unnamed'}</td>
+        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+      `;
 
-      const sheetNameCell = document.createElement('td');
-      sheetNameCell.textContent = item.sheetName || 'Unnamed';
-
-      const costCell = document.createElement('td');
-      costCell.textContent = item.total3PLCost ? `$${Number(item.total3PLCost).toFixed(2)}` : '$0.00';
-
-      row.appendChild(sheetLinkCell);
-      row.appendChild(sheetNameCell);
-      row.appendChild(costCell);
-      tableBody.appendChild(row);
-
+      selectors.threePLTableBody.appendChild(row);
       grandTotal += Number(item.total3PLCost) || 0;
     });
 
@@ -210,7 +160,7 @@ async function load3PLSummary() {
       <td colspan="2"><strong>Grand Total</strong></td>
       <td><strong>$${grandTotal.toFixed(2)}</strong></td>
     `;
-    tableBody.appendChild(totalRow);
+    selectors.threePLTableBody.appendChild(totalRow);
   } catch (error) {
     console.error('Error loading 3PL summary:', error);
     showToast(`Failed to load 3PL cost summary: ${error.message}`);
@@ -218,19 +168,15 @@ async function load3PLSummary() {
 }
 
 function toggle3PLTable() {
-  const wrapper = document.getElementById('threePLWrapper');
-  wrapper.classList.toggle('active');
+  selectors.threePLWrapper.classList.toggle('active');
 }
 
-
 // === Product Filter ===
-
 async function loadFilteredOrders() {
-  const selectedProduct = document.getElementById('productFilter').value;
-  const baseUrl = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
+  const selectedProduct = selectors.productFilter.value;
   const endpoint = selectedProduct
-    ? `${baseUrl}?product=${encodeURIComponent(selectedProduct)}`
-    : baseUrl;
+    ? `${API_BASE}?product=${encodeURIComponent(selectedProduct)}`
+    : API_BASE;
 
   try {
     const response = await fetch(endpoint);
@@ -242,41 +188,28 @@ async function loadFilteredOrders() {
   }
 }
 
-
-// Load Product Dropdown logic with evenlistener
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadProductDropdown();
-});
-
 async function loadProductDropdown() {
-  const dropdown = document.getElementById('productFilter');
-  if (!dropdown) {
+  if (!selectors.productFilter) {
     console.warn('Product filter dropdown not found.');
     return;
   }
 
-  dropdown.innerHTML = '<option value="">All Products</option>';
+  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
 
   try {
-    const endpoint = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec?mode=products';
+    const endpoint = `${API_BASE}?mode=products`;
     const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
 
     const products = await response.json();
-    if (!Array.isArray(products)) {
-      throw new Error('Invalid product data format');
-    }
+    if (!Array.isArray(products)) throw new Error('Invalid product data format');
 
     products.sort().forEach(product => {
       if (product && typeof product === 'string') {
         const option = document.createElement('option');
         option.value = product;
         option.textContent = product;
-        dropdown.appendChild(option);
+        selectors.productFilter.appendChild(option);
       }
     });
 
@@ -286,5 +219,3 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
-
-
