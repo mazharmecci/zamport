@@ -156,38 +156,24 @@ button {
 }
 
 #viewStatus,
-#scanBox {
-  width: auto; /* Allows the button to size based on content */
-  padding: 8px 16px; /* Adjusts spacing inside the button */
-  font-size: 14px; /* Optional: tweak for better readability */
-  border-radius: 6px; /* Optional: adds a softer edge */
-  white-space: nowrap; /* Prevents text from wrapping */
-}
 
 #viewStatus {
-  background-color: orange;
-  color: Black;
+  display: block;
+  margin: 0 auto 16px;
+  padding: 12px 24px;
+  background-color: #f39c12; /* Orange background */
+  color: black;              /* Black text */
+  font-size: 16px;
   border: none;
-  padding: 10px 20px;
-  font-size: 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .actions {
   display: flex;
   gap: 10px; /* Adds spacing between buttons */
   justify-content: center; /* Centers them horizontally */
-}
-
-#scanBox {
-  background-color: orange; /* default color */
-  color: Black;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 /* Hover effect: light green */
