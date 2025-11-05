@@ -22,35 +22,30 @@
 
     <!-- Action Buttons -->
     
-     <div class="date-picker-row">
-      <label for="orderDate">
-        <i class="fa-solid fa-calendar-days"></i>
-      </label>
-        <input type="date" id="orderDate" />
-    </div>
-    <button id="viewStatus"><span class="spinner"></span> 📦 Pending Orders</button>
+<form class="stock-form" onsubmit="event.preventDefault();">
+  <!-- Date Picker + Pending Orders -->
+  <div class="date-picker-row">
+    <label for="orderDate">
+      <i class="fa-solid fa-calendar-days"></i>
+    </label>
+    <input type="date" id="orderDate" />
+    <button type="button" id="viewStatus">
+      <span class="spinner"></span> 📦 Pending Orders
+    </button>
+  </div>
 
-    <section class="actions">      
-      <button id="scanBox">📷 Scan</button>
-    </section>
+  <!-- SKU Input Section -->
+  <div class="sku-input-row">
+    <label for="skuInput">Enter SKU</label>
+    <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
+    <button type="submit" id="submitSku">
+      <span class="spinner"></span>
+      Submit
+    </button>
+  </div>
+</form>
 
-    <!-- Scan + Manual Input -->
-    <section class="scan-area">
-      <button id="closeScanner" style="display: none;">❌ Close Scanner</button>
-      <div id="qr-reader" style="width: 300px;">
-        <noscript>Please enable JavaScript to use the QR scanner.</noscript>
-      </div>
-      <form class="stock-form" onsubmit="event.preventDefault();">
-        <label for="skuInput">Enter SKU</label>
-        <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
-        <button type="submit" id="submitSku">
-          <span class="spinner"></span>
-          Submit
-        </button>
-      </form>
-    </section>
-
-    <!-- 3PL Summary -->
+<!-- 3PL Summary -->
     <section class="threepl-section">
       <button id="threePLSummaryBtn" onclick="toggle3PLTable(); load3PLSummary();">
         📊 3PL Cost Summary
