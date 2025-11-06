@@ -1,3 +1,40 @@
+// === Zamport Login Constants ===
+
+(function enforceSession() {
+  const SESSION_KEY = "zamport-auth";
+  const LAST_ACTIVE_KEY = "zamport-last-active";
+  const MAX_IDLE_TIME = 15 * 60 * 1000; // 15 minutes
+
+  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
+  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
+  const now = Date.now();
+
+  const isSessionExpired = !lastActive || (now - lastActive > MAX_IDLE_TIME);
+
+  if (!isLoggedIn || isSessionExpired) {
+    showToast("Session expired. Please log in again.");
+    sessionStorage.clear();
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 2000); // show toast for 2 seconds before redirect
+  } else {
+    sessionStorage.setItem(LAST_ACTIVE_KEY, now); // refresh activity
+  }
+})();
+
+const username = sessionStorage.getItem("zamport-user");
+if (username) {
+  document.getElementById("usernameDisplay").textContent = username.charAt(0).toUpperCase() + username.slice(1);
+}
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  sessionStorage.clear();
+  showToast("You’ve been logged out.");
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 1500);
+});
+
 // === Constants ===
 const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
 
