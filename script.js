@@ -39,8 +39,8 @@ async function fetchPendingOrders() {
   selectors.pendingContainer.innerHTML = '';
 
   try {
-    const response = await fetch(API_BASE);
-    const data = await response.json();
+    const res = await fetch(API_BASE);
+    const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -53,7 +53,10 @@ async function fetchPendingOrders() {
 // === Submit SKU ===
 async function submitSku() {
   const sku = selectors.skuInput.value.trim();
-  if (!sku) return alert("Enter or scan a SKU first");
+  if (!sku) {
+    alert("Enter or scan a SKU first");
+    return;
+  }
 
   showSpinner(selectors.submitBtn);
 
@@ -88,7 +91,7 @@ async function submitSku() {
   }
 }
 
-// === Render Pending Cards ===
+// === Render Cards ===
 function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
@@ -98,41 +101,16 @@ function renderPendingCards(data) {
   }
 
   data.forEach(order => {
-    const formattedDate = formatDate(order.date);
-
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <strong>SKU:</strong> ${order.sku}<br/>
       <strong>Product:</strong> ${order.product || 'N/A'}<br/>
       <strong>Status:</strong> ${order.status}<br/>
-      <strong>Sheet:</strong> ${order.sheetName}<br/>
-      <strong>Date:</strong> ${formattedDate || 'N/A'}
+      <strong>Sheet:</strong> ${order.sheetName}
     `;
     selectors.pendingContainer.appendChild(card);
   });
-}
-
-// === Format Date Utility ===
-function formatDate(dateValue) {
-  if (!dateValue) return null;
-
-  if (dateValue instanceof Date) {
-    const mm = String(dateValue.getMonth() + 1).padStart(2, '0');
-    const dd = String(dateValue.getDate()).padStart(2, '0');
-    const yyyy = dateValue.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
-  }
-
-  const parsed = new Date(dateValue);
-  if (!isNaN(parsed)) {
-    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-    const dd = String(parsed.getDate()).padStart(2, '0');
-    const yyyy = parsed.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
-  }
-
-  return null;
 }
 
 // === Spinner Logic ===
@@ -231,7 +209,6 @@ async function loadFilteredOrders() {
   }
 }
 
-// === Product Dropdown ===
 async function loadProductDropdown() {
   if (!selectors.productFilter) return;
 
@@ -240,19 +217,13 @@ async function loadProductDropdown() {
   try {
     const endpoint = `${API_BASE}?mode=products`;
     const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Status ${response.status}`);
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
 
     const products = await response.json();
-    if (!Array.isArray(products)) throw new Error('Invalid format');
-
-    if (products.length === 0) {
-      console.warn('Product list is empty');
-      showToast('No products found.');
-      return;
-    }
+    if (!Array.isArray(products)) throw new Error('Invalid product data format');
 
     products.sort().forEach(product => {
-      if (typeof product === 'string' && product.trim()) {
+      if (product && typeof product === 'string') {
         const option = document.createElement('option');
         option.value = product;
         option.textContent = product;
@@ -260,13 +231,9 @@ async function loadProductDropdown() {
       }
     });
 
-    console.log('✅ Product dropdown loaded:', products);
+    console.log('Product dropdown loaded:', products);
   } catch (error) {
-    console.error('❌ Product dropdown error:', error);
-
-    const fallbackOption = document.createElement('option');
-    fallbackOption.value = 'Fallback';
-    fallbackOption.textContent = 'Fallback Product';
-    selectors.productFilter.appendChild(fallbackOption);
-
-    showToast('Failed to load product list. Using
+    console.error('Error loading products:', error);
+    showToast('Failed to load product list.');
+  }
+}
