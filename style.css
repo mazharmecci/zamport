@@ -325,6 +325,7 @@ h2 {
 }
 
 /* === Collapsible Toggle (Optional) === */
+
 .collapsible {
   background-color: #2c3e50;
   color: white;
@@ -402,6 +403,152 @@ h2 {
 
 .hidden {
   display: none;
+}
+
+
+/* === Login page settings - Zamport === */
+
+body.login-body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f2f5;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Login form container */
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 320px;
+}
+
+/* Animate the login form */
+
+.login-container {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeSlideUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logo styling */
+
+.login-logo {
+  width: 60px;
+  margin-bottom: 1rem;
+}
+
+/* Input fields */
+
+input {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Login button */
+
+button {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Error message */
+.error-msg {
+  color: red;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 999;
+}
+
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+button.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+button.loading::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.export-btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto; /* Prevent full-width */
+  max-width: 200px; /* Optional: cap width */
+  transition: background-color 0.3s ease;
+}
+
+.export-btn:hover {
+  background-color: #005fa3;
 }
 
 .user-profile {
@@ -506,4 +653,49 @@ h2 {
 
 .login-btn:hover {
   background-color: #005fa3;
+}
+
+.istos-units-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.instrument-select-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.dropdown-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.extract-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.extract-btn:hover {
+  background-color: #005fa3;
+}
+
+.instrument-caption-wrapper {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.instrument-caption {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
 }
