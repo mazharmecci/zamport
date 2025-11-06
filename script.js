@@ -34,12 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // === Fetch Pending Orders ===
-async function fetchPendingOrders() {
+async function fetchPendingOrders(product = '') {
   showSpinner(selectors.viewStatusBtn);
   selectors.pendingContainer.innerHTML = '';
 
+  const endpoint = product
+    ? `${API_BASE}?product=${encodeURIComponent(product)}`
+    : API_BASE;
+
   try {
-    const res = await fetch(API_BASE);
+    const res = await fetch(endpoint);
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
@@ -53,10 +57,7 @@ async function fetchPendingOrders() {
 // === Submit SKU ===
 async function submitSku() {
   const sku = selectors.skuInput.value.trim();
-  if (!sku) {
-    alert("Enter or scan a SKU first");
-    return;
-  }
+  if (!sku) return alert("Enter or scan a SKU first");
 
   showSpinner(selectors.submitBtn);
 
@@ -100,9 +101,7 @@ function renderPendingCards(data) {
     return;
   }
 
-  data.forEach(order => {
-    const { sku, product, status, sheetName } = order;
-
+  data.forEach(({ sku, product, status, sheetName }) => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -197,18 +196,7 @@ function hideLoader() {
 // === Product Filter ===
 async function loadFilteredOrders() {
   const selectedProduct = selectors.productFilter.value.trim();
-  const endpoint = selectedProduct
-    ? `${API_BASE}?product=${encodeURIComponent(selectedProduct)}`
-    : API_BASE;
-
-  try {
-    const response = await fetch(endpoint);
-    const orders = await response.json();
-    renderPendingCards(orders);
-  } catch (error) {
-    console.error('Error loading filtered orders:', error);
-    showToast('Failed to load filtered orders.');
-  }
+  fetchPendingOrders(selectedProduct);
 }
 
 async function loadProductDropdown() {
