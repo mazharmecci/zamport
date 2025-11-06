@@ -96,18 +96,20 @@ function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
   if (!Array.isArray(data) || data.length === 0) {
-    selectors.pendingContainer.innerHTML = '<p>No pending orders found.</p>';
+    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found.</p>';
     return;
   }
 
   data.forEach(order => {
+    const { sku, product, status, sheetName } = order;
+
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <strong>SKU:</strong> ${order.sku}<br/>
-      <strong>Product:</strong> ${order.product || 'N/A'}<br/>
-      <strong>Status:</strong> ${order.status}<br/>
-      <strong>Sheet:</strong> ${order.sheetName}
+      <strong>SKU:</strong> ${sku}<br/>
+      <strong>Product:</strong> ${product}<br/>
+      <strong>Status:</strong> ${status}<br/>
+      <strong>Sheet:</strong> ${sheetName}
     `;
     selectors.pendingContainer.appendChild(card);
   });
@@ -194,7 +196,7 @@ function hideLoader() {
 
 // === Product Filter ===
 async function loadFilteredOrders() {
-  const selectedProduct = selectors.productFilter.value;
+  const selectedProduct = selectors.productFilter.value.trim();
   const endpoint = selectedProduct
     ? `${API_BASE}?product=${encodeURIComponent(selectedProduct)}`
     : API_BASE;
