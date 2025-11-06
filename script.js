@@ -98,7 +98,7 @@ function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
   if (!Array.isArray(data) || data.length === 0) {
-    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found.</p>';
+    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found for this month.</p>';
     return;
   }
 
