@@ -39,8 +39,8 @@ async function fetchPendingOrders() {
   selectors.pendingContainer.innerHTML = '';
 
   try {
-    const res = await fetch(API_BASE);
-    const data = await res.json();
+    const response = await fetch(API_BASE);
+    const data = await response.json();
     renderPendingCards(data);
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -53,10 +53,7 @@ async function fetchPendingOrders() {
 // === Submit SKU ===
 async function submitSku() {
   const sku = selectors.skuInput.value.trim();
-  if (!sku) {
-    alert("Enter or scan a SKU first");
-    return;
-  }
+  if (!sku) return alert("Enter or scan a SKU first");
 
   showSpinner(selectors.submitBtn);
 
@@ -91,7 +88,7 @@ async function submitSku() {
   }
 }
 
-// === Render Cards ===
+// === Render Pending Cards ===
 function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
@@ -101,13 +98,22 @@ function renderPendingCards(data) {
   }
 
   data.forEach(order => {
+    const formattedDate = order.date
+      ? new Date(order.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        })
+      : 'N/A';
+
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <strong>SKU:</strong> ${order.sku}<br/>
       <strong>Product:</strong> ${order.product || 'N/A'}<br/>
       <strong>Status:</strong> ${order.status}<br/>
-      <strong>Sheet:</strong> ${order.sheetName}
+      <strong>Sheet:</strong> ${order.sheetName}<br/>
+      <strong>Date:</strong> ${formattedDate}
     `;
     selectors.pendingContainer.appendChild(card);
   });
