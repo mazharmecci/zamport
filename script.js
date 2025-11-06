@@ -223,40 +223,22 @@ async function loadProductDropdown() {
   try {
     const endpoint = `${API_BASE}?mode=products`;
     const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
 
     const products = await response.json();
-    if (!Array.isArray(products)) throw new Error('Invalid product data format');
 
-    products.sort().forEach(product => {
-      if (product && typeof product === 'string') {
-        const option = document.createElement('option');
-        option.value = product;
-        option.textContent = product;
-        selectors.productFilter.appendChild(option);
-      }
-    });
+    if (!Array.isArray(products)) {
+      throw new Error('Response is not a valid array');
+    }
 
-    console.log('Product dropdown loaded:', products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    showToast('Failed to load product list.');
-  }
-}
-
-
-async function loadProductDropdown() {
-  if (!selectors.productFilter) return;
-
-  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
-
-  try {
-    const endpoint = `${API_BASE}?mode=products`;
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Status ${response.status}`);
-
-    const products = await response.json();
-    if (!Array.isArray(products)) throw new Error('Invalid format');
+    if (products.length === 0) {
+      console.warn('Product list is empty');
+      showToast('No products found.');
+      return;
+    }
 
     products.sort().forEach(product => {
       if (typeof product === 'string' && product.trim()) {
@@ -267,10 +249,18 @@ async function loadProductDropdown() {
       }
     });
 
-    console.log('Product dropdown loaded:', products);
+    console.log('✅ Product dropdown loaded:', products);
   } catch (error) {
-    console.error('Product dropdown error:', error);
-    showToast('Failed to load product list.');
+    console.error('❌ Product dropdown error:', error);
+
+    // Optional fallback: add a static option
+    const fallbackOption = document.createElement('option');
+    fallbackOption.value = 'Fallback';
+    fallbackOption.textContent = 'Fallback Product';
+    selectors.productFilter.appendChild(fallbackOption);
+
+    showToast('Failed to load product list. Using fallback.');
   }
 }
+
 
