@@ -98,13 +98,7 @@ function renderPendingCards(data) {
   }
 
   data.forEach(order => {
-    const formattedDate = order.date
-      ? new Date(order.date).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        })
-      : 'N/A';
+    const formattedDate = formatDate(order.date);
 
     const card = document.createElement('div');
     card.className = 'card';
@@ -113,10 +107,32 @@ function renderPendingCards(data) {
       <strong>Product:</strong> ${order.product || 'N/A'}<br/>
       <strong>Status:</strong> ${order.status}<br/>
       <strong>Sheet:</strong> ${order.sheetName}<br/>
-      <strong>Date:</strong> ${formattedDate}
+      <strong>Date:</strong> ${formattedDate || 'N/A'}
     `;
     selectors.pendingContainer.appendChild(card);
   });
+}
+
+// === Format Date Utility ===
+function formatDate(dateValue) {
+  if (!dateValue) return null;
+
+  if (dateValue instanceof Date) {
+    const mm = String(dateValue.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateValue.getDate()).padStart(2, '0');
+    const yyyy = dateValue.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  }
+
+  const parsed = new Date(dateValue);
+  if (!isNaN(parsed)) {
+    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+    const dd = String(parsed.getDate()).padStart(2, '0');
+    const yyyy = parsed.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  }
+
+  return null;
 }
 
 // === Spinner Logic ===
@@ -215,6 +231,7 @@ async function loadFilteredOrders() {
   }
 }
 
+// === Product Dropdown ===
 async function loadProductDropdown() {
   if (!selectors.productFilter) return;
 
@@ -223,16 +240,10 @@ async function loadProductDropdown() {
   try {
     const endpoint = `${API_BASE}?mode=products`;
     const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`Server responded with status ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Status ${response.status}`);
 
     const products = await response.json();
-
-    if (!Array.isArray(products)) {
-      throw new Error('Response is not a valid array');
-    }
+    if (!Array.isArray(products)) throw new Error('Invalid format');
 
     if (products.length === 0) {
       console.warn('Product list is empty');
@@ -253,14 +264,9 @@ async function loadProductDropdown() {
   } catch (error) {
     console.error('❌ Product dropdown error:', error);
 
-    // Optional fallback: add a static option
     const fallbackOption = document.createElement('option');
     fallbackOption.value = 'Fallback';
     fallbackOption.textContent = 'Fallback Product';
     selectors.productFilter.appendChild(fallbackOption);
 
-    showToast('Failed to load product list. Using fallback.');
-  }
-}
-
-
+    showToast('Failed to load product list. Using
