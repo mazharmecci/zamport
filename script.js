@@ -243,3 +243,34 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
+
+
+async function loadProductDropdown() {
+  if (!selectors.productFilter) return;
+
+  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
+
+  try {
+    const endpoint = `${API_BASE}?mode=products`;
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Status ${response.status}`);
+
+    const products = await response.json();
+    if (!Array.isArray(products)) throw new Error('Invalid format');
+
+    products.sort().forEach(product => {
+      if (typeof product === 'string' && product.trim()) {
+        const option = document.createElement('option');
+        option.value = product;
+        option.textContent = product;
+        selectors.productFilter.appendChild(option);
+      }
+    });
+
+    console.log('Product dropdown loaded:', products);
+  } catch (error) {
+    console.error('Product dropdown error:', error);
+    showToast('Failed to load product list.');
+  }
+}
+
