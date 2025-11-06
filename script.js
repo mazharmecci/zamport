@@ -93,6 +93,7 @@ async function submitSku() {
 }
 
 // === Render Cards ===
+
 function renderPendingCards(data) {
   selectors.pendingContainer.innerHTML = '';
 
@@ -101,15 +102,22 @@ function renderPendingCards(data) {
     return;
   }
 
-  data.forEach(({ sku, product, status, sheetName }) => {
+  data.forEach(({ sku, product, status, sheetName, labelLink }) => {
     const card = document.createElement('div');
     card.className = 'card';
+
+    const labelHTML = labelLink
+      ? `<a href="${labelLink}" target="_blank" class="label-link">🖨️ Print Label</a>`
+      : '<em>No label link</em>';
+
     card.innerHTML = `
       <strong>SKU:</strong> ${sku}<br/>
       <strong>Product:</strong> ${product}<br/>
       <strong>Status:</strong> ${status}<br/>
-      <strong>Sheet:</strong> ${sheetName}
+      <strong>Sheet:</strong> ${sheetName}<br/>
+      ${labelHTML}
     `;
+
     selectors.pendingContainer.appendChild(card);
   });
 }
