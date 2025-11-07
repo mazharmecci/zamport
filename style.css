@@ -670,53 +670,60 @@ button .spinner {
   margin: 0 auto;
 }
 
-.sku-input-container {
-  width: 75%; /* Reduces size by 25% */
-  max-width: 600px; /* Optional: cap the width */
-  margin: 0 auto;   /* Center it horizontally */
-}
-
-#skuForm {
-  width: 75%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-#skuInput {
-  width: 100%;
-  font-size: 14px; /* Optional: reduce font size */
-  padding: 8px 12px;
-}
-
-/* === Box Sizing Reset === */
+/* === Global Box Sizing Reset === */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* === Responsive Layout Adjustments === */
-@media (max-width: 768px) {
-  .dashboard-layout {
-    flex-direction: column;
-    gap: 16px;
-  }
+/* === SKU Form Styling === */
+.stock-form {
+  width: 75%;               /* Shrink container by 25% */
+  max-width: 600px;         /* Optional: cap width */
+  margin: 0 auto;           /* Center horizontally */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;                /* Space between label, input, and button */
+}
 
-  .filter-actions {
-    flex-direction: column;
-    gap: 16px;
+/* === Input Field Styling === */
+#skuInput {
+  width: 100%;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* === Submit Button Styling === */
+#submitSku {
+  padding: 8px 14px;
+  font-size: 14px;
+  background-color: #8B4513; /* Brown color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#submitSku:hover {
+  background-color: #5c3310;
+}
+
+/* === Responsive Layout === */
+@media (max-width: 768px) {
+  .stock-form {
+    width: 100%;
+    max-width: none;
     padding: 0 12px;
   }
 
-  .sku-input-container,
-  #skuForm {
-    width: 100%;
-    max-width: none;
-  }
-
-  #viewStatus {
+  #submitSku {
     width: 100%;
     justify-content: center;
   }
 }
+
 
