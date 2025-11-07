@@ -1,22 +1,3 @@
-// === Session Enforcement ===
-(function enforceSession() {
-  const SESSION_KEY = "zamport-auth";
-  const LAST_ACTIVE_KEY = "zamport-last-active";
-  const MAX_IDLE_TIME = 15 * 60 * 1000;
-
-  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
-  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
-  const now = Date.now();
-
-  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE_TIME) {
-    showToast("Session expired. Please log in again.");
-    sessionStorage.clear();
-    setTimeout(() => window.location.href = "index.html", 2000);
-  } else {
-    sessionStorage.setItem(LAST_ACTIVE_KEY, now);
-  }
-})();
-
 // === Constants ===
 const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
 
@@ -37,58 +18,105 @@ const selectors = {
   currentMonthTotal: document.getElementById("currentMonthTotal"),
 };
 
-// === DOM Ready ===
+// === Session Validation ===
+// === Session Validation ===
+function validateSession() {
+  console.log("🔐 Validating session...");
+  const SESSION_KEY = "zamport-auth";
+  const LAST_ACTIVE_KEY = "zamport-last-active";
+  const MAX_IDLE = 15 * 60 * 1000;
 
-document.addEventListener("DOMContentLoaded", async () => {
-  initializeUserSession();
-  bindDashboardButtons();
+  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
+  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
+  const now = Date.now();
 
-  // Initial dashboard load with overlay
+  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE) {
+    console.warn("⚠️ Session invalid or expired.");
+    showToast("Session expired. Please log in again.");
+    sessionStorage.clear();
+    setTimeout(() => window.location.href = "index.html", 1500);
+    return false;
+  }
+
+  sessionStorage.setItem(LAST_ACTIVE_KEY, now);
+  console.log("✅ Session valid.");
+  return true;
+}
+
+// === Dashboard Initialization ===
+async function initializeDashboard() {
+  console.log("🚀 Initializing dashboard...");
+  showLoadingOverlay();
+
   try {
-    showLoadingOverlay();
-
     await loadProductDropdown();
     const selectedProduct = selectors.productFilter.value.trim();
     await fetchPendingOrders(selectedProduct);
     await loadCurrentMonth3PLSummary();
+    console.log("✅ Dashboard loaded successfully.");
   } catch (error) {
-    console.error("Initial dashboard load failed:", error);
+    console.error("❌ Dashboard init failed:", error);
     showToast("Failed to load dashboard.");
   } finally {
     hideLoadingOverlay();
   }
+}
+
+// === DOM Ready ===
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("📦 DOM fully loaded.");
+  initializeUserSession();
+  bindDashboardButtons();
+
+  if (!validateSession()) {
+    hideLoadingOverlay();
+    return;
+  }
+
+  await initializeDashboard();
 });
 
+// === User Session Display + Logout ===
 function initializeUserSession() {
+  console.log("👤 Initializing user session...");
   const username = sessionStorage.getItem("zamport-user");
   if (username) {
     const displayName = username.charAt(0).toUpperCase() + username.slice(1);
-    document.getElementById("usernameDisplay").textContent = displayName;
+    const usernameDisplay = document.getElementById("usernameDisplay");
+    if (usernameDisplay) usernameDisplay.textContent = displayName;
   }
 
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    sessionStorage.clear();
-    showToast("You’ve been logged out.");
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 1500);
-  });
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      console.log("🔓 Logging out...");
+      sessionStorage.clear();
+      showToast("You’ve been logged out.");
+      setTimeout(() => window.location.href = "index.html", 1500);
+    });
+  }
 }
 
+// === Button Bindings ===
 function bindDashboardButtons() {
+  console.log("🔗 Binding dashboard buttons...");
+
   selectors.submitBtn?.addEventListener("click", submitSku);
 
   selectors.viewStatusBtn?.addEventListener("click", () => {
     const selectedProduct = selectors.productFilter.value.trim();
+    console.log("📦 Viewing status for:", selectedProduct);
     fetchPendingOrders(selectedProduct);
   });
 
   selectors.productFilter?.addEventListener("change", () => {
     const selectedProduct = selectors.productFilter.value.trim();
-    fetchPendingOrders(selectedProduct); // replaces missing loadFilteredOrders
+    console.log("🔄 Product filter changed:", selectedProduct);
+    fetchPendingOrders(selectedProduct);
   });
 
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
+    console.log("📊 Loading 3PL summary...");
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
     showLoader();
@@ -101,6 +129,7 @@ function bindDashboardButtons() {
   });
 
   selectors.reloadBtn?.addEventListener("click", async () => {
+    console.log("🔄 Reloading products and cards...");
     const spinner = selectors.reloadBtn.querySelector(".spinner");
     spinner.classList.remove("hidden");
     selectors.reloadBtn.disabled = true;
@@ -112,7 +141,7 @@ function bindDashboardButtons() {
       await fetchPendingOrders(selectedProduct);
       showToast("Product list and cards refreshed.");
     } catch (error) {
-      console.error("Reload failed:", error);
+      console.error("❌ Reload failed:", error);
       showToast("Failed to reload products and cards.");
     } finally {
       spinner.classList.add("hidden");
@@ -122,59 +151,9 @@ function bindDashboardButtons() {
   });
 }
 
-
-function showLoadingOverlay() {
-  selectors.loadingOverlay?.classList.remove("hidden");
-}
-
-function showLoadingOverlay() {
-  selectors.loadingOverlay?.classList.remove("hidden");
-}
-
-function hideLoadingOverlay() {
-  selectors.loadingOverlay?.classList.add("hidden");
-}
-
-function validateSession() {
-  const SESSION_KEY = "zamport-auth";
-  const LAST_ACTIVE_KEY = "zamport-last-active";
-  const MAX_IDLE = 15 * 60 * 1000;
-
-  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
-  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
-  const now = Date.now();
-
-  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE) {
-    showToast("Session expired. Please log in again.");
-    sessionStorage.clear();
-    setTimeout(() => window.location.href = "index.html", 1500);
-    return false;
-  }
-
-  sessionStorage.setItem(LAST_ACTIVE_KEY, now);
-  return true;
-}
-
-async function initializeDashboard() {
-  showLoadingOverlay();
-
-  try {
-    await loadProductDropdown();
-    const selectedProduct = selectors.productFilter.value.trim();
-    await fetchPendingOrders(selectedProduct);
-    await loadCurrentMonth3PLSummary();
-  } catch (error) {
-    console.error("Dashboard init failed:", error);
-    showToast("Failed to load dashboard.");
-  } finally {
-    hideLoadingOverlay();
-  }
-}
-
-
-
 // === Fetch & Render ===
 async function fetchPendingOrders(product = '') {
+  console.log("📡 Fetching pending orders for:", product || "All Products");
   showSpinner(selectors.viewStatusBtn);
   selectors.pendingContainer.innerHTML = '';
 
@@ -185,14 +164,15 @@ async function fetchPendingOrders(product = '') {
     const data = await res.json();
     renderPendingCards(data);
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    showToast('Failed to load pending orders.');
+    console.error("❌ Error fetching orders:", error);
+    showToast("Failed to load pending orders.");
   } finally {
     hideSpinner(selectors.viewStatusBtn);
   }
 }
 
 function renderPendingCards(data) {
+  console.log("🧩 Rendering pending cards...");
   selectors.pendingContainer.innerHTML = '';
 
   if (!Array.isArray(data) || data.length === 0) {
@@ -216,9 +196,12 @@ function renderPendingCards(data) {
     `;
     selectors.pendingContainer.appendChild(card);
   });
+
+  console.log(`✅ Rendered ${data.length} pending cards.`);
 }
 
 // === SKU Submit ===
+
 async function submitSku() {
   const sku = selectors.skuInput.value.trim();
   if (!sku) return alert("Enter or scan a SKU first");
