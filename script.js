@@ -1,39 +1,21 @@
-// === Zamport Login Constants ===
-
+// === Session Enforcement ===
 (function enforceSession() {
   const SESSION_KEY = "zamport-auth";
   const LAST_ACTIVE_KEY = "zamport-last-active";
-  const MAX_IDLE_TIME = 15 * 60 * 1000; // 15 minutes
+  const MAX_IDLE_TIME = 15 * 60 * 1000;
 
   const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
   const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
   const now = Date.now();
 
-  const isSessionExpired = !lastActive || (now - lastActive > MAX_IDLE_TIME);
-
-  if (!isLoggedIn || isSessionExpired) {
+  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE_TIME) {
     showToast("Session expired. Please log in again.");
     sessionStorage.clear();
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 2000); // show toast for 2 seconds before redirect
+    setTimeout(() => window.location.href = "index.html", 2000);
   } else {
-    sessionStorage.setItem(LAST_ACTIVE_KEY, now); // refresh activity
+    sessionStorage.setItem(LAST_ACTIVE_KEY, now);
   }
 })();
-
-const username = sessionStorage.getItem("zamport-user");
-if (username) {
-  document.getElementById("usernameDisplay").textContent = username.charAt(0).toUpperCase() + username.slice(1);
-}
-
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  sessionStorage.clear();
-  showToast("You’ve been logged out.");
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 1500);
-});
 
 // === Constants ===
 const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
@@ -49,14 +31,32 @@ const selectors = {
   threePLWrapper: document.getElementById('threePLWrapper'),
   threePLSummaryBtn: document.getElementById('threePLSummaryBtn'),
   threePLLoader: document.getElementById('threePLLoader'),
+  reloadBtn: document.getElementById("reloadProductsBtn"),
+  loadingOverlay: document.getElementById("loadingOverlay"),
+  currentMonthBody: document.getElementById("currentMonth3PLBody"),
+  currentMonthTotal: document.getElementById("currentMonthTotal"),
 };
 
-// === Initialization ===
-document.addEventListener('DOMContentLoaded', () => {
-  selectors.submitBtn?.addEventListener('click', submitSku);
-  selectors.viewStatusBtn?.addEventListener('click', fetchPendingOrders);
-  selectors.productFilter?.addEventListener('change', loadFilteredOrders);
-  selectors.threePLSummaryBtn?.addEventListener('click', async () => {
+// === DOM Ready ===
+document.addEventListener("DOMContentLoaded", () => {
+  const username = sessionStorage.getItem("zamport-user");
+  if (username) {
+    document.getElementById("usernameDisplay").textContent = username.charAt(0).toUpperCase() + username.slice(1);
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    sessionStorage.clear();
+    showToast("You’ve been logged out.");
+    setTimeout(() => window.location.href = "index.html", 1500);
+  });
+
+  selectors.submitBtn?.addEventListener("click", submitSku);
+  selectors.viewStatusBtn?.addEventListener("click", () => {
+    const selectedProduct = selectors.productFilter.value.trim();
+    fetchPendingOrders(selectedProduct);
+  });
+  selectors.productFilter?.addEventListener("change", loadFilteredOrders);
+  selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
     showLoader();
@@ -67,17 +67,38 @@ document.addEventListener('DOMContentLoaded', () => {
       hideSpinner(selectors.threePLSummaryBtn);
     }
   });
+
+  selectors.reloadBtn?.addEventListener("click", async () => {
+    const spinner = selectors.reloadBtn.querySelector(".spinner");
+    spinner.classList.remove("hidden");
+    selectors.reloadBtn.disabled = true;
+    selectors.loadingOverlay.classList.remove("hidden");
+
+    try {
+      await loadProductDropdown();
+      const selectedProduct = selectors.productFilter.value.trim();
+      await fetchPendingOrders(selectedProduct);
+      showToast("Product list and cards refreshed.");
+    } catch (error) {
+      console.error("Reload failed:", error);
+      showToast("Failed to reload products and cards.");
+    } finally {
+      spinner.classList.add("hidden");
+      selectors.reloadBtn.disabled = false;
+      selectors.loadingOverlay.classList.add("hidden");
+    }
+  });
+
   loadProductDropdown();
+  loadCurrentMonth3PLSummary();
 });
 
-// === Fetch Pending Orders ===
+// === Fetch & Render ===
 async function fetchPendingOrders(product = '') {
   showSpinner(selectors.viewStatusBtn);
   selectors.pendingContainer.innerHTML = '';
 
-  const endpoint = product
-    ? `${API_BASE}?product=${encodeURIComponent(product)}`
-    : API_BASE;
+  const endpoint = product ? `${API_BASE}?product=${encodeURIComponent(product)}` : API_BASE;
 
   try {
     const res = await fetch(endpoint);
@@ -91,7 +112,33 @@ async function fetchPendingOrders(product = '') {
   }
 }
 
-// === Submit SKU ===
+function renderPendingCards(data) {
+  selectors.pendingContainer.innerHTML = '';
+
+  if (!Array.isArray(data) || data.length === 0) {
+    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found for this month.</p>';
+    return;
+  }
+
+  data.forEach(({ sku, product, status, sheetName, labelLink }) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const labelHTML = labelLink
+      ? `<a href="${labelLink}" target="_blank" class="label-link">🖨️ Print Label</a>`
+      : '<em>No label link</em>';
+
+    card.innerHTML = `
+      <strong>SKU:</strong> ${sku}<br/>
+      <strong>Product:</strong> ${product}<br/>
+      <strong>Status:</strong> ${status}<br/>
+      <strong>Sheet:</strong> ${sheetName}<br/>
+      ${labelHTML}
+    `;
+    selectors.pendingContainer.appendChild(card);
+  });
+}
+
+// === SKU Submit ===
 async function submitSku() {
   const sku = selectors.skuInput.value.trim();
   if (!sku) return alert("Enter or scan a SKU first");
@@ -129,315 +176,54 @@ async function submitSku() {
   }
 }
 
-// === Render Cards ===
-
-function renderPendingCards(data) {
-  selectors.pendingContainer.innerHTML = '';
-
-  if (!Array.isArray(data) || data.length === 0) {
-    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found for this month.</p>';
-    return;
-  }
-
-  data.forEach(({ sku, product, status, sheetName, labelLink }) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    const labelHTML = labelLink
-      ? `<a href="${labelLink}" target="_blank" class="label-link">🖨️ Print Label</a>`
-      : '<em>No label link</em>';
-
-    card.innerHTML = `
-      <strong>SKU:</strong> ${sku}<br/>
-      <strong>Product:</strong> ${product}<br/>
-      <strong>Status:</strong> ${status}<br/>
-      <strong>Sheet:</strong> ${sheetName}<br/>
-      ${labelHTML}
-    `;
-
-    selectors.pendingContainer.appendChild(card);
-  });
-}
-
-
-// === Spinner Logic ===
-function showSpinner(button) {
-  const spinner = button.querySelector('.spinner');
-  if (spinner) {
-    spinner.style.display = 'inline-block';
-    button.disabled = true;
-  }
-}
-
-function hideSpinner(button) {
-  const spinner = button.querySelector('.spinner');
-  if (spinner) {
-    spinner.style.display = 'none';
-    button.disabled = false;
-  }
-}
-
-// === Toast Notification ===
-function showToast(message) {
-  selectors.toast.textContent = message;
-  selectors.toast.className = "show";
-  setTimeout(() => {
-    selectors.toast.classList.remove("show");
-  }, 3000);
-}
-
 // === 3PL Summary ===
 async function load3PLSummary() {
   selectors.threePLTableBody.innerHTML = '';
-
-  try {
-    const endpoint = `${API_BASE}?mode=3pl`;
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
-    const summary = await response.json();
-    if (!Array.isArray(summary)) throw new Error('Invalid data format received');
-
-    let grandTotal = 0;
-
-    summary.forEach((item, index) => {
-      const row = document.createElement('tr');
-      if (index % 2 === 1) row.classList.add('alt-row');
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || 'Unnamed'}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
-      `;
-
-      selectors.threePLTableBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
-    });
-
-    const totalRow = document.createElement('tr');
-    totalRow.classList.add('grand-total');
-    totalRow.innerHTML = `
-      <td colspan="2"><strong>Grand Total</strong></td>
-      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
-    `;
-    selectors.threePLTableBody.appendChild(totalRow);
-  } catch (error) {
-    console.error('Error loading 3PL summary:', error);
-    showToast(`Failed to load 3PL cost summary: ${error.message}`);
-  }
-}
-
-function toggle3PLTable() {
-  selectors.threePLWrapper.classList.toggle('active');
-}
-
-function showLoader() {
-  selectors.threePLLoader?.classList.remove('hidden');
-}
-
-function hideLoader() {
-  selectors.threePLLoader?.classList.add('hidden');
-}
-
-// === Product Filter ===
-async function loadFilteredOrders() {
-  const selectedProduct = selectors.productFilter.value.trim();
-  fetchPendingOrders(selectedProduct);
-}
-
-async function loadProductDropdown() {
-  if (!selectors.productFilter) return;
-
-  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
-
-  try {
-    const endpoint = `${API_BASE}?mode=products`;
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
-    const products = await response.json();
-    if (!Array.isArray(products)) throw new Error('Invalid product data format');
-
-    products.sort().forEach(product => {
-      if (product && typeof product === 'string') {
-        const option = document.createElement('option');
-        option.value = product;
-        option.textContent = product;
-        selectors.productFilter.appendChild(option);
-      }
-    });
-
-    console.log('Product dropdown loaded:', products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    showToast('Failed to load product list.');
-  }
-}
-
-// SKU Vault
-
-function openVault(skuData) {
-  const vault = document.getElementById("skuVault");
-  const details = document.getElementById("vaultDetails");
-
-  const doi = skuData.G && skuData.G !== "missing" ? excelSerialToDate(skuData.G) : "—";
-  const warranty = skuData.H && skuData.H !== "missing" ? excelSerialToDate(skuData.H) : "—";
-
-  details.innerHTML = `
-    <p><strong>SKU:</strong> ${skuData.A}</p>
-    <p><strong>Customer:</strong> ${skuData.B}</p>
-    <p><strong>State:</strong> ${skuData.C}</p>
-    <p><strong>Instrument:</strong> ${skuData.D}</p>
-    <p><strong>Sheet:</strong> ${skuData.E}</p>
-    <p><strong>3PL Cost:</strong> ₹${skuData.F}</p>
-    <p><strong>DOI:</strong> ${doi}</p>
-    <p><strong>Warranty:</strong> ${warranty}</p>
-  `;
-
-  vault.classList.remove("hidden");
-}
-
-function closeVault() {
-  document.getElementById("skuVault").classList.add("hidden");
-}
-
-const skuValue = document.getElementById("skuInput").value.trim();
-const matched = crmData.find(row => row.A === skuValue);
-if (matched) {
-  openVault(matched);
-} else {
-  showToast("SKU not found.");
-}
-
-// Filter dropdown reload button
-
-const reloadBtn = document.getElementById("reloadProductsBtn");
-const loadingOverlay = document.getElementById("loadingOverlay");
-
-reloadBtn?.addEventListener("click", async () => {
-  const spinner = reloadBtn.querySelector(".spinner");
-  spinner.classList.remove("hidden");
-  reloadBtn.disabled = true;
-  loadingOverlay.classList.remove("hidden");
-
-  try {
-    await loadProductDropdown();
-    const selectedProduct = document.getElementById("productFilter")?.value.trim();
-    await fetchPendingOrders(selectedProduct);
-    showToast("Product list and cards refreshed.");
-  } catch (error) {
-    console.error("Reload failed:", error);
-    showToast("Failed to reload products and cards.");
-  } finally {
-    spinner.classList.add("hidden");
-    reloadBtn.disabled = false;
-    loadingOverlay.classList.add("hidden");
-  }
-});
-
-// === 3PL Summary ===
-async function load3PLSummary() {
-  selectors.threePLTableBody.innerHTML = '';
-  try {
-    const endpoint = `${API_BASE}?mode=3pl`;
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
-    const summary = await response.json();
-    if (!Array.isArray(summary)) throw new Error('Invalid data format received');
-
-    let grandTotal = 0;
-
-    summary.forEach((item, index) => {
-      const row = document.createElement('tr');
-      if (index % 2 === 1) row.classList.add('alt-row');
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || 'Unnamed'}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
-      `;
-
-      selectors.threePLTableBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
-    });
-
-    const totalRow = document.createElement('tr');
-    totalRow.classList.add('grand-total');
-    totalRow.innerHTML = `
-      <td colspan="2"><strong>Grand Total</strong></td>
-      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
-    `;
-    selectors.threePLTableBody.appendChild(totalRow);
-  } catch (error) {
-    console.error('Error loading 3PL summary:', error);
-    showToast(`Failed to load 3PL cost summary: ${error.message}`);
-  }
-}
-
-function toggle3PLTable() {
-  selectors.threePLWrapper.classList.toggle('active');
-}
-
-function showLoader() {
-  selectors.threePLLoader?.classList.remove('hidden');
-}
-
-function hideLoader() {
-  selectors.threePLLoader?.classList.add('hidden');
-}
-
-// === Product Filter ===
-async function loadFilteredOrders() {
-  const selectedProduct = selectors.productFilter.value.trim();
-  fetchPendingOrders(selectedProduct);
-}
-
-async function loadProductDropdown() {
-  if (!selectors.productFilter) return;
-
-  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
-
-  try {
-    const endpoint = `${API_BASE}?mode=products`;
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
-    const products = await response.json();
-    if (!Array.isArray(products)) throw new Error('Invalid product data format');
-
-    products.sort().forEach(product => {
-      if (product && typeof product === 'string') {
-        const option = document.createElement('option');
-        option.value = product;
-        option.textContent = product;
-        selectors.productFilter.appendChild(option);
-      }
-    });
-
-    console.log('Product dropdown loaded:', products);
-  } catch (error) {
-    console.error('Error loading products:', error);
-    showToast('Failed to load product list.');
-  }
-}
-
-async function loadCurrentMonth3PLSummary() {
-  const tableBody = document.getElementById("currentMonth3PLBody");
-  const totalCell = document.getElementById("currentMonthTotal");
-  tableBody.innerHTML = "";
   let grandTotal = 0;
 
   try {
     const endpoint = `${API_BASE}?mode=3pl`;
     const response = await fetch(endpoint);
-    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
-
     const summary = await response.json();
-    if (!Array.isArray(summary)) throw new Error("Invalid data format received");
+
+    summary.forEach((item, index) => {
+      const row = document.createElement('tr');
+      if (index % 2 === 1) row.classList.add('alt-row');
+
+      row.innerHTML = `
+        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
+        <td>${item.sheetName || 'Unnamed'}</td>
+        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+      `;
+      selectors.threePLTableBody.appendChild(row);
+      grandTotal += Number(item.total3PLCost) || 0;
+    });
+
+    const totalRow = document.createElement('tr');
+    totalRow.classList.add('grand-total');
+    totalRow.innerHTML = `
+      <td colspan="2"><strong>Grand Total</strong></td>
+      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
+    `;
+    selectors.threePLTableBody.appendChild(totalRow);
+  } catch (error) {
+    console.error('Error loading 3PL summary:', error);
+    showToast(`Failed to load 3PL cost summary: ${error.message}`);
+  }
+}
+
+// === Current Month Summary ===
+async function loadCurrentMonth3PLSummary() {
+  selectors.currentMonthBody.innerHTML = '';
+  let grandTotal = 0;
+
+  try {
+    const endpoint = `${API_BASE}?mode=3pl`;
+    const response = await fetch(endpoint);
+    const summary = await response.json();
 
     const today = new Date();
-    const currentMonth = today.getMonth(); // 0-indexed
+    const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     const currentDay = today.getDate();
 
@@ -451,37 +237,4 @@ async function loadCurrentMonth3PLSummary() {
       );
     });
 
-    filtered.forEach((item, index) => {
-      const row = document.createElement("tr");
-      if (index % 2 === 1) row.classList.add("alt-row");
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || "Unnamed"}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
-      `;
-
-      tableBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
-    });
-
-    totalCell.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
-  } catch (error) {
-    console.error("Error loading current month 3PL summary:", error);
-    showToast(`Failed to load current month summary: ${error.message}`);
-  }
-}
-
-// Helper: Extract date from sheet name like "7 November" or "15 March"
-function extractDateFromSheetName(name) {
-  const regex = /(\d{1,2})\s+([A-Za-z]+)(?:\s+(\d{4}))?/;
-  const match = name.match(regex);
-  if (!match) return null;
-
-  const day = parseInt(match[1], 10);
-  const month = new Date(`${match[2]} 1`).getMonth(); // Converts "November" to 10
-  const year = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
-
-  return new Date(year, month, day);
-}
-
+    filtered.forEach((item, index) =>
