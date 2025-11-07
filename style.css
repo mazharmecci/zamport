@@ -742,36 +742,38 @@ button.loading::after {
 }
 
 .reload-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   padding: 6px 12px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
+  font-size: 14px;
+  background-color: #0078d4; /* login button color */
+  color: #000;
+  border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition: background-color 0.3s ease;
 }
 
 .reload-btn:hover {
-  background-color: #125ea2;
+  background-color: #9ecae1; /* Slightly darker on hover */
 }
 
-.spinner {
+.reload-btn .spinner {
   width: 16px;
   height: 16px;
   border: 2px solid #fff;
-  border-top: 2px solid transparent;
+  border-top: 2px solid #000;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-.hidden {
+.spinner.hidden {
   display: none;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
