@@ -309,7 +309,24 @@ if (matched) {
   showToast("SKU not found.");
 }
 
-document.getElementById("reloadProductsBtn")?.addEventListener("click", () => {
-  loadProductDropdown();
-  showToast("Product list refreshed.");
+// Filter dropdown reload button
+
+const reloadBtn = document.getElementById("reloadProductsBtn");
+
+reloadBtn?.addEventListener("click", async () => {
+  const spinner = reloadBtn.querySelector(".spinner");
+  spinner.classList.remove("hidden");
+  reloadBtn.disabled = true;
+
+  try {
+    await loadProductDropdown();
+    showToast("Product list refreshed.");
+  } catch (error) {
+    console.error("Reload failed:", error);
+    showToast("Failed to reload products.");
+  } finally {
+    spinner.classList.add("hidden");
+    reloadBtn.disabled = false;
+  }
 });
+
