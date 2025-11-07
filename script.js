@@ -12,6 +12,7 @@ function showToast(message) {
 }
 
 // === DOM Ready Handler ===
+
 document.addEventListener("DOMContentLoaded", () => {
   // 🔐 Auth Check
   const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
@@ -30,11 +31,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-    // === DOM Elements ===
+  // === DOM Elements ===
   const viewStatusBtn = document.getElementById("viewStatus");
   const productFilter = document.getElementById("productFilter");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+
+  // === Global Variables ===
+  let pendingOrders = [];
+
+  // ✅ Attach Event Listener Safely
+  if (viewStatusBtn) {
+    viewStatusBtn.addEventListener("click", () => {
+      // your logic here
+    });
+  } else {
+    console.warn("viewStatus button not found in DOM");
+  }
 
   // === UI Helpers ===
   function toggleSpinner(button, show) {
@@ -67,9 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function createOrderCard(order) {
     const card = document.createElement("div");
     card.className = "order-card";
-  
+
     const statusColor = order.status === "Order-Pending" ? "red" : "green";
-  
+
     card.innerHTML = `
       <h4>📦 SKU: ${order.sku}</h4>
       <p>🧪 Product: ${order.product}</p>
@@ -82,6 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     return card;
   }
+});
+
 
   function renderPendingOrders(orders) {
     pendingOrdersContainer.innerHTML = "";
