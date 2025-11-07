@@ -40,6 +40,22 @@ function showToast(message) {
   }, 3000);
 }
 
+function showSpinner(button) {
+  const spinner = button?.querySelector(".spinner");
+  if (spinner) {
+    spinner.classList.remove("hidden");
+    console.log("⏳ Spinner shown");
+  }
+}
+
+function hideSpinner(button) {
+  const spinner = button?.querySelector(".spinner");
+  if (spinner) {
+    spinner.classList.add("hidden");
+    console.log("✅ Spinner hidden");
+  }
+}
+
 // === Session Validation ===
 
 function validateSession() {
