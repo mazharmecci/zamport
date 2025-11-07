@@ -85,11 +85,15 @@
     <hr class="subtle-divider" />
 
     <!-- Product Filter -->
+    
     <section class="product-filter">
       <label for="productFilter" class="dropdown-caption">🔍 Filter cards based on specific product</label>
-      <select id="productFilter">
-        <option value="">All Products</option>
-      </select>
+      <div class="product-filter-row">
+        <select id="productFilter">
+          <option value="">All Products</option>
+        </select>
+        <button id="reloadProductsBtn" class="reload-btn">🔄 Reload</button>
+      </div>
     </section>
 
     <!-- Pending Orders -->
