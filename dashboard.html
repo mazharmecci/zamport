@@ -19,9 +19,7 @@
       <h2>ZAMPORT</h2>
     </header>
 
-     <!-- Profile -->
-    
-      <main class="container">
+    <!-- Dashboard Header -->
     <section class="dashboard-header">
       <div class="dashboard-title-row">
         <h2>📊 Dashboard</h2>
@@ -32,7 +30,7 @@
         </div>
       </div>
     </section>
-        
+
     <!-- SKU Submission Form -->
     <form class="stock-form" onsubmit="event.preventDefault();">
       <label for="skuInput">Enter SKU</label>
@@ -46,36 +44,33 @@
     <hr class="subtle-divider" />
 
     <!-- Action Buttons -->
-    
     <section class="action-row">
       <button id="viewStatus" class="action-btn">
         <span class="spinner"></span>
         📦 Pending Orders
       </button>
-    
       <button id="threePLSummaryBtn" class="action-btn">
         <span class="spinner"></span>
         📊 3PL Cost Summary
       </button>
     </section>
 
-      <div id="threePLWrapper">
-        <div id="threePLLoader" class="loader-overlay hidden">
-          <div class="loader-spinner"></div>
-          <p>Loading summary...</p>
-        </div>
-
-        <table id="threePLSummaryTable">
-          <thead>
-            <tr>
-              <th>📄 Sheet</th>
-              <th>📘 Sheet Name</th>
-              <th>💰 Total 3PL Cost</th>
-            </tr>
-          </thead>
-          <tbody id="threePLTableBody"></tbody>
-        </table>
+    <!-- 3PL Summary Table -->
+    <section id="threePLWrapper">
+      <div id="threePLLoader" class="loader-overlay hidden">
+        <div class="loader-spinner"></div>
+        <p>Loading summary...</p>
       </div>
+      <table id="threePLSummaryTable">
+        <thead>
+          <tr>
+            <th>📄 Sheet</th>
+            <th>📘 Sheet Name</th>
+            <th>💰 Total 3PL Cost</th>
+          </tr>
+        </thead>
+        <tbody id="threePLTableBody"></tbody>
+      </table>
     </section>
 
     <hr class="subtle-divider" />
