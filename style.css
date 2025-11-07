@@ -513,3 +513,16 @@ body.login-body {
 .logout-btn:hover {
   background-color: #c0392b;
 }
+
+@media (max-width: 600px) {
+  .dashboard-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .user-badge {
+    align-self: flex-end;
+  }
+}
+
