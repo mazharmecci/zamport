@@ -629,3 +629,15 @@ body.login-body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+button .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: #0078D4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
