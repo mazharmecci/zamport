@@ -1,24 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // === Logout & Auth Check ===
   const logoutBtn = document.getElementById("logoutBtn");
-
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
-      sessionStorage.clear(); // or remove specific keys
-      window.location.href = "https://mazharmecci.github.io/zamport/"; // adjust if needed
+      sessionStorage.clear();
+      window.location.href = "https://mazharmecci.github.io/zamport/";
     });
   }
 
-  // Optional: Redirect to login if not authenticated
   const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
   if (!isAuthenticated) {
     window.location.href = "https://mazharmecci.github.io/zamport/";
+    return; // prevent further execution
   }
-});
 
-// === Constants ===
-
-document.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with actual deployment URL
+  // === Constants ===
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
   const productFilter = document.getElementById("productFilter");
   const reloadBtn = document.getElementById("reloadProductsBtn");
@@ -73,35 +70,30 @@ document.addEventListener("DOMContentLoaded", () => {
     productFilter.dispatchEvent(new Event("change")); // Trigger initial load
   }
 
-  
-function renderPendingOrders(orders) {
-  pendingOrdersContainer.innerHTML = "";
+  function renderPendingOrders(orders) {
+    pendingOrdersContainer.innerHTML = "";
 
-  if (!orders.length) {
-    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
-    return;
+    if (!orders.length) {
+      pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+      return;
+    }
+
+    orders.forEach(order => {
+      const card = document.createElement("div");
+      card.className = "order-card";
+
+      card.innerHTML = `
+        <h4>📦 SKU: ${order.sku}</h4>
+        <p>🧪 Product: ${order.product}</p>
+        <p>📌 Status: ${order.status}</p>
+        <p>📄 Sheet: ${order.sheetName}</p>
+        <p>📅 Date: ${order.date || "N/A"}</p>
+        <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+        <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+        ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+      `;
+
+      pendingOrdersContainer.appendChild(card);
+    });
   }
-
-  orders.forEach(order => {
-    const card = document.createElement("div");
-    card.className = "order-card";
-
-    card.innerHTML = `
-      <h4>📦 SKU: ${order.sku}</h4>
-      <p>🧪 Product: ${order.product}</p>
-      <p>📌 Status: ${order.status}</p>
-      <p>📄 Sheet: ${order.sheetName}</p>
-      <p>📅 Date: ${order.date || "N/A"}</p>
-      <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-      <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-      ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-    `;
-
-    pendingOrdersContainer.appendChild(card);
-  });
-}
-
-
-
-
-
+});
