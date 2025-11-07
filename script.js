@@ -30,46 +30,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-  const productFilter = document.getElementById("productFilter");
+    // === DOM Elements ===
   const reloadBtn = document.getElementById("reloadProductsBtn");
-  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+  const viewStatusBtn = document.getElementById("viewStatus");
+  const productFilter = document.getElementById("productFilter");
   const loadingOverlay = document.getElementById("loadingOverlay");
-
-  // 🔄 Reload product list
-  reloadBtn.addEventListener("click", () => {
-    toggleSpinner(reloadBtn, true);
-    fetch(`${API_URL}?mode=products`)
-      .then(res => res.json())
-      .then(products => populateProductDropdown(products))
-      .catch(err => console.error("Failed to load products:", err))
-      .finally(() => toggleSpinner(reloadBtn, false));
-  });
-
-  // 🔍 Filter pending orders
-  productFilter.addEventListener("change", () => {
-    const selectedProduct = productFilter.value;
-    showLoadingOverlay(true);
-    const url = selectedProduct
-      ? `${API_URL}?product=${encodeURIComponent(selectedProduct)}`
-      : API_URL;
-
-    fetch(url)
-      .then(res => res.json())
-      .then(orders => renderPendingOrders(orders))
-      .catch(err => console.error("Failed to fetch orders:", err))
-      .finally(() => showLoadingOverlay(false));
-  });
-
-  // 🌀 Initial load
-  reloadBtn.click();
+  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
 
   // === UI Helpers ===
   function toggleSpinner(button, show) {
-    button.querySelector(".spinner").classList.toggle("hidden", !show);
+    const spinner = button.querySelector(".spinner");
+    if (spinner) spinner.classList.toggle("hidden", !show);
   }
 
   function showLoadingOverlay(show) {
     loadingOverlay.classList.toggle("hidden", !show);
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
   function populateProductDropdown(products) {
@@ -80,33 +63,73 @@ document.addEventListener("DOMContentLoaded", () => {
       option.textContent = product;
       productFilter.appendChild(option);
     });
-    productFilter.dispatchEvent(new Event("change")); // Trigger initial load
+  }
+
+  function createOrderCard(order) {
+    const card = document.createElement("div");
+    card.className = "order-card";
+    card.innerHTML = `
+      <h4>📦 SKU: ${order.sku}</h4>
+      <p>🧪 Product: ${order.product}</p>
+      <p>📌 Status: ${order.status}</p>
+      <p>📄 Sheet: ${order.sheetName}</p>
+      <p>📅 Date: ${order.date || "N/A"}</p>
+      <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+      <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+      ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+    `;
+    return card;
   }
 
   function renderPendingOrders(orders) {
     pendingOrdersContainer.innerHTML = "";
-
     if (!orders.length) {
       pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
       return;
     }
-
     orders.forEach(order => {
-      const card = document.createElement("div");
-      card.className = "order-card";
-
-      card.innerHTML = `
-        <h4>📦 SKU: ${order.sku}</h4>
-        <p>🧪 Product: ${order.product}</p>
-        <p>📌 Status: ${order.status}</p>
-        <p>📄 Sheet: ${order.sheetName}</p>
-        <p>📅 Date: ${order.date || "N/A"}</p>
-        <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-        <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-        ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-      `;
-
-      pendingOrdersContainer.appendChild(card);
+      pendingOrdersContainer.appendChild(createOrderCard(order));
     });
   }
+
+  function fetchAndRenderOrders(product = "") {
+    showLoadingOverlay(true);
+    const url = product
+      ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+      : `${API_URL}?mode=3pl-month`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(orders => renderPendingOrders(orders))
+      .catch(err => {
+        console.error("Failed to fetch orders:", err);
+        showToast("❌ Failed to load orders.");
+      })
+      .finally(() => showLoadingOverlay(false));
+  }
+
+  // === 🔘 Pending Orders Button Click ===
+  viewStatusBtn.addEventListener("click", () => {
+    toggleSpinner(viewStatusBtn, true);
+
+    fetch(`${API_URL}?mode=products`)
+      .then(res => res.json())
+      .then(products => {
+        populateProductDropdown(products);
+        fetchAndRenderOrders(); // Load all pending orders
+      })
+      .catch(err => {
+        console.error("Failed to load products:", err);
+        showToast("❌ Failed to load product list.");
+      })
+      .finally(() => toggleSpinner(viewStatusBtn, false));
+  });
+
+  // === 🔄 Filter by Product ===
+  productFilter.addEventListener("change", () => {
+    const selectedProduct = productFilter.value;
+    fetchAndRenderOrders(selectedProduct);
+  });
 });
+
+
