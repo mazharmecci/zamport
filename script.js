@@ -4,14 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       sessionStorage.clear(); // or remove specific keys
-      window.location.href = "login.html"; // adjust if needed
+      window.location.href = "https://mazharmecci.github.io/zamport/"; // adjust if needed
     });
   }
 
   // Optional: Redirect to login if not authenticated
   const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
   if (!isAuthenticated) {
-    window.location.href = "login.html";
+    window.location.href = "https://mazharmecci.github.io/zamport/";
   }
 });
 
