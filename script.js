@@ -18,6 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const usernameDisplay = document.getElementById("usernameDisplay");
+const userName = sessionStorage.getItem("zamport-user");
+
+if (usernameDisplay && userName) {
+  usernameDisplay.textContent = userName;
+}
 
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
