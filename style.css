@@ -160,26 +160,27 @@ h2 {
 }
 
 /* === Toast Notification === */
+
 .toast {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
   position: fixed;
-  bottom: 1rem;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #e74c3c;
-  color: white;
-  padding: 0.8rem 1.2rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-  z-index: 9999;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 1000;
 }
 
-.toast.visible {
+.toast.show {
+  visibility: visible;
   opacity: 1;
-  pointer-events: auto;
 }
+
 
 /* === Loading Overlay === */
 .loader-overlay {
