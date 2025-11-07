@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
     // === DOM Elements ===
-  const reloadBtn = document.getElementById("reloadProductsBtn");
   const viewStatusBtn = document.getElementById("viewStatus");
   const productFilter = document.getElementById("productFilter");
   const loadingOverlay = document.getElementById("loadingOverlay");
@@ -135,4 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
+// === 🔄 Refresh orders ===
+document.getElementById("refreshOrdersBtn").addEventListener("click", () => {
+  fetchAndRenderOrders(productFilter?.value || "");
+});
