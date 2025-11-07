@@ -71,6 +71,11 @@
   </aside>
 </div>
 
+<label for="productFilter">Filter by Product</label>
+<select id="productFilter" class="product-filter">
+  <option value="">All Products</option>
+</select>
+
 <!-- 🔔 Toast Notification -->
 <div id="toast" role="alert" aria-live="assertive"></div>
 
@@ -106,6 +111,10 @@
 </script>
 
   <script src="script.js"></script>
+  
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+</div>
 
 </body>
 </html>
