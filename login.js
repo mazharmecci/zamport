@@ -25,3 +25,5 @@ function validateLogin(event) {
     showToast("Invalid credentials. Please try again.");
   }
 }
+
+<div id="toast" class="toast" role="alert" aria-live="assertive"></div>
