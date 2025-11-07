@@ -82,6 +82,7 @@ function validateSession() {
 }
 
 // === Dashboard Initialization ===
+
 async function initializeDashboard() {
   console.log("🚀 Initializing dashboard...");
   showLoadingOverlay();
@@ -101,6 +102,7 @@ async function initializeDashboard() {
 }
 
 // === DOM Ready ===
+
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("📦 DOM fully loaded.");
   initializeUserSession();
@@ -115,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // === User Session Display + Logout ===
+
 function initializeUserSession() {
   console.log("👤 Initializing user session...");
   const username = sessionStorage.getItem("zamport-user");
@@ -136,6 +139,7 @@ function initializeUserSession() {
 }
 
 // === Button Bindings ===
+
 function bindDashboardButtons() {
   console.log("🔗 Binding dashboard buttons...");
 
@@ -190,6 +194,7 @@ function bindDashboardButtons() {
 }
 
 // === Fetch & Render ===
+
 async function fetchPendingOrders(product = '') {
   console.log("📡 Fetching pending orders for:", product || "All Products");
   showSpinner(selectors.viewStatusBtn);
@@ -300,49 +305,43 @@ async function submitSku() {
   }
 }
 
+function parseDateSafely(raw) {
+  const parsed = new Date(raw);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 async function loadCurrentMonth3PLSummary() {
-  selectors.currentMonthBody.innerHTML = '';
-  let grandTotal = 0;
+  console.log("📊 Loading current month 3PL summary...");
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const allRows = [];
 
-  try {
-    const endpoint = `${API_BASE}?mode=3pl`;
-    const response = await fetch(endpoint);
-    const summary = await response.json();
+  SHEET_IDS.forEach(sheetId => {
+    const spreadsheet = SpreadsheetApp.openById(sheetId);
+    spreadsheet.getSheets().forEach(sheet => {
+      const data = sheet.getDataRange().getValues();
+      const header = data[1]; // Assuming row 2 is header
+      const costCol = header.indexOf("3PL Cost");
+      const sheetName = sheet.getName();
 
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const currentDay = today.getDate();
+      for (let i = 2; i < data.length; i++) {
+        const rawDate = data[i][0];
+        const parsedDate = parseDateSafely(rawDate);
+        if (!parsedDate) continue;
 
-    const filtered = summary.filter(item => {
-      const sheetDate = extractDateFromSheetName(item.sheetName);
-      return (
-        sheetDate &&
-        sheetDate.getMonth() === currentMonth &&
-        sheetDate.getFullYear() === currentYear &&
-        sheetDate.getDate() <= currentDay
-      );
+        if (
+          parsedDate.getMonth() === currentMonth &&
+          parsedDate.getFullYear() === currentYear
+        ) {
+          const cost = parseFloat(data[i][costCol]) || 0;
+          allRows.push({ sheetId, sheetName, cost });
+        }
+      }
     });
+  });
 
-    filtered.forEach((item, index) => {
-      const row = document.createElement("tr");
-      if (index % 2 === 1) row.classList.add("alt-row");
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || "Unnamed"}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
-      `;
-
-      selectors.currentMonthBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
-    });
-
-    selectors.currentMonthTotal.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
-  } catch (error) {
-    console.error("Error loading current month 3PL summary:", error);
-    showToast(`Failed to load current month summary: ${error.message}`);
-  }
+  renderCurrentMonthSummary(allRows);
 }
 
 console.log("✅ Script loaded successfully");
