@@ -68,10 +68,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function createOrderCard(order) {
     const card = document.createElement("div");
     card.className = "order-card";
+  
+    const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  
     card.innerHTML = `
       <h4>📦 SKU: ${order.sku}</h4>
       <p>🧪 Product: ${order.product}</p>
-      <p>📌 Status: ${order.status}</p>
+      <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
       <p>📄 Sheet: ${order.sheetName}</p>
       <p>📅 Date: ${order.date || "N/A"}</p>
       <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
