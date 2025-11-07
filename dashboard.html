@@ -65,22 +65,23 @@
     </section>
 
     <!-- 3PL Summary Table -->
-    <section id="threePLWrapper">
-      <div id="threePLLoader" class="loader-overlay hidden">
-        <div class="loader-spinner"></div>
-        <p>Loading summary...</p>
-      </div>
-      <table id="threePLSummaryTable">
-        <thead>
-          <tr>
-            <th>📄 Sheet</th>
-            <th>📘 Sheet Name</th>
-            <th>💰 Total 3PL Cost</th>
-          </tr>
-        </thead>
-        <tbody id="threePLTableBody"></tbody>
-      </table>
-    </section>
+    
+    <table id="currentMonth3PLTable">
+      <thead>
+        <tr>
+          <th>📄 Sheet</th>
+          <th>📘 Sheet Name</th>
+          <th>💰 Total 3PL Cost</th>
+        </tr>
+      </thead>
+      <tbody id="currentMonth3PLBody"></tbody>
+      <tfoot>
+        <tr class="grand-total">
+          <td colspan="2"><strong>Grand Total</strong></td>
+          <td id="currentMonthTotal"><strong>$0.00</strong></td>
+        </tr>
+      </tfoot>
+    </table>
 
     <hr class="subtle-divider" />
 
