@@ -335,28 +335,22 @@ reloadBtn?.addEventListener("click", async () => {
   }
 });
 
-async function loadCurrentMonth3PLSummary() {
-  const tableBody = document.getElementById("currentMonth3PLBody");
-  const totalCell = document.getElementById("currentMonthTotal");
-  tableBody.innerHTML = "";
-  let grandTotal = 0;
-
+// === 3PL Summary ===
+async function load3PLSummary() {
+  selectors.threePLTableBody.innerHTML = '';
   try {
     const endpoint = `${API_BASE}?mode=3pl`;
     const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
     const summary = await response.json();
+    if (!Array.isArray(summary)) throw new Error('Invalid data format received');
 
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    let grandTotal = 0;
 
-    const filtered = summary.filter(item => {
-      const sheetDate = extractDateFromSheetName(item.sheetName);
-      return sheetDate && sheetDate.getMonth() === currentMonth && sheetDate.getFullYear() === currentYear;
-    });
-
-    filtered.forEach((item, index) => {
-      const row = document.createElement("tr");
-      if (index % 2 === 1) row.classList.add("alt-row");
+    summary.forEach((item, index) => {
+      const row = document.createElement('tr');
+      if (index % 2 === 1) row.classList.add('alt-row');
 
       row.innerHTML = `
         <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
@@ -364,26 +358,67 @@ async function loadCurrentMonth3PLSummary() {
         <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
       `;
 
-      tableBody.appendChild(row);
+      selectors.threePLTableBody.appendChild(row);
       grandTotal += Number(item.total3PLCost) || 0;
     });
 
-    totalCell.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
+    const totalRow = document.createElement('tr');
+    totalRow.classList.add('grand-total');
+    totalRow.innerHTML = `
+      <td colspan="2"><strong>Grand Total</strong></td>
+      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
+    `;
+    selectors.threePLTableBody.appendChild(totalRow);
   } catch (error) {
-    console.error("Error loading current month 3PL summary:", error);
-    showToast("Failed to load current month summary.");
+    console.error('Error loading 3PL summary:', error);
+    showToast(`Failed to load 3PL cost summary: ${error.message}`);
   }
 }
 
-// Helper to extract date from sheet name like "15 March" or "March 2025"
-function extractDateFromSheetName(name) {
-  const regex = /(\d{1,2})\s+([A-Za-z]+)(?:\s+(\d{4}))?/;
-  const match = name.match(regex);
-  if (!match) return null;
-
-  const day = parseInt(match[1], 10);
-  const month = new Date(`${match[2]} 1`).getMonth();
-  const year = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
-
-  return new Date(year, month, day);
+function toggle3PLTable() {
+  selectors.threePLWrapper.classList.toggle('active');
 }
+
+function showLoader() {
+  selectors.threePLLoader?.classList.remove('hidden');
+}
+
+function hideLoader() {
+  selectors.threePLLoader?.classList.add('hidden');
+}
+
+// === Product Filter ===
+async function loadFilteredOrders() {
+  const selectedProduct = selectors.productFilter.value.trim();
+  fetchPendingOrders(selectedProduct);
+}
+
+async function loadProductDropdown() {
+  if (!selectors.productFilter) return;
+
+  selectors.productFilter.innerHTML = '<option value="">All Products</option>';
+
+  try {
+    const endpoint = `${API_BASE}?mode=products`;
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+    const products = await response.json();
+    if (!Array.isArray(products)) throw new Error('Invalid product data format');
+
+    products.sort().forEach(product => {
+      if (product && typeof product === 'string') {
+        const option = document.createElement('option');
+        option.value = product;
+        option.textContent = product;
+        selectors.productFilter.appendChild(option);
+      }
+    });
+
+    console.log('Product dropdown loaded:', products);
+  } catch (error) {
+    console.error('Error loading products:', error);
+    showToast('Failed to load product list.');
+  }
+}
+
