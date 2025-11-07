@@ -200,6 +200,16 @@ function renderPendingCards(data) {
   console.log(`✅ Rendered ${data.length} pending cards.`);
 }
 
+
+function showLoadingOverlay() {
+  selectors.loadingOverlay?.classList.remove("hidden");
+}
+
+function hideLoadingOverlay() {
+  selectors.loadingOverlay?.classList.add("hidden");
+}
+
+
 // === SKU Submit ===
 
 async function submitSku() {
