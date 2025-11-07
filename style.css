@@ -669,3 +669,54 @@ button .spinner {
   max-width: 960px;
   margin: 0 auto;
 }
+
+.sku-input-container {
+  width: 75%; /* Reduces size by 25% */
+  max-width: 600px; /* Optional: cap the width */
+  margin: 0 auto;   /* Center it horizontally */
+}
+
+#skuForm {
+  width: 75%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#skuInput {
+  width: 100%;
+  font-size: 14px; /* Optional: reduce font size */
+  padding: 8px 12px;
+}
+
+/* === Box Sizing Reset === */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* === Responsive Layout Adjustments === */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .filter-actions {
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 12px;
+  }
+
+  .sku-input-container,
+  #skuForm {
+    width: 100%;
+    max-width: none;
+  }
+
+  #viewStatus {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
