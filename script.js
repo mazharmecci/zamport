@@ -311,30 +311,27 @@ if (matched) {
 
 // Filter dropdown reload button
 
-document.addEventListener("DOMContentLoaded", () => {
-  const reloadBtn = document.getElementById("reloadProductsBtn");
+const reloadBtn = document.getElementById("reloadProductsBtn");
+const loadingOverlay = document.getElementById("loadingOverlay");
 
-  if (reloadBtn) {
-    reloadBtn.addEventListener("click", async () => {
-      const spinner = reloadBtn.querySelector(".spinner");
-      if (spinner) spinner.classList.remove("hidden");
-      reloadBtn.disabled = true;
+reloadBtn?.addEventListener("click", async () => {
+  const spinner = reloadBtn.querySelector(".spinner");
+  spinner.classList.remove("hidden");
+  reloadBtn.disabled = true;
+  loadingOverlay.classList.remove("hidden");
 
-      try {
-        await loadProductDropdown(); // Refresh dropdown options
-
-        const selectedProduct = document.getElementById("productFilter")?.value.trim();
-        await fetchPendingOrders(selectedProduct); // Reload cards based on current filter
-
-        showToast("Product list and cards refreshed.");
-      } catch (error) {
-        console.error("Reload failed:", error);
-        showToast("Failed to reload products and cards.");
-      } finally {
-        if (spinner) spinner.classList.add("hidden");
-        reloadBtn.disabled = false;
-      }
-    });
+  try {
+    await loadProductDropdown();
+    const selectedProduct = document.getElementById("productFilter")?.value.trim();
+    await fetchPendingOrders(selectedProduct);
+    showToast("Product list and cards refreshed.");
+  } catch (error) {
+    console.error("Reload failed:", error);
+    showToast("Failed to reload products and cards.");
+  } finally {
+    spinner.classList.add("hidden");
+    reloadBtn.disabled = false;
+    loadingOverlay.classList.add("hidden");
   }
 });
 
