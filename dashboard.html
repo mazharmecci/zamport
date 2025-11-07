@@ -52,31 +52,31 @@
 
     <hr class="subtle-divider" />
 
-<div class="dashboard-layout">
-  <!-- Pending Orders Container -->
-  <div id="pendingOrdersContainer"></div>
+    <div class="dashboard-layout">
+      <!-- Pending Orders Container -->
+    <div id="pendingOrdersContainer"></div>
 
+  <label for="productFilter">Filter by Product</label>
+  <select id="productFilter" class="product-filter">
+    <option value="">All Products</option>
+  </select>
+      
   <!-- Button Panel -->
-    <button id="viewStatus" class="action-btn" aria-label="View pending orders">
+ <button id="viewStatus" class="action-btn" aria-label="View pending orders">
       <span class="spinner hidden" aria-hidden="true"></span>
       <span class="btn-label">📦 Pending Orders</span>
-    </button>
+ </button>
 
-    <button id="refreshOrdersBtn">🔄 Refresh Orders</button>
+   <button id="refreshOrdersBtn">🔄 Refresh Orders</button>
 
     <!-- Future buttons go here -->
   </aside>
 </div>
-
-<label for="productFilter">Filter by Product</label>
-<select id="productFilter" class="product-filter">
-  <option value="">All Products</option>
-</select>
-
-<!-- 🔔 Toast Notification -->
-<div id="toast" role="alert" aria-live="assertive"></div>
-
-</main>
+ 
+  <!-- 🔔 Toast Notification -->
+  <div id="toast" role="alert" aria-live="assertive"></div>
+  
+  </main>
 
   <!-- ✅ Logout Logic -->
 <script>
