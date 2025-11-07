@@ -273,3 +273,39 @@ async function loadProductDropdown() {
     showToast('Failed to load product list.');
   }
 }
+
+// SKU Vault
+
+function openVault(skuData) {
+  const vault = document.getElementById("skuVault");
+  const details = document.getElementById("vaultDetails");
+
+  const doi = skuData.G && skuData.G !== "missing" ? excelSerialToDate(skuData.G) : "—";
+  const warranty = skuData.H && skuData.H !== "missing" ? excelSerialToDate(skuData.H) : "—";
+
+  details.innerHTML = `
+    <p><strong>SKU:</strong> ${skuData.A}</p>
+    <p><strong>Customer:</strong> ${skuData.B}</p>
+    <p><strong>State:</strong> ${skuData.C}</p>
+    <p><strong>Instrument:</strong> ${skuData.D}</p>
+    <p><strong>Sheet:</strong> ${skuData.E}</p>
+    <p><strong>3PL Cost:</strong> ₹${skuData.F}</p>
+    <p><strong>DOI:</strong> ${doi}</p>
+    <p><strong>Warranty:</strong> ${warranty}</p>
+  `;
+
+  vault.classList.remove("hidden");
+}
+
+function closeVault() {
+  document.getElementById("skuVault").classList.add("hidden");
+}
+
+const skuValue = document.getElementById("skuInput").value.trim();
+const matched = crmData.find(row => row.A === skuValue);
+if (matched) {
+  openVault(matched);
+} else {
+  showToast("SKU not found.");
+}
+
