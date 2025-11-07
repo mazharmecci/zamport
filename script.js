@@ -422,3 +422,66 @@ async function loadProductDropdown() {
   }
 }
 
+async function loadCurrentMonth3PLSummary() {
+  const tableBody = document.getElementById("currentMonth3PLBody");
+  const totalCell = document.getElementById("currentMonthTotal");
+  tableBody.innerHTML = "";
+  let grandTotal = 0;
+
+  try {
+    const endpoint = `${API_BASE}?mode=3pl`;
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+    const summary = await response.json();
+    if (!Array.isArray(summary)) throw new Error("Invalid data format received");
+
+    const today = new Date();
+    const currentMonth = today.getMonth(); // 0-indexed
+    const currentYear = today.getFullYear();
+    const currentDay = today.getDate();
+
+    const filtered = summary.filter(item => {
+      const sheetDate = extractDateFromSheetName(item.sheetName);
+      return (
+        sheetDate &&
+        sheetDate.getMonth() === currentMonth &&
+        sheetDate.getFullYear() === currentYear &&
+        sheetDate.getDate() <= currentDay
+      );
+    });
+
+    filtered.forEach((item, index) => {
+      const row = document.createElement("tr");
+      if (index % 2 === 1) row.classList.add("alt-row");
+
+      row.innerHTML = `
+        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
+        <td>${item.sheetName || "Unnamed"}</td>
+        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+      `;
+
+      tableBody.appendChild(row);
+      grandTotal += Number(item.total3PLCost) || 0;
+    });
+
+    totalCell.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
+  } catch (error) {
+    console.error("Error loading current month 3PL summary:", error);
+    showToast(`Failed to load current month summary: ${error.message}`);
+  }
+}
+
+// Helper: Extract date from sheet name like "7 November" or "15 March"
+function extractDateFromSheetName(name) {
+  const regex = /(\d{1,2})\s+([A-Za-z]+)(?:\s+(\d{4}))?/;
+  const match = name.match(regex);
+  if (!match) return null;
+
+  const day = parseInt(match[1], 10);
+  const month = new Date(`${match[2]} 1`).getMonth(); // Converts "November" to 10
+  const year = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
+
+  return new Date(year, month, day);
+}
+
