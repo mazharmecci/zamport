@@ -218,18 +218,35 @@ async function fetchPendingOrders(product = '') {
 async function loadProductDropdown() {
   console.log("📥 Loading product dropdown...");
   try {
-    const res = await fetch(`${API_BASE}?action=products`);
+    const res = await fetch(`${API_BASE}?mode=products`);
     const products = await res.json();
 
+    if (!Array.isArray(products)) {
+      console.warn("⚠️ Unexpected product format:", products);
+      showToast("Product list is unavailable.");
+      return;
+    }
+
     selectors.productFilter.innerHTML = '';
-    products.forEach(product => {
+
+    if (products.length === 0) {
       const option = document.createElement('option');
-      option.value = product;
-      option.textContent = product;
+      option.value = '';
+      option.textContent = 'No products found';
+      selectors.productFilter.appendChild(option);
+      console.log("⚠️ No products returned.");
+      return;
+    }
+
+    products.forEach(product => {
+      const label = typeof product === 'string' ? product : String(product?.name || product);
+      const option = document.createElement('option');
+      option.value = label;
+      option.textContent = label;
       selectors.productFilter.appendChild(option);
     });
 
-    console.log(`✅ Loaded ${products.length} products.`);
+    console.log(`✅ Loaded ${products.length} products:`, products);
   } catch (error) {
     console.error("❌ Failed to load product dropdown:", error);
     showToast("Failed to load product list.");
