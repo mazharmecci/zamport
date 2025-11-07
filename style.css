@@ -768,3 +768,67 @@ button.loading::after {
     transform: rotate(360deg);
   }
 }
+
+
+/* === Current Month 3PL Summary Table === */
+
+#currentMonth3PLTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 24px;
+}
+
+#currentMonth3PLTable th,
+#currentMonth3PLTable td {
+  padding: 10px 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#currentMonth3PLTable th {
+  background-color: #3498db; /* Slightly lighter than #2980b9 */
+  color: white;
+  font-weight: bold;
+}
+
+#currentMonth3PLTable td:nth-child(1) {
+  width: 10%;
+}
+
+#currentMonth3PLTable td:nth-child(2) {
+  width: 30%;
+}
+
+#currentMonth3PLTable td:nth-child(3) {
+  width: 18%;
+}
+
+#currentMonth3PLTable .alt-row {
+  background-color: #f9f9f9;
+}
+
+#currentMonth3PLTable .grand-total {
+  background-color: #e8f6f3;
+  font-weight: bold;
+}
+
+/* Optional Section Styling */
+.current-month-summary {
+  margin-top: 32px;
+  padding: 16px;
+  background-color: #fefefe;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.current-month-summary h3 {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #2c3e50;
+}
