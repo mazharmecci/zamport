@@ -27,20 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     usernameDisplay.textContent = userName;
   }
 
-  // 🚪 Logout Handler
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
-});
-
-
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
