@@ -56,61 +56,35 @@ document.addEventListener("DOMContentLoaded", () => {
     productFilter.dispatchEvent(new Event("change")); // Trigger initial load
   }
 
-  function renderPendingOrders(orders) {
-    pendingOrdersContainer.innerHTML = "";
+  
+function renderPendingOrders(orders) {
+  pendingOrdersContainer.innerHTML = "";
 
-    if (!orders.length) {
-      pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
-      return;
-    }
-
-    orders.forEach(order => {
-      const card = document.createElement("div");
-      card.className = "order-card";
-      card.innerHTML = `
-        <h4>SKU: ${order.sku}</h4>
-        <p>Product: ${order.product}</p>
-        <p>Status: ${order.status}</p>
-        ${order.labelLink ? `<a href="${order.labelLink}" target="_blank">📦 Label</a>` : ""}
-        <button class="dispatch-btn" data-sku="${order.sku}">🚚 Mark as Dispatched</button>
-      `;
-      pendingOrdersContainer.appendChild(card);
-    });
-
-    // Attach dispatch handlers
-    document.querySelectorAll(".dispatch-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const sku = btn.dataset.sku;
-        btn.disabled = true;
-        btn.textContent = "⏳ Dispatching...";
-        dispatchOrder(sku, btn);
-      });
-    });
+  if (!orders.length) {
+    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+    return;
   }
 
-  function dispatchOrder(sku, btn) {
-    const formData = new FormData();
-    formData.append("sku", sku);
+  orders.forEach(order => {
+    const card = document.createElement("div");
+    card.className = "order-card";
 
-    fetch(API_URL, {
-      method: "POST",
-      body: formData,
-    })
-      .then(res => res.json())
-      .then(data => {
-        btn.textContent = "✅ Dispatched";
-        if (data.labelLink) {
-          const label = document.createElement("a");
-          label.href = data.labelLink;
-          label.target = "_blank";
-          label.textContent = "📦 Label";
-          btn.insertAdjacentElement("afterend", label);
-        }
-      })
-      .catch(err => {
-        console.error("Dispatch failed:", err);
-        btn.textContent = "❌ Failed";
-        btn.disabled = false;
-      });
-  }
-});
+    card.innerHTML = `
+      <h4>📦 SKU: ${order.sku}</h4>
+      <p>🧪 Product: ${order.product}</p>
+      <p>📌 Status: ${order.status}</p>
+      <p>📄 Sheet: ${order.sheetName}</p>
+      <p>📅 Date: ${order.date || "N/A"}</p>
+      <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+      <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+      ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+    `;
+
+    pendingOrdersContainer.appendChild(card);
+  });
+}
+
+
+
+
+
