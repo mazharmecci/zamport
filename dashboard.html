@@ -52,14 +52,23 @@
 
     <hr class="subtle-divider" />
 
- <div class="button-panel">
-  <button id="reloadProductsBtn" class="action-btn">🔄 Reload Products</button>
-      <!-- Action Buttons -->
-  <section class="action-row">
-  <button id="viewStatus" class="action-btn" aria-label="View pending orders">
-    <span class="spinner hidden" aria-hidden="true"></span>
-    <span class="btn-label">📦 Pending Orders</span>
-  </button>  
+<div class="dashboard-layout">
+  <!-- Pending Orders Container -->
+  <div id="pendingOrdersContainer"></div>
+
+  <!-- Button Panel -->
+  <aside class="button-panel">
+    <button id="reloadProductsBtn" class="action-btn" aria-label="Reload product list">
+      🔄 Reload Products
+    </button>
+
+    <button id="viewStatus" class="action-btn" aria-label="View pending orders">
+      <span class="spinner hidden" aria-hidden="true"></span>
+      <span class="btn-label">📦 Pending Orders</span>
+    </button>
+
+    <!-- Future buttons go here -->
+  </aside>
 </div>
 
 <!-- 🔔 Toast Notification -->
