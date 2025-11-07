@@ -29,6 +29,17 @@ function hideLoadingOverlay() {
   console.log("✅ Overlay hidden");
 }
 
+function showToast(message) {
+  if (!selectors.toast) return;
+
+  selectors.toast.textContent = message;
+  selectors.toast.classList.add("visible");
+
+  setTimeout(() => {
+    selectors.toast.classList.remove("visible");
+  }, 3000);
+}
+
 // === Session Validation ===
 
 function validateSession() {
@@ -181,6 +192,29 @@ async function fetchPendingOrders(product = '') {
     hideSpinner(selectors.viewStatusBtn);
   }
 }
+
+
+async function loadProductDropdown() {
+  console.log("📥 Loading product dropdown...");
+  try {
+    const res = await fetch(`${API_BASE}?action=products`);
+    const products = await res.json();
+
+    selectors.productFilter.innerHTML = '';
+    products.forEach(product => {
+      const option = document.createElement('option');
+      option.value = product;
+      option.textContent = product;
+      selectors.productFilter.appendChild(option);
+    });
+
+    console.log(`✅ Loaded ${products.length} products.`);
+  } catch (error) {
+    console.error("❌ Failed to load product dropdown:", error);
+    showToast("Failed to load product list.");
+  }
+}
+
 
 function renderPendingCards(data) {
   console.log("🧩 Rendering pending cards...");
