@@ -38,18 +38,23 @@ const selectors = {
 };
 
 // === DOM Ready ===
+
 document.addEventListener("DOMContentLoaded", () => {
   const username = sessionStorage.getItem("zamport-user");
   if (username) {
-    document.getElementById("usernameDisplay").textContent = username.charAt(0).toUpperCase() + username.slice(1);
+    document.getElementById("usernameDisplay").textContent =
+      username.charAt(0).toUpperCase() + username.slice(1);
   }
 
   document.getElementById("logoutBtn").addEventListener("click", () => {
     sessionStorage.clear();
     showToast("You’ve been logged out.");
-    setTimeout(() => window.location.href = "index.html", 1500);
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1500);
   });
 
+  // Button bindings
   selectors.submitBtn?.addEventListener("click", submitSku);
   selectors.viewStatusBtn?.addEventListener("click", () => {
     const selectedProduct = selectors.productFilter.value.trim();
@@ -72,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const spinner = selectors.reloadBtn.querySelector(".spinner");
     spinner.classList.remove("hidden");
     selectors.reloadBtn.disabled = true;
-    selectors.loadingOverlay.classList.remove("hidden");
+    showLoadingOverlay();
 
     try {
       await loadProductDropdown();
@@ -85,13 +90,60 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       spinner.classList.add("hidden");
       selectors.reloadBtn.disabled = false;
-      selectors.loadingOverlay.classList.add("hidden");
+      hideLoadingOverlay();
     }
   });
 
-  loadProductDropdown();
-  loadCurrentMonth3PLSummary();
+  // ✅ Fast session check + dashboard load
+  if (validateSession()) {
+    initializeDashboard();
+  }
 });
+
+function showLoadingOverlay() {
+  selectors.loadingOverlay?.classList.remove("hidden");
+}
+
+function hideLoadingOverlay() {
+  selectors.loadingOverlay?.classList.add("hidden");
+}
+
+function validateSession() {
+  const SESSION_KEY = "zamport-auth";
+  const LAST_ACTIVE_KEY = "zamport-last-active";
+  const MAX_IDLE = 15 * 60 * 1000;
+
+  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
+  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
+  const now = Date.now();
+
+  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE) {
+    showToast("Session expired. Please log in again.");
+    sessionStorage.clear();
+    setTimeout(() => window.location.href = "index.html", 1500);
+    return false;
+  }
+
+  sessionStorage.setItem(LAST_ACTIVE_KEY, now);
+  return true;
+}
+
+async function initializeDashboard() {
+  showLoadingOverlay();
+
+  try {
+    await loadProductDropdown();
+    const selectedProduct = selectors.productFilter.value.trim();
+    await fetchPendingOrders(selectedProduct);
+    await loadCurrentMonth3PLSummary();
+  } catch (error) {
+    console.error("Dashboard init failed:", error);
+    showToast("Failed to load dashboard.");
+  } finally {
+    hideLoadingOverlay();
+  }
+}
+
 
 // === Fetch & Render ===
 async function fetchPendingOrders(product = '') {
