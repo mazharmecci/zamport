@@ -1,34 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // === Logout & Auth Check ===
   const logoutBtn = document.getElementById("logoutBtn");
+
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       sessionStorage.clear();
-      window.location.href = "https://mazharmecci.github.io/zamport/";
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
     });
   }
 
   const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
   if (!isAuthenticated) {
     window.location.href = "https://mazharmecci.github.io/zamport/";
-    return; // prevent further execution
+    return;
   }
+});
 
-  if (allowedUsers.includes(username) && password === correctPassword) {
-  const userMap = {
-    zaman: "Zaman Mecci",
-    mazhar: "Mazhar Mecci"
-  };
-
-  sessionStorage.setItem("zamport-auth", "true");
-  sessionStorage.setItem("zamport-user", userMap[username]);
-  sessionStorage.setItem("zamport-last-active", Date.now().toString());
-
-  showToast("✅ Login successful!");
-  setTimeout(() => {
-    window.location.href = "dashboard.html";
-  }, 1000); // Delay to let toast appear
-}
 
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
