@@ -17,7 +17,10 @@ function validateLogin(event) {
     sessionStorage.setItem("zamport-user", userMap[username]);
     sessionStorage.setItem("zamport-last-active", Date.now().toString());
 
-    window.location.href = "dashboard.html";
+    showToast("✅ Login successful!");
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 1000);
   } else {
     showToast("Invalid credentials. Please try again.");
   }
