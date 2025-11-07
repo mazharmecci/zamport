@@ -1,3 +1,15 @@
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
 function validateLogin(event) {
   event.preventDefault();
 
@@ -22,8 +34,6 @@ function validateLogin(event) {
       window.location.href = "dashboard.html";
     }, 1000);
   } else {
-    showToast("Invalid credentials. Please try again.");
+    showToast("❌ Invalid credentials. Please try again.");
   }
 }
-
-<div id="toast" class="toast" role="alert" aria-live="assertive"></div>
