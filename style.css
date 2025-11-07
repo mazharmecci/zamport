@@ -742,18 +742,8 @@ button.loading::after {
 }
 
 .reload-btn {
-  padding: 6px 12px;
-  font-size: 14px;
-  background-color: #add8e6;
-  color: #000;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: auto;
-  line-height: normal;
+  width: 100px;
+  justify-content: center;
 }
 
 .reload-btn:hover {
