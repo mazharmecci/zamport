@@ -527,3 +527,51 @@ body.login-body {
   }
 }
 
+.order-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.order-card h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.order-card p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.button-panel {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ccc;
+  align-items: center;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: #0056b3;
+}
+
