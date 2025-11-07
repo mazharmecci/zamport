@@ -12,7 +12,6 @@ function showToast(message) {
 }
 
 // === DOM Ready Handler ===
-
 document.addEventListener("DOMContentLoaded", () => {
   // 🔐 Auth Check
   const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
@@ -36,18 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const productFilter = document.getElementById("productFilter");
   const loadingOverlay = document.getElementById("loadingOverlay");
   const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
 
   // === Global Variables ===
   let pendingOrders = [];
-
-  // ✅ Attach Event Listener Safely
-  if (viewStatusBtn) {
-    viewStatusBtn.addEventListener("click", () => {
-      // your logic here
-    });
-  } else {
-    console.warn("viewStatus button not found in DOM");
-  }
 
   // === UI Helpers ===
   function toggleSpinner(button, show) {
@@ -57,14 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showLoadingOverlay(show) {
     loadingOverlay.classList.toggle("hidden", !show);
-  }
-
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-    toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
   function populateProductDropdown(products) {
@@ -95,8 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     return card;
   }
-});
-
 
   function renderPendingOrders(orders) {
     pendingOrdersContainer.innerHTML = "";
@@ -126,30 +107,38 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === 🔘 Pending Orders Button Click ===
-  viewStatusBtn.addEventListener("click", () => {
-    toggleSpinner(viewStatusBtn, true);
+  if (viewStatusBtn) {
+    viewStatusBtn.addEventListener("click", () => {
+      toggleSpinner(viewStatusBtn, true);
 
-    fetch(`${API_URL}?mode=products`)
-      .then(res => res.json())
-      .then(products => {
-        populateProductDropdown(products);
-        fetchAndRenderOrders(); // Load all pending orders
-      })
-      .catch(err => {
-        console.error("Failed to load products:", err);
-        showToast("❌ Failed to load product list.");
-      })
-      .finally(() => toggleSpinner(viewStatusBtn, false));
-  });
+      fetch(`${API_URL}?mode=products`)
+        .then(res => res.json())
+        .then(products => {
+          populateProductDropdown(products);
+          fetchAndRenderOrders(); // Load all pending orders
+        })
+        .catch(err => {
+          console.error("Failed to load products:", err);
+          showToast("❌ Failed to load product list.");
+        })
+        .finally(() => toggleSpinner(viewStatusBtn, false));
+    });
+  } else {
+    console.warn("viewStatus button not found in DOM");
+  }
 
   // === 🔄 Filter by Product ===
-  productFilter.addEventListener("change", () => {
-    const selectedProduct = productFilter.value;
-    fetchAndRenderOrders(selectedProduct);
-  });
-});
+  if (productFilter) {
+    productFilter.addEventListener("change", () => {
+      const selectedProduct = productFilter.value;
+      fetchAndRenderOrders(selectedProduct);
+    });
+  }
 
-// === 🔄 Refresh orders ===
-document.getElementById("refreshOrdersBtn").addEventListener("click", () => {
-  fetchAndRenderOrders(productFilter?.value || "");
+  // === 🔄 Refresh Orders Button ===
+  if (refreshOrdersBtn) {
+    refreshOrdersBtn.addEventListener("click", () => {
+      fetchAndRenderOrders(productFilter?.value || "");
+    });
+  }
 });
