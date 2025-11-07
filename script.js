@@ -310,38 +310,53 @@ function parseDateSafely(raw) {
   return isNaN(parsed.getTime()) ? null : parsed;
 }
 
-async function loadCurrentMonth3PLSummary() {
-  console.log("📊 Loading current month 3PL summary...");
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const allRows = [];
-
-  SHEET_IDS.forEach(sheetId => {
-    const spreadsheet = SpreadsheetApp.openById(sheetId);
-    spreadsheet.getSheets().forEach(sheet => {
-      const data = sheet.getDataRange().getValues();
-      const header = data[1]; // Assuming row 2 is header
-      const costCol = header.indexOf("3PL Cost");
-      const sheetName = sheet.getName();
-
-      for (let i = 2; i < data.length; i++) {
-        const rawDate = data[i][0];
-        const parsedDate = parseDateSafely(rawDate);
-        if (!parsedDate) continue;
-
-        if (
-          parsedDate.getMonth() === currentMonth &&
-          parsedDate.getFullYear() === currentYear
-        ) {
-          const cost = parseFloat(data[i][costCol]) || 0;
-          allRows.push({ sheetId, sheetName, cost });
-        }
-      }
-    });
-  });
-
-  renderCurrentMonthSummary(allRows);
+function parseDateSafely(raw) {
+  const parsed = new Date(raw);
+  return isNaN(parsed.getTime()) ? null : parsed;
 }
 
-console.log("✅ Script loaded successfully");
+async function loadCurrentMonth3PLSummary() {
+  console.log("📊 Loading current month 3PL summary...");
+  selectors.currentMonthBody.innerHTML = '';
+  let grandTotal = 0;
+
+  try {
+    const endpoint = `${API_BASE}?mode=3pl`;
+    const response = await fetch(endpoint);
+    const summary = await response.json();
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const filtered = summary.filter(item => {
+      const parsedDate = parseDateSafely(item.entryDate);
+      return (
+        parsedDate &&
+        parsedDate.getMonth() === currentMonth &&
+        parsedDate.getFullYear() === currentYear
+      );
+    });
+
+    filtered.forEach((item, index) => {
+      const row = document.createElement("tr");
+      if (index % 2 === 1) row.classList.add("alt-row");
+
+      row.innerHTML = `
+        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
+        <td>${item.sheetName || "Unnamed"}</td>
+        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+      `;
+
+      selectors.currentMonthBody.appendChild(row);
+      grandTotal += Number(item.total3PLCost) || 0;
+    });
+
+    selectors.currentMonthTotal.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
+    console.log(`✅ Rendered ${filtered.length} current-month rows.`);
+  } catch (error) {
+    console.error("❌ Error loading current month 3PL summary:", error);
+    showToast("Failed to load current month summary.");
+  }
+}
+
