@@ -11,12 +11,7 @@
 
 <body>
 
-  <!-- 🧾 Pending Orders Container - DON"T DELETE IT THIS IS FOR CARDS INJECTION -->
-<div id="pendingOrdersContainer" class="pending-orders-grid">
-  <!-- Cards will be injected here -->
-</div>
 
-  
   <!-- SKU Vault -->
   <div id="skuVault" class="modal hidden">
     <div class="modal-content">
@@ -59,20 +54,26 @@
 
     <hr class="subtle-divider" />
 
-<div class="filter-panel-wrapper">
-  <div class="filter-actions">
-    <div class="filter-group">
-      <label for="productFilter">Filter by Product</label>
-      <select id="productFilter">
-        <option>All Products</option>
-        <!-- other options -->
-      </select>
+<div class="dashboard-section">
+  <div class="filter-panel-wrapper">
+    <!-- Filter and Pending Orders Button -->
+    <div class="filter-actions">
+      <div class="filter-group">
+        <label for="productFilter">Filter by Product</label>
+        <select id="productFilter">
+          <option>All Products</option>
+          <!-- other options -->
+        </select>
+      </div>
+      <button id="viewStatus" class="action-btn" aria-label="View pending orders">
+        <span class="spinner hidden" aria-hidden="true"></span>
+        <span class="btn-label">📦 Pending Orders</span>
+      </button>
     </div>
-    <button id="viewStatus" class="action-btn" aria-label="View pending orders">
-      <span class="spinner hidden" aria-hidden="true"></span>
-      <span class="btn-label">📦 Pending Orders</span>
-    </button>
   </div>
+
+  <!-- 🧾 Pending Orders Container -->
+  <div id="pendingOrdersContainer" class="pending-orders-grid"></div>
 </div>
  
   <!-- 🔔 Toast Notification -->
