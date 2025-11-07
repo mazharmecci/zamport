@@ -575,6 +575,7 @@ body.login-body {
   flex-wrap: wrap;
 }
 
+/* === Base Button Styles === */
 .action-btn {
   padding: 8px 14px;
   font-size: 14px;
@@ -590,40 +591,7 @@ body.login-body {
   background-color: #0056b3;
 }
 
-#pendingOrdersContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.dashboard-layout {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-#pendingOrdersContainer {
-  flex: 1;
-}
-
-.button-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
+/* === Spinner Styles === */
 .spinner {
   width: 48px;
   height: 48px;
@@ -631,14 +599,6 @@ body.login-body {
   border-top-color: #0078D4;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-.hidden {
-  display: none;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 button .spinner {
@@ -653,6 +613,15 @@ button .spinner {
   vertical-align: middle;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none;
+}
+
+/* === Loading Overlay === */
 .loading-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -665,19 +634,38 @@ button .spinner {
   z-index: 9999;
 }
 
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid #ccc;
-  border-top-color: #0078D4;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+/* === Layout Containers === */
+.dashboard-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
-.hidden {
-  display: none;
+#pendingOrdersContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  flex: 1;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* === Filter & Button Panel === */
+.filter-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 0 16px;
+}
+
+.filter-group,
+#viewStatus {
+  display: flex;
+  align-items: center;
+  height: 40px; /* Match dropdown height for symmetry */
+}
+
+/* === Optional: Section Wrapper for Centering === */
+.dashboard-section {
+  max-width: 960px;
+  margin: 0 auto;
 }
