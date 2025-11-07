@@ -60,11 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedProduct = selectors.productFilter.value.trim();
     fetchPendingOrders(selectedProduct);
   });
-  selectors.productFilter?.addEventListener("change", () => {
-  const selectedProduct = selectors.productFilter.value.trim();
-  fetchPendingOrders(selectedProduct);
-});
-
+  selectors.productFilter?.addEventListener("change", loadFilteredOrders);
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
@@ -101,8 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Fast session check + dashboard load
   if (validateSession()) {
     initializeDashboard();
+  } else {
+    hideLoadingOverlay(); // prevent stuck overlay if session fails
   }
 });
+
+
+function showLoadingOverlay() {
+  selectors.loadingOverlay?.classList.remove("hidden");
+}
 
 function showLoadingOverlay() {
   selectors.loadingOverlay?.classList.remove("hidden");
@@ -147,6 +150,7 @@ async function initializeDashboard() {
     hideLoadingOverlay();
   }
 }
+
 
 
 // === Fetch & Render ===
