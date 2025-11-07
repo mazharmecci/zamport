@@ -120,8 +120,19 @@ h2 {
 }
 
 #viewStatus {
-  background-color: #ffe4cd;
-  color: black;
+  display: block;              /* Ensures it takes full width if needed */
+  margin-left: 0;              /* Aligns to the left */
+  background-color: #007bff;   /* Change to any desired color (e.g., blue) */
+  color: white;                /* Text color */
+  border: none;                /* Optional: remove border */
+  padding: 10px 16px;          /* Optional: adjust spacing */
+  border-radius: 4px;          /* Optional: rounded corners */
+  cursor: pointer;             /* Pointer on hover */
+}
+
+#viewStatus {
+  margin-left: 0 !important;
+  background-color: #007bff !important;
 }
 
 #viewStatus:hover {
