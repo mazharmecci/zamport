@@ -622,6 +622,7 @@ button .spinner {
 }
 
 /* === Loading Overlay === */
+
 .loading-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -635,42 +636,22 @@ button .spinner {
 }
 
 /* === Layout Containers === */
+
 .dashboard-layout {
   display: flex;
   gap: 24px;
   align-items: flex-start;
 }
 
-#pendingOrdersContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  flex: 1;
-}
-
-/* === Filter & Button Panel === */
-.filter-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  padding: 0 16px;
-}
-
-.filter-group,
-#viewStatus {
-  display: flex;
-  align-items: center;
-  height: 40px; /* Match dropdown height for symmetry */
-}
-
 /* === Optional: Section Wrapper for Centering === */
+
 .dashboard-section {
   max-width: 960px;
   margin: 0 auto;
 }
 
 /* === Global Box Sizing Reset === */
+
 *,
 *::before,
 *::after {
@@ -678,6 +659,7 @@ button .spinner {
 }
 
 /* === SKU Form Styling === */
+
 .stock-form {
   width: 75%;               /* Shrink container by 25% */
   max-width: 600px;         /* Optional: cap width */
@@ -688,6 +670,7 @@ button .spinner {
 }
 
 /* === Input Field Styling === */
+
 #skuInput {
   width: 100%;
   font-size: 14px;
@@ -710,6 +693,27 @@ button .spinner {
 
 #submitSku:hover {
   background-color: #5c3310;
+}
+
+.filter-panel-wrapper {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.filter-group,
+#viewStatus {
+  display: flex;
+  align-items: center;
+  height: 40px;
 }
 
 /* === Responsive Layout === */
