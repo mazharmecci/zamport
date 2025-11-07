@@ -176,43 +176,6 @@ async function submitSku() {
   }
 }
 
-// === 3PL Summary ===
-async function load3PLSummary() {
-  selectors.threePLTableBody.innerHTML = '';
-  let grandTotal = 0;
-
-  try {
-    const endpoint = `${API_BASE}?mode=3pl`;
-    const response = await fetch(endpoint);
-    const summary = await response.json();
-
-    summary.forEach((item, index) => {
-      const row = document.createElement('tr');
-      if (index % 2 === 1) row.classList.add('alt-row');
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || 'Unnamed'}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
-      `;
-      selectors.threePLTableBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
-    });
-
-    const totalRow = document.createElement('tr');
-    totalRow.classList.add('grand-total');
-    totalRow.innerHTML = `
-      <td colspan="2"><strong>Grand Total</strong></td>
-      <td><strong>$${grandTotal.toFixed(2)}</strong></td>
-    `;
-    selectors.threePLTableBody.appendChild(totalRow);
-  } catch (error) {
-    console.error('Error loading 3PL summary:', error);
-    showToast(`Failed to load 3PL cost summary: ${error.message}`);
-  }
-}
-
-// === Current Month Summary ===
 async function loadCurrentMonth3PLSummary() {
   selectors.currentMonthBody.innerHTML = '';
   let grandTotal = 0;
@@ -237,4 +200,25 @@ async function loadCurrentMonth3PLSummary() {
       );
     });
 
-    filtered.forEach((item, index) =>
+    filtered.forEach((item, index) => {
+      const row = document.createElement("tr");
+      if (index % 2 === 1) row.classList.add("alt-row");
+
+      row.innerHTML = `
+        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
+        <td>${item.sheetName || "Unnamed"}</td>
+        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+      `;
+
+      selectors.currentMonthBody.appendChild(row);
+      grandTotal += Number(item.total3PLCost) || 0;
+    });
+
+    selectors.currentMonthTotal.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
+  } catch (error) {
+    console.error("Error loading current month 3PL summary:", error);
+    showToast(`Failed to load current month summary: ${error.message}`);
+  }
+}
+
+console.log("✅ Script loaded successfully");
