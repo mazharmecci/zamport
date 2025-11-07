@@ -309,3 +309,7 @@ if (matched) {
   showToast("SKU not found.");
 }
 
+document.getElementById("reloadProductsBtn")?.addEventListener("click", () => {
+  loadProductDropdown();
+  showToast("Product list refreshed.");
+});
