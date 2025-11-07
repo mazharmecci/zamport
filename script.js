@@ -138,8 +138,17 @@ function initializeUserSession() {
   }
 }
 
-// === Button Bindings ===
+// === Utility ===
+function toggle3PLTable() {
+  const table = document.getElementById("threePLSummaryTable");
+  if (!table) {
+    console.warn("⚠️ 3PL summary table not found.");
+    return;
+  }
+  table.classList.toggle("hidden");
+}
 
+// === Button Bindings ===
 function bindDashboardButtons() {
   console.log("🔗 Binding dashboard buttons...");
 
@@ -156,15 +165,6 @@ function bindDashboardButtons() {
     console.log("🔄 Product filter changed:", selectedProduct);
     fetchPendingOrders(selectedProduct);
   });
-
-  function toggle3PLTable() {
-  const table = document.getElementById("threePLSummaryTable");
-  if (!table) {
-    console.warn("⚠️ 3PL summary table not found.");
-    return;
-  }
-  table.classList.toggle("hidden");
-}
 
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     console.log("📊 Loading 3PL summary...");
