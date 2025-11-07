@@ -730,4 +730,11 @@ button .spinner {
   }
 }
 
+// Don't delete this - This is for the cards
+
+#pendingOrdersContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
 
