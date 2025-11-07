@@ -584,3 +584,19 @@ body.login-body {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
+
+.dashboard-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+#pendingOrdersContainer {
+  flex: 1;
+}
+
+.button-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
