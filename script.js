@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 🚪 Logout Handler
+document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -38,8 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 1000);
     });
   }
-}); // ✅ This closes the DOMContentLoaded block
-
+});
+ // ✅ This closes the DOMContentLoaded block
 
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
