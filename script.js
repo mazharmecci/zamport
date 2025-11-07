@@ -1,388 +1,116 @@
 // === Constants ===
-const API_BASE = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
 
-const selectors = {
-  skuInput: document.getElementById('skuInput'),
-  submitBtn: document.getElementById('submitSku'),
-  viewStatusBtn: document.getElementById('viewStatus'),
-  pendingContainer: document.getElementById('pendingOrdersContainer'),
-  toast: document.getElementById('toast'),
-  productFilter: document.getElementById('productFilter'),
-  threePLTableBody: document.getElementById('threePLTableBody'),
-  threePLWrapper: document.getElementById('threePLWrapper'),
-  threePLSummaryBtn: document.getElementById('threePLSummaryBtn'),
-  threePLLoader: document.getElementById('threePLLoader'),
-  reloadBtn: document.getElementById("reloadProductsBtn"),
-  loadingOverlay: document.getElementById("loadingOverlay"),
-  currentMonthBody: document.getElementById("currentMonth3PLBody"),
-  currentMonthTotal: document.getElementById("currentMonthTotal"),
-};
+document.addEventListener("DOMContentLoaded", () => {
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with actual deployment URL
 
-// === Overlay Helpers ===
-function showLoadingOverlay() {
-  selectors.loadingOverlay?.classList.remove("hidden");
-  console.log("🌀 Overlay shown");
-}
+  const productFilter = document.getElementById("productFilter");
+  const reloadBtn = document.getElementById("reloadProductsBtn");
+  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+  const loadingOverlay = document.getElementById("loadingOverlay");
 
-function hideLoadingOverlay() {
-  selectors.loadingOverlay?.classList.add("hidden");
-  console.log("✅ Overlay hidden");
-}
-
-function showToast(message) {
-  if (!selectors.toast) return;
-
-  selectors.toast.textContent = message;
-  selectors.toast.classList.add("visible");
-
-  setTimeout(() => {
-    selectors.toast.classList.remove("visible");
-  }, 3000);
-}
-
-function showSpinner(button) {
-  const spinner = button?.querySelector(".spinner");
-  if (spinner) {
-    spinner.classList.remove("hidden");
-    console.log("⏳ Spinner shown");
-  }
-}
-
-function hideSpinner(button) {
-  const spinner = button?.querySelector(".spinner");
-  if (spinner) {
-    spinner.classList.add("hidden");
-    console.log("✅ Spinner hidden");
-  }
-}
-
-// === Session Validation ===
-
-function validateSession() {
-  console.log("🔐 Validating session...");
-  const SESSION_KEY = "zamport-auth";
-  const LAST_ACTIVE_KEY = "zamport-last-active";
-  const MAX_IDLE = 15 * 60 * 1000;
-
-  const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
-  const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
-  const now = Date.now();
-
-  if (!isLoggedIn || !lastActive || now - lastActive > MAX_IDLE) {
-    console.warn("⚠️ Session invalid or expired.");
-    showToast("Session expired. Please log in again.");
-    sessionStorage.clear();
-    setTimeout(() => window.location.href = "index.html", 1500);
-    return false;
-  }
-
-  sessionStorage.setItem(LAST_ACTIVE_KEY, now);
-  console.log("✅ Session valid.");
-  return true;
-}
-
-// === Dashboard Initialization ===
-
-async function initializeDashboard() {
-  console.log("🚀 Initializing dashboard...");
-  showLoadingOverlay();
-
-  try {
-    await loadProductDropdown();
-    const selectedProduct = selectors.productFilter.value.trim();
-    await fetchPendingOrders(selectedProduct);
-    await loadCurrentMonth3PLSummary();
-    console.log("✅ Dashboard loaded successfully.");
-  } catch (error) {
-    console.error("❌ Dashboard init failed:", error);
-    showToast("Failed to load dashboard.");
-  } finally {
-    hideLoadingOverlay();
-  }
-}
-
-// === DOM Ready ===
-
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("📦 DOM fully loaded.");
-  initializeUserSession();
-  bindDashboardButtons();
-
-  if (!validateSession()) {
-    hideLoadingOverlay();
-    return;
-  }
-
-  await initializeDashboard();
-});
-
-// === User Session Display + Logout ===
-
-function initializeUserSession() {
-  console.log("👤 Initializing user session...");
-  const username = sessionStorage.getItem("zamport-user");
-  if (username) {
-    const displayName = username.charAt(0).toUpperCase() + username.slice(1);
-    const usernameDisplay = document.getElementById("usernameDisplay");
-    if (usernameDisplay) usernameDisplay.textContent = displayName;
-  }
-
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      console.log("🔓 Logging out...");
-      sessionStorage.clear();
-      showToast("You’ve been logged out.");
-      setTimeout(() => window.location.href = "index.html", 1500);
-    });
-  }
-}
-
-// === Utility ===
-function toggle3PLTable() {
-  const table = document.getElementById("threePLSummaryTable");
-  if (!table) {
-    console.warn("⚠️ 3PL summary table not found.");
-    return;
-  }
-  table.classList.toggle("hidden");
-}
-
-// === Button Bindings ===
-function bindDashboardButtons() {
-  console.log("🔗 Binding dashboard buttons...");
-
-  selectors.submitBtn?.addEventListener("click", submitSku);
-
-  selectors.viewStatusBtn?.addEventListener("click", () => {
-    const selectedProduct = selectors.productFilter.value.trim();
-    console.log("📦 Viewing status for:", selectedProduct);
-    fetchPendingOrders(selectedProduct);
+  // 🔄 Reload product list
+  reloadBtn.addEventListener("click", () => {
+    toggleSpinner(reloadBtn, true);
+    fetch(`${API_URL}?mode=products`)
+      .then(res => res.json())
+      .then(products => populateProductDropdown(products))
+      .catch(err => console.error("Failed to load products:", err))
+      .finally(() => toggleSpinner(reloadBtn, false));
   });
 
-  selectors.productFilter?.addEventListener("change", () => {
-    const selectedProduct = selectors.productFilter.value.trim();
-    console.log("🔄 Product filter changed:", selectedProduct);
-    fetchPendingOrders(selectedProduct);
+  // 🔍 Filter pending orders
+  productFilter.addEventListener("change", () => {
+    const selectedProduct = productFilter.value;
+    showLoadingOverlay(true);
+    const url = selectedProduct
+      ? `${API_URL}?product=${encodeURIComponent(selectedProduct)}`
+      : API_URL;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(orders => renderPendingOrders(orders))
+      .catch(err => console.error("Failed to fetch orders:", err))
+      .finally(() => showLoadingOverlay(false));
   });
 
-  selectors.threePLSummaryBtn?.addEventListener("click", async () => {
-    console.log("📊 Loading 3PL summary...");
-    toggle3PLTable();
-    showSpinner(selectors.threePLSummaryBtn);
-    showLoader();
-    try {
-      await load3PLSummary();
-    } finally {
-      hideLoader();
-      hideSpinner(selectors.threePLSummaryBtn);
-    }
-  });
+  // 🌀 Initial load
+  reloadBtn.click();
 
-  selectors.reloadBtn?.addEventListener("click", async () => {
-    console.log("🔄 Reloading products and cards...");
-    const spinner = selectors.reloadBtn.querySelector(".spinner");
-    spinner.classList.remove("hidden");
-    selectors.reloadBtn.disabled = true;
-    showLoadingOverlay();
-
-    try {
-      await loadProductDropdown();
-      const selectedProduct = selectors.productFilter.value.trim();
-      await fetchPendingOrders(selectedProduct);
-      showToast("Product list and cards refreshed.");
-    } catch (error) {
-      console.error("❌ Reload failed:", error);
-      showToast("Failed to reload products and cards.");
-    } finally {
-      spinner.classList.add("hidden");
-      selectors.reloadBtn.disabled = false;
-      hideLoadingOverlay();
-    }
-  });
-}
-
-// === Fetch & Render ===
-
-async function fetchPendingOrders(product = '') {
-  console.log("📡 Fetching pending orders for:", product || "All Products");
-  showSpinner(selectors.viewStatusBtn);
-  selectors.pendingContainer.innerHTML = '';
-
-  const endpoint = product ? `${API_BASE}?product=${encodeURIComponent(product)}` : API_BASE;
-
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-    renderPendingCards(data);
-  } catch (error) {
-    console.error("❌ Error fetching orders:", error);
-    showToast("Failed to load pending orders.");
-  } finally {
-    hideSpinner(selectors.viewStatusBtn);
+  // === UI Helpers ===
+  function toggleSpinner(button, show) {
+    button.querySelector(".spinner").classList.toggle("hidden", !show);
   }
-}
 
+  function showLoadingOverlay(show) {
+    loadingOverlay.classList.toggle("hidden", !show);
+  }
 
-async function loadProductDropdown() {
-  console.log("📥 Loading product dropdown...");
-  try {
-    const res = await fetch(`${API_BASE}?mode=products`);
-    const products = await res.json();
-
-    if (!Array.isArray(products)) {
-      console.warn("⚠️ Unexpected product format:", products);
-      showToast("Product list is unavailable.");
-      return;
-    }
-
-    selectors.productFilter.innerHTML = '';
-
-    if (products.length === 0) {
-      const option = document.createElement('option');
-      option.value = '';
-      option.textContent = 'No products found';
-      selectors.productFilter.appendChild(option);
-      console.log("⚠️ No products returned.");
-      return;
-    }
-
+  function populateProductDropdown(products) {
+    productFilter.innerHTML = `<option value="">All Products</option>`;
     products.forEach(product => {
-      const label = typeof product === 'string' ? product : String(product?.name || product);
-      const option = document.createElement('option');
-      option.value = label;
-      option.textContent = label;
-      selectors.productFilter.appendChild(option);
+      const option = document.createElement("option");
+      option.value = product;
+      option.textContent = product;
+      productFilter.appendChild(option);
     });
-
-    console.log(`✅ Loaded ${products.length} products:`, products);
-  } catch (error) {
-    console.error("❌ Failed to load product dropdown:", error);
-    showToast("Failed to load product list.");
-  }
-}
-
-
-function renderPendingCards(data) {
-  console.log("🧩 Rendering pending cards...");
-  selectors.pendingContainer.innerHTML = '';
-
-  if (!Array.isArray(data) || data.length === 0) {
-    selectors.pendingContainer.innerHTML = '<p>No valid pending orders found for this month.</p>';
-    return;
+    productFilter.dispatchEvent(new Event("change")); // Trigger initial load
   }
 
-  data.forEach(({ sku, product, status, sheetName, labelLink }) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    const labelHTML = labelLink
-      ? `<a href="${labelLink}" target="_blank" class="label-link">🖨️ Print Label</a>`
-      : '<em>No label link</em>';
+  function renderPendingOrders(orders) {
+    pendingOrdersContainer.innerHTML = "";
 
-    card.innerHTML = `
-      <strong>SKU:</strong> ${sku}<br/>
-      <strong>Product:</strong> ${product}<br/>
-      <strong>Status:</strong> ${status}<br/>
-      <strong>Sheet:</strong> ${sheetName}<br/>
-      ${labelHTML}
-    `;
-    selectors.pendingContainer.appendChild(card);
-  });
-
-  console.log(`✅ Rendered ${data.length} pending cards.`);
-}
-
-// === SKU Submit ===
-
-async function submitSku() {
-  const sku = selectors.skuInput.value.trim();
-  if (!sku) return alert("Enter or scan a SKU first");
-
-  showSpinner(selectors.submitBtn);
-
-  try {
-    const response = await fetch(API_BASE, {
-      method: 'POST',
-      body: new URLSearchParams({ sku }),
-    });
-
-    const result = await response.json();
-    showToast(result.message || 'Update complete');
-
-    if (result.labelLink) {
-      const printWindow = window.open(result.labelLink, '_blank');
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-          showToast("Label sent to printer!");
-          selectors.skuInput.value = "";
-        };
-      } else {
-        showToast("Popup blocked. Please allow popups.");
-      }
+    if (!orders.length) {
+      pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+      return;
     }
 
-    fetchPendingOrders();
-  } catch (error) {
-    console.error('Error submitting SKU:', error);
-    showToast("Failed to update order status.");
-  } finally {
-    hideSpinner(selectors.submitBtn);
-  }
-}
-
-function parseDateSafely(raw) {
-  const parsed = new Date(raw);
-  return isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function parseDateSafely(raw) {
-  const parsed = new Date(raw);
-  return isNaN(parsed.getTime()) ? null : parsed;
-}
-
-async function loadCurrentMonth3PLSummary() {
-  console.log("📊 Loading current month 3PL summary...");
-  selectors.currentMonthBody.innerHTML = '';
-  let grandTotal = 0;
-
-  try {
-    const endpoint = `${API_BASE}?mode=3pl`;
-    const response = await fetch(endpoint);
-    const summary = await response.json();
-
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    const filtered = summary.filter(item => {
-      const parsedDate = parseDateSafely(item.entryDate);
-      return (
-        parsedDate &&
-        parsedDate.getMonth() === currentMonth &&
-        parsedDate.getFullYear() === currentYear
-      );
-    });
-
-    filtered.forEach((item, index) => {
-      const row = document.createElement("tr");
-      if (index % 2 === 1) row.classList.add("alt-row");
-
-      row.innerHTML = `
-        <td><a href="https://docs.google.com/spreadsheets/d/${item.sheetId}" target="_blank">Sheet ${index + 1}</a></td>
-        <td>${item.sheetName || "Unnamed"}</td>
-        <td>$${Number(item.total3PLCost || 0).toFixed(2)}</td>
+    orders.forEach(order => {
+      const card = document.createElement("div");
+      card.className = "order-card";
+      card.innerHTML = `
+        <h4>SKU: ${order.sku}</h4>
+        <p>Product: ${order.product}</p>
+        <p>Status: ${order.status}</p>
+        ${order.labelLink ? `<a href="${order.labelLink}" target="_blank">📦 Label</a>` : ""}
+        <button class="dispatch-btn" data-sku="${order.sku}">🚚 Mark as Dispatched</button>
       `;
-
-      selectors.currentMonthBody.appendChild(row);
-      grandTotal += Number(item.total3PLCost) || 0;
+      pendingOrdersContainer.appendChild(card);
     });
 
-    selectors.currentMonthTotal.innerHTML = `<strong>$${grandTotal.toFixed(2)}</strong>`;
-    console.log(`✅ Rendered ${filtered.length} current-month rows.`);
-  } catch (error) {
-    console.error("❌ Error loading current month 3PL summary:", error);
-    showToast("Failed to load current month summary.");
+    // Attach dispatch handlers
+    document.querySelectorAll(".dispatch-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sku = btn.dataset.sku;
+        btn.disabled = true;
+        btn.textContent = "⏳ Dispatching...";
+        dispatchOrder(sku, btn);
+      });
+    });
   }
-}
 
+  function dispatchOrder(sku, btn) {
+    const formData = new FormData();
+    formData.append("sku", sku);
+
+    fetch(API_URL, {
+      method: "POST",
+      body: formData,
+    })
+      .then(res => res.json())
+      .then(data => {
+        btn.textContent = "✅ Dispatched";
+        if (data.labelLink) {
+          const label = document.createElement("a");
+          label.href = data.labelLink;
+          label.target = "_blank";
+          label.textContent = "📦 Label";
+          btn.insertAdjacentElement("afterend", label);
+        }
+      })
+      .catch(err => {
+        console.error("Dispatch failed:", err);
+        btn.textContent = "❌ Failed";
+        btn.disabled = false;
+      });
+  }
+});
