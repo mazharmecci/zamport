@@ -157,6 +157,15 @@ function bindDashboardButtons() {
     fetchPendingOrders(selectedProduct);
   });
 
+  function toggle3PLTable() {
+  const table = document.getElementById("threePLSummaryTable");
+  if (!table) {
+    console.warn("⚠️ 3PL summary table not found.");
+    return;
+  }
+  table.classList.toggle("hidden");
+}
+
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     console.log("📊 Loading 3PL summary...");
     toggle3PLTable();
