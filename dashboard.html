@@ -76,6 +76,35 @@
 
 </main>
 
+  <!-- ✅ Logout Logic -->
+<script>
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        sessionStorage.clear();
+        showToast("👋 Logged out successfully!");
+        setTimeout(() => {
+          window.location.href = "https://mazharmecci.github.io/zamport/";
+        }, 1000);
+      });
+    }
+  });
+</script>
+
   <script src="script.js"></script>
 
 </body>
