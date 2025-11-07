@@ -6,7 +6,7 @@
   <title>ZAMPORT Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-  
+
 <body class="login-body">
   <form class="login-container" onsubmit="return validateLogin(event)">
     <img src="zamport.png" alt="Zamport Logo" class="login-logo" />
@@ -24,11 +24,52 @@
 
     <button type="submit" class="login-btn">Login</button>
     <p id="error" class="error-msg"></p>
-  </form>  
+  </form>
 
-  <script src="login.js"></script>
+  <!-- 🔔 Toast Notification -->
   <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
 
-</body>
+  <!-- ✅ Login Logic -->
+  <script>
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
 
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    function validateLogin(event) {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      const allowedUsers = ["zaman", "mazhar"];
+      const correctPassword = "zamport@123";
+
+      if (allowedUsers.includes(username) && password === correctPassword) {
+        const userMap = {
+          zaman: "Zaman Mecci",
+          mazhar: "Mazhar Mecci"
+        };
+
+        sessionStorage.setItem("zamport-auth", "true");
+        sessionStorage.setItem("zamport-user", userMap[username]);
+        sessionStorage.setItem("zamport-last-active", Date.now().toString());
+
+        showToast("✅ Login successful!");
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1000);
+      } else {
+        showToast("❌ Invalid credentials. Please try again.");
+      }
+    }
+  </script>
+</body>
 </html>
