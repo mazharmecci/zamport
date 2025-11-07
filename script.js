@@ -1,17 +1,19 @@
-// Logout
-
 document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
 
-  logoutBtn?.addEventListener("click", () => {
-    // Clear session or localStorage if used
-    localStorage.clear();
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.clear(); // or remove specific keys
+      window.location.href = "login.html"; // adjust if needed
+    });
+  }
 
-    // Redirect to login page or homepage
-    window.location.href = "https://mazharmecci.github.io/zamport/"; // Change to your actual login page
-  });
+  // Optional: Redirect to login if not authenticated
+  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
+  if (!isAuthenticated) {
+    window.location.href = "login.html";
+  }
 });
-
 
 // === Constants ===
 
