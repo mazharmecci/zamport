@@ -59,15 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-
-  // ✅ Fast session check + dashboard load
-  if (validateSession()) {
-    initializeDashboard();
-  } else {
-    hideLoadingOverlay(); // prevent stuck overlay if session fails
-  }
-});
-
 function initializeUserSession() {
   const username = sessionStorage.getItem("zamport-user");
   if (username) {
