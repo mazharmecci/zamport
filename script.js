@@ -39,28 +39,64 @@ const selectors = {
 
 // === DOM Ready ===
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  initializeUserSession();
+  bindDashboardButtons();
+
+  // Initial dashboard load with overlay
+  try {
+    showLoadingOverlay();
+
+    await loadProductDropdown();
+    const selectedProduct = selectors.productFilter.value.trim();
+    await fetchPendingOrders(selectedProduct);
+    await loadCurrentMonth3PLSummary();
+  } catch (error) {
+    console.error("Initial dashboard load failed:", error);
+    showToast("Failed to load dashboard.");
+  } finally {
+    hideLoadingOverlay();
+  }
+});
+
+
+  // ✅ Fast session check + dashboard load
+  if (validateSession()) {
+    initializeDashboard();
+  } else {
+    hideLoadingOverlay(); // prevent stuck overlay if session fails
+  }
+});
+
+function initializeUserSession() {
   const username = sessionStorage.getItem("zamport-user");
   if (username) {
-    document.getElementById("usernameDisplay").textContent =
-      username.charAt(0).toUpperCase() + username.slice(1);
+    const displayName = username.charAt(0).toUpperCase() + username.slice(1);
+    document.getElementById("usernameDisplay").textContent = displayName;
   }
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
     sessionStorage.clear();
     showToast("You’ve been logged out.");
     setTimeout(() => {
       window.location.href = "index.html";
     }, 1500);
   });
+}
 
-  // Button bindings
+function bindDashboardButtons() {
   selectors.submitBtn?.addEventListener("click", submitSku);
+
   selectors.viewStatusBtn?.addEventListener("click", () => {
     const selectedProduct = selectors.productFilter.value.trim();
     fetchPendingOrders(selectedProduct);
   });
-  selectors.productFilter?.addEventListener("change", loadFilteredOrders);
+
+  selectors.productFilter?.addEventListener("change", () => {
+    const selectedProduct = selectors.productFilter.value.trim();
+    fetchPendingOrders(selectedProduct); // replaces missing loadFilteredOrders
+  });
+
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
@@ -93,14 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hideLoadingOverlay();
     }
   });
-
-  // ✅ Fast session check + dashboard load
-  if (validateSession()) {
-    initializeDashboard();
-  } else {
-    hideLoadingOverlay(); // prevent stuck overlay if session fails
-  }
-});
+}
 
 
 function showLoadingOverlay() {
