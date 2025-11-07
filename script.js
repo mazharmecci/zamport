@@ -319,14 +319,17 @@ reloadBtn?.addEventListener("click", async () => {
   reloadBtn.disabled = true;
 
   try {
-    await loadProductDropdown();
-    showToast("Product list refreshed.");
+    await loadProductDropdown(); // Refresh dropdown options
+    const selectedProduct = selectors.productFilter.value.trim(); // Get current filter
+    await fetchPendingOrders(selectedProduct); // Reload cards based on filter
+    showToast("Product list and cards refreshed.");
   } catch (error) {
     console.error("Reload failed:", error);
-    showToast("Failed to reload products.");
+    showToast("Failed to reload products and cards.");
   } finally {
     spinner.classList.add("hidden");
     reloadBtn.disabled = false;
   }
 });
+
 
