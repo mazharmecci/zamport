@@ -14,6 +14,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return; // prevent further execution
   }
 
+  if (allowedUsers.includes(username) && password === correctPassword) {
+  const userMap = {
+    zaman: "Zaman Mecci",
+    mazhar: "Mazhar Mecci"
+  };
+
+  sessionStorage.setItem("zamport-auth", "true");
+  sessionStorage.setItem("zamport-user", userMap[username]);
+  sessionStorage.setItem("zamport-last-active", Date.now().toString());
+
+  showToast("✅ Login successful!");
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 1000); // Delay to let toast appear
+}
+
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
