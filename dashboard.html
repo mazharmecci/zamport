@@ -53,86 +53,93 @@
     <hr class="subtle-divider" />
 
     <!-- Action Buttons -->
-    <section class="action-row">
-      <button id="viewStatus" class="action-btn">
-        <span class="spinner"></span>
-        📦 Pending Orders
-      </button>
-      <button id="threePLSummaryBtn" class="action-btn">
-        <span class="spinner"></span>
-        📊 3PL Cost Summary
-      </button>
-    </section>
+<section class="action-row">
+  <button id="viewStatus" class="action-btn" aria-label="View pending orders">
+    <span class="spinner hidden" aria-hidden="true"></span>
+    <span class="btn-label">📦 Pending Orders</span>
+  </button>
 
-    <!-- 3PL Summary Table -->
-    <section id="threePLWrapper">
-      <div id="threePLLoader" class="loader-overlay hidden">
-        <div class="loader-spinner"></div>
-        <p>Loading summary...</p>
-      </div>
-      <table id="threePLSummaryTable">
-        <thead>
-          <tr>
-            <th>📄 Sheet</th>
-            <th>📘 Sheet Name</th>
-            <th>💰 Total 3PL Cost</th>
-          </tr>
-        </thead>
-        <tbody id="threePLTableBody"></tbody>
-      </table>
-    </section>
+  <button id="threePLSummaryBtn" class="action-btn" aria-label="View 3PL cost summary">
+    <span class="spinner hidden" aria-hidden="true"></span>
+    <span class="btn-label">📊 3PL Cost Summary</span>
+  </button>
+</section>
 
-    <hr class="subtle-divider" />
+<!-- 📦 3PL Summary Table -->
+<section id="threePLWrapper" class="summary-section">
+  <div id="threePLLoader" class="loader-overlay hidden" role="status" aria-live="polite">
+    <div class="loader-spinner" aria-hidden="true"></div>
+    <p>Loading summary...</p>
+  </div>
 
-    <section class="current-month-summary">
-      <h3>📅 Current Month 3PL Summary</h3>
-      <table id="currentMonth3PLTable">
-        <thead>
-          <tr>
-            <th>📄 Sheet</th>
-            <th>📘 Sheet Name</th>
-            <th>💰 Monthly 3PL Cost</th>
-          </tr>
-        </thead>
-        <tbody id="currentMonth3PLBody"></tbody>
-        <tfoot>
-          <tr class="grand-total">
-            <td colspan="2"><strong>Grand Total</strong></td>
-            <td id="currentMonthTotal"><strong>$0.00</strong></td>
-          </tr>
-        </tfoot>
-      </table>
-    </section>
+  <table id="threePLSummaryTable" class="summary-table">
+    <caption>📦 All-Time 3PL Cost Summary</caption>
+    <thead>
+      <tr>
+        <th scope="col">📄 Sheet</th>
+        <th scope="col">📘 Sheet Name</th>
+        <th scope="col">💰 Total 3PL Cost</th>
+      </tr>
+    </thead>
+    <tbody id="threePLTableBody"></tbody>
+  </table>
+</section>
 
+<hr class="subtle-divider" />
+
+<!-- 📅 Current Month Summary -->
+<section class="current-month-summary summary-section">
+  <h3>📅 Current Month 3PL Summary</h3>
+
+  <table id="currentMonth3PLTable" class="summary-table">
+    <caption>📅 Monthly Breakdown</caption>
+    <thead>
+      <tr>
+        <th scope="col">📄 Sheet</th>
+        <th scope="col">📘 Sheet Name</th>
+        <th scope="col">💰 Monthly 3PL Cost</th>
+      </tr>
+    </thead>
+    <tbody id="currentMonth3PLBody"></tbody>
+    <tfoot>
+      <tr class="grand-total">
+        <td colspan="2"><strong>Grand Total</strong></td>
+        <td id="currentMonthTotal"><strong>$0.00</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+</section>
     
     <hr class="subtle-divider" />
     
     <!-- Product Filter -->
     
-    <section class="product-filter">
-      <label for="productFilter" class="dropdown-caption">🔍 Filter cards based on specific product</label>
-      <div class="product-filter-row">
-        <select id="productFilter">
-          <option value="">All Products</option>
-        </select>
-        <button id="reloadProductsBtn" class="reload-btn">
-      <span class="spinner hidden"></span>🔄 Reload </button>
-      </div>
-    </section>
+<!-- 🔍 Product Filter -->
+<section class="product-filter">
+  <label for="productFilter" class="dropdown-caption">🔍 Filter cards by product</label>
+  <div class="product-filter-row">
+    <select id="productFilter" aria-label="Select product to filter cards">
+      <option value="">All Products</option>
+    </select>
 
-    <!-- Pending Orders -->
-    <section id="pendingOrdersContainer" class="card-container"></section>
+    <button id="reloadProductsBtn" class="reload-btn" aria-label="Reload product list">
+      <span class="spinner hidden" aria-hidden="true"></span>
+      <span class="btn-label">🔄 Reload</span>
+    </button>
+  </div>
+</section>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden"></div>
+<!-- 📦 Pending Orders -->
+<section id="pendingOrdersContainer" class="card-container" aria-live="polite"></section>
 
-    <!-- Full Page Loading Overlay -->
-    
-    <div id="loadingOverlay" class="loader-overlay hidden">
-      <div class="loader-spinner"></div>
-      <p>Loading products...</p>
-    </div>
+<!-- 🔔 Toast Notification -->
+<div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div>
 
+<!-- 🌀 Full Page Loading Overlay -->
+<div id="loadingOverlay" class="loader-overlay hidden" role="status" aria-live="polite">
+  <div class="loader-spinner" aria-hidden="true"></div>
+  <p>Loading products...</p>
+</div>
     
   </main>
 
