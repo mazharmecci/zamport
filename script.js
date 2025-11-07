@@ -18,8 +18,19 @@ const selectors = {
   currentMonthTotal: document.getElementById("currentMonthTotal"),
 };
 
+// === Overlay Helpers ===
+function showLoadingOverlay() {
+  selectors.loadingOverlay?.classList.remove("hidden");
+  console.log("🌀 Overlay shown");
+}
+
+function hideLoadingOverlay() {
+  selectors.loadingOverlay?.classList.add("hidden");
+  console.log("✅ Overlay hidden");
+}
+
 // === Session Validation ===
-// === Session Validation ===
+
 function validateSession() {
   console.log("🔐 Validating session...");
   const SESSION_KEY = "zamport-auth";
@@ -199,16 +210,6 @@ function renderPendingCards(data) {
 
   console.log(`✅ Rendered ${data.length} pending cards.`);
 }
-
-
-function showLoadingOverlay() {
-  selectors.loadingOverlay?.classList.remove("hidden");
-}
-
-function hideLoadingOverlay() {
-  selectors.loadingOverlay?.classList.add("hidden");
-}
-
 
 // === SKU Submit ===
 
