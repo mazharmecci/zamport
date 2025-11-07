@@ -60,7 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedProduct = selectors.productFilter.value.trim();
     fetchPendingOrders(selectedProduct);
   });
-  selectors.productFilter?.addEventListener("change", loadFilteredOrders);
+  selectors.productFilter?.addEventListener("change", () => {
+  const selectedProduct = selectors.productFilter.value.trim();
+  fetchPendingOrders(selectedProduct);
+});
+
   selectors.threePLSummaryBtn?.addEventListener("click", async () => {
     toggle3PLTable();
     showSpinner(selectors.threePLSummaryBtn);
