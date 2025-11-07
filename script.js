@@ -1,23 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
-
-  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
-  if (!isAuthenticated) {
-    window.location.href = "https://mazharmecci.github.io/zamport/";
-    return;
-  }
-});
-
+// === Toast Notification Helper ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   if (!toast) return;
@@ -30,12 +11,35 @@ function showToast(message) {
   }, 3000);
 }
 
-const usernameDisplay = document.getElementById("usernameDisplay");
-const userName = sessionStorage.getItem("zamport-user");
+// === DOM Ready Handler ===
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔐 Auth Check
+  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
+  if (!isAuthenticated) {
+    window.location.href = "https://mazharmecci.github.io/zamport/";
+    return;
+  }
 
-if (usernameDisplay && userName) {
-  usernameDisplay.textContent = userName;
-}
+  // 👤 Display Logged-in User
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const userName = sessionStorage.getItem("zamport-user");
+  if (usernameDisplay && userName) {
+    usernameDisplay.textContent = userName;
+  }
+
+  // 🚪 Logout Handler
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.clear();
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
+    });
+  }
+});
+
 
   // === Constants ===
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
