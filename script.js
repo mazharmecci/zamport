@@ -28,56 +28,61 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === Constants ===
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-  // === DOM Elements ===
-  const viewStatusBtn = document.getElementById("viewStatus");
-  const productFilter = document.getElementById("productFilter");
-  const loadingOverlay = document.getElementById("loadingOverlay");
-  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
-  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
+// === DOM Elements ===
+const viewStatusBtn = document.getElementById("viewStatus");
+const productFilter = document.getElementById("productFilter");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
 
-  // === Global Variables ===
-  let pendingOrders = [];
+// === Global Variables ===
+let pendingOrders = [];
 
-  // === UI Helpers ===
-  function toggleSpinner(button, show) {
-    const spinner = button.querySelector(".spinner");
-    if (spinner) spinner.classList.toggle("hidden", !show);
-  }
+// === UI Helpers ===
+function toggleSpinner(button, show) {
+  const spinner = button.querySelector(".spinner");
+  if (spinner) spinner.classList.toggle("hidden", !show);
+}
 
-  function showLoadingOverlay(show) {
-    loadingOverlay.classList.toggle("hidden", !show);
-  }
+function showLoadingOverlay(show) {
+  loadingOverlay.classList.toggle("hidden", !show);
+}
 
-  function populateProductDropdown(products) {
-    productFilter.innerHTML = `<option value="">All Products</option>`;
-    products.forEach(product => {
-      const option = document.createElement("option");
-      option.value = product;
-      option.textContent = product;
-      productFilter.appendChild(option);
-    });
-  }
+function populateProductDropdown(products) {
+  productFilter.innerHTML = `<option value="">All Products</option>`;
+  products.forEach(product => {
+    const option = document.createElement("option");
+    option.value = product;
+    option.textContent = product;
+    productFilter.appendChild(option);
+  });
+}
 
-  function createOrderCard(order) {
-    const card = document.createElement("div");
-    card.className = "order-card";
+function createOrderCard(order) {
+  const card = document.createElement("div");
+  card.className = "order-card";
 
-    const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  const statusColor = order.status === "Order-Pending" ? "red" : "green";
 
-    card.innerHTML = `
-      <h4>📦 SKU: ${order.sku}</h4>
-      <p>🧪 Product: ${order.product}</p>
-      <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
-      <p>📄 Sheet: ${order.sheetName}</p>
-      <p>📅 Date: ${order.date || "N/A"}</p>
-      <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-      <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-      ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-    `;
-    return card;
-  }
+  card.innerHTML = `
+    <h4>📦 SKU: ${order.sku}</h4>
+    <p>🧪 Product: ${order.product}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
+    <p>📄 Sheet: ${order.sheetName}</p>
+    <p>📅 Date: ${order.date || "N/A"}</p>
+    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+  `;
+  return card;
+}
+
+// === Spinner Reset on Load ===
+window.addEventListener("DOMContentLoaded", () => {
+  showLoadingOverlay(false); // Ensure spinner is hidden on initial load
+});
 
   function renderPendingOrders(orders) {
     pendingOrdersContainer.innerHTML = "";
