@@ -58,9 +58,6 @@ function createOrderCard(order) {
 }
 
 function renderPendingOrders(orders) {
-  const card = createDispatchableOrderCard(order); // ← use this for testing
-// const card = createOrderCard(order); // ← keep this commented for fallback
-
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
 
@@ -73,13 +70,14 @@ function renderPendingOrders(orders) {
   const fragment = document.createDocumentFragment();
 
   orders.forEach((order, index) => {
-    const card = createOrderCard(order);
-    card.style.animationDelay = `${index * 80}ms`; // staggered delay
+    const card = createDispatchableOrderCard(order); // or createOrderCard(order)
+    card.style.animationDelay = `${index * 80}ms`;
     fragment.appendChild(card);
   });
 
   container.appendChild(fragment);
 }
+
 
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
@@ -137,7 +135,7 @@ function createDispatchableOrderCard(order) {
 function markOrderAsDispatched(order) {
   showToast("🔄 Updating status...");
 
-  const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec"; // Replace with your new endpoint
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with your new endpoint
   const payload = {
     sku: order.sku,
     sheetId: order.sheetId,
