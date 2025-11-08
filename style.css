@@ -654,6 +654,32 @@ body.login-body {
   color: #333;
 }
 
+/* === Beautify dispatch button logic === */
+
+.dispatch-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dispatch-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.dispatch-btn:active {
+  background-color: #004494;
+  transform: scale(0.98);
+}
+
+
 /* === fadeout card once order status is changed === */
 
 .fade-out {
@@ -661,3 +687,4 @@ body.login-body {
   transform: scale(0.95);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
+
