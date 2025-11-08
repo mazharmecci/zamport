@@ -94,9 +94,32 @@ function fetchAndRenderOrders(product = "") {
 }
 
 // === Dispatch SKU Handler ===
+
 function dispatchSKU() {
   const sku = document.getElementById("skuInput")?.value?.trim();
   if (!sku) return showToast("⚠️ Please enter a valid SKU.");
+
+  const cards = document.querySelectorAll(".order-card");
+  let matchedCard = null;
+  let matchedData = {};
+
+  cards.forEach(card => {
+    const cardSKU = card.querySelector("h4")?.textContent?.split(":")[1]?.trim();
+    if (cardSKU === sku) {
+      matchedCard = card;
+      matchedData = {
+        sku: cardSKU,
+        product: card.querySelector("p:nth-of-type(1)")?.textContent?.split(":")[1]?.trim(),
+        status: card.querySelector("p:nth-of-type(2)")?.textContent?.split(":")[1]?.trim(),
+        sheetName: card.querySelector("p:nth-of-type(3)")?.textContent?.split(":")[1]?.trim(),
+        date: card.querySelector("p:nth-of-type(4)")?.textContent?.split(":")[1]?.trim()
+      };
+    }
+  });
+
+  if (!matchedCard || !matchedData.date || matchedData.status !== "Order-Pending") {
+    return showToast("❌ No matching pending order found for this SKU.");
+  }
 
   showLoadingOverlay(true);
   const API = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -104,16 +127,17 @@ function dispatchSKU() {
   fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode: "dispatch-sku", sku })
+    body: JSON.stringify({ mode: "dispatch-sku", ...matchedData })
   })
     .then(res => res.json())
     .then(response => {
       if (response.success) {
-        showToast(`✅ SKU ${sku} marked as dispatched.`);
+        showToast(`✅ Dispatched SKU ${sku} from ${matchedData.sheetName}.`);
+        matchedCard.classList.add("fade-out");
+        setTimeout(() => matchedCard.remove(), 400);
         document.getElementById("skuInput").value = "";
-        fetchAndRenderOrders();
       } else {
-        showToast(`❌ ${response.message || "SKU not found or already dispatched."}`);
+        showToast(`❌ ${response.message || "Dispatch failed."}`);
       }
     })
     .catch(err => {
@@ -122,6 +146,7 @@ function dispatchSKU() {
     })
     .finally(() => showLoadingOverlay(false));
 }
+
 
 // === DOM Ready ===
 document.addEventListener("DOMContentLoaded", () => {
