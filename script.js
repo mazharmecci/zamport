@@ -58,6 +58,9 @@ function createOrderCard(order) {
 }
 
 function renderPendingOrders(orders) {
+  const card = createDispatchableOrderCard(order); // ← use this for testing
+// const card = createOrderCard(order); // ← keep this commented for fallback
+
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
 
@@ -98,6 +101,62 @@ function fetchAndRenderOrders(product = "") {
     })
     .finally(() => {
       showLoadingOverlay(false);
+    });
+}
+
+function createDispatchableOrderCard(order) {
+  const card = document.createElement("div");
+  card.className = "order-card";
+
+  const statusColor = order.status === "Order-Pending" ? "red" : "green";
+
+  card.innerHTML = `
+    <h4>📦 SKU: ${order.sku}</h4>
+    <p>🧪 Product: ${order.product}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
+    <p>📄 Sheet: ${order.sheetName}</p>
+    <p>📅 Date: ${order.date || "N/A"}</p>
+    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+  `;
+
+  if (order.status === "Order-Pending") {
+    const dispatchBtn = document.createElement("button");
+    dispatchBtn.textContent = "Mark as Dispatched";
+    dispatchBtn.className = "dispatch-btn";
+    dispatchBtn.onclick = () => markOrderAsDispatched(order);
+    card.appendChild(dispatchBtn);
+  }
+
+  return card;
+}
+
+function markOrderAsDispatched(order) {
+  showToast("🔄 Updating status...");
+
+  const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec"; // Replace with your new endpoint
+  const payload = {
+    sku: order.sku,
+    sheetId: order.sheetId,
+    sheetName: order.sheetName,
+    rowIndex: order.rowIndex,
+    newStatus: "Order-Dispatched"
+  };
+
+  fetch(API_URL, {
+    method: "POST",
+    body: new URLSearchParams(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      showToast("✅ Order marked as dispatched!");
+      order.status = "Order-Dispatched";
+      renderPendingOrders(currentOrders); // or re-fetch if needed
+    })
+    .catch(err => {
+      console.error("Dispatch failed:", err);
+      showToast("❌ Failed to update order.");
     });
 }
 
