@@ -43,17 +43,14 @@ function renderPendingOrders(orders) {
   const filtered = orders.filter(order => {
     const statusMatch = order.status?.trim().toLowerCase() === "order-pending";
 
-    // Robust MM/DD/YYYY parsing
-    const dateParts = (order.date || "").split("/");
-    if (dateParts.length !== 3) {
-      console.warn("⚠️ Skipping malformed date:", order.date);
-      return false;
-    }
+    // Parse MM/DD/YYYY manually
+    const dateStr = order.date?.trim();
+    if (!dateStr || !dateStr.includes("/")) return false;
 
-    const [mm, dd, yyyy] = dateParts;
-    const parsedDate = new Date(`${yyyy}-${mm}-${dd}`);
+    const [mm, dd, yyyy] = dateStr.split("/");
+    const parsedDate = new Date(`${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`);
     if (isNaN(parsedDate)) {
-      console.warn("⚠️ Invalid date object:", order.date);
+      console.warn("⚠️ Skipping invalid date:", dateStr);
       return false;
     }
 
