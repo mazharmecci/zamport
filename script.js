@@ -131,7 +131,7 @@ function markOrderAsDispatched(order, dispatchBtn) {
     newStatus: "Order-Dispatched"
   };
 
-  // ✅ Disable immediately to prevent double clicks
+  // ✅ Disable button immediately
   dispatchBtn.disabled = true;
   dispatchBtn.textContent = "Dispatching...";
   dispatchBtn.style.opacity = "0.7";
@@ -153,25 +153,18 @@ function markOrderAsDispatched(order, dispatchBtn) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      // ✅ Update button to success state and keep it disabled
+      // ✅ Update button to show tick and keep it disabled
       dispatchBtn.textContent = "✅ Dispatched";
       dispatchBtn.style.backgroundColor = "#28a745";
+      dispatchBtn.style.opacity = "1";
       dispatchBtn.style.cursor = "default";
       dispatchBtn.style.boxShadow = "none";
-      dispatchBtn.style.opacity = "1";
-
-      // ✅ Slide out and remove the card
-      const card = dispatchBtn.closest(".order-card");
-      if (card) {
-        setTimeout(() => {
-          card.classList.add("fade-out");
-          setTimeout(() => card.remove(), 500);
-        }, 1000);
-      }
     })
     .catch(err => {
       console.error("Dispatch failed:", err);
       showToast("❌ Failed to update order.");
+
+      // Re-enable button if dispatch fails
       dispatchBtn.disabled = false;
       dispatchBtn.textContent = "Mark as Dispatched";
       dispatchBtn.style.opacity = "1";
