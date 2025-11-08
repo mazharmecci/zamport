@@ -121,7 +121,7 @@ function fetchAndRenderOrders(product = "") {
 function markOrderAsDispatched(order) {
   showToast("🔄 Updating status...");
 
-  const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec"; // Replace with your new endpoint
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with your new endpoint
   const payload = {
     sku: order.sku,
     sheetId: order.sheetId,
