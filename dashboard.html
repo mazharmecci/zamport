@@ -12,7 +12,15 @@
 <body>
   <main class="dashboard-wrapper">
     <header class="dashboard-header">
-      <img src="zamport.png" alt="Zamport Logo" class="dashboard-logo" />      
+      <div class="logo-block">
+        <img src="zamport.png" alt="Zamport Logo" class="dashboard-logo" />
+      </div>
+    
+      <div class="user-info">
+        <img src="user-icon.png" alt="User Icon" class="user-icon" />
+        <span id="usernameDisplay">User</span>
+        <button id="logoutBtn" class="btn btn-orange">Logout</button>
+      </div>
     </header>
 
     <form class="dashboard-form" onsubmit="event.preventDefault();">
