@@ -16,12 +16,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px; /* reduced from 10px */
+  margin-bottom: 10px; /* optional: reduce vertical spacing */
+}
+
+.logo-header h2 {
+  font-size: 1.1rem; /* reduced from 1.25rem */
+  font-weight: bold;
+  margin: 0;
 }
 
 .logo-img {
-  width: 40px;
-  height: 40px;
+  width: 32px; /* reduced from 40px */
+  height: 32px;
 }
 
 .dashboard-header {
