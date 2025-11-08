@@ -10,69 +10,37 @@
 </head>
 
 <body>
-  <!-- SKU Vault Modal -->
-  <div id="skuVault" class="modal hidden">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeVault()">×</span>
-      <h3>🔍 SKU Insights</h3>
-      <div id="vaultDetails"></div>
-    </div>
-  </div>
+  <main class="dashboard-wrapper">
+    <header class="dashboard-header">
+      <img src="zamport.png" alt="Zamport Logo" class="dashboard-logo" />
+      <h2>Zamport Dashboard</h2>
+    </header>
 
-  <main class="container">
-    <form id="dashboardForm" onsubmit="event.preventDefault();">
-      <!-- Logo + Title -->
-      <header class="logo-header">
-        <img src="zamport.png" alt="Zamport Logo" class="logo-img" />        
-      </header>
+    <form class="dashboard-form" onsubmit="event.preventDefault();">
+      <label for="skuInput">Scan or Type SKU</label>
+      <input type="text" id="skuInput" placeholder="Enter SKU" required />
 
-      <!-- Dashboard Header -->
-      <section class="dashboard-header">
-        <h2>📊 Dashboard</h2>
-        <div class="user-info">
-          <img src="user-icon.png" alt="User Icon" class="user-icon" />
-          <span id="usernameDisplay">User</span>
-          <button type="button" id="logoutBtn" class="logout-btn">Logout</button>
-        </div>
-      </section>
+      <label for="productFilter">Filter by Product</label>
+      <select id="productFilter">
+        <option value="">All Products</option>
+      </select>
 
-      <!-- SKU Input + Filter + Status -->
-      <section class="form-section">
-        <div class="form-row">
-          <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="sku-input" />
-          <button type="submit" id="submitSku" class="submit-btn">
-            <span class="spinner hidden"></span>
-            Submit
-          </button>
-        </div>
-
-        <div class="form-row">
-          <label for="productFilter">Filter by Product</label>
-          <select id="productFilter" class="product-filter">
-            <option>All Products</option>
-          </select>
-          <button type="button" id="viewStatus" class="status-btn">
-            <span class="spinner hidden"></span>
-            📦 Pending Orders
-          </button>
-        </div>
-      </section>
-
-      <!-- Pending Orders Grid -->
-      <section class="orders-section">
-        <div id="pendingOrdersContainer" class="orders-grid"></div>
-      </section>
+      <button type="submit" id="submitSku">Submit</button>
     </form>
 
-    <!-- Toast Notification -->
+    <section id="pendingOrdersContainer" class="orders-grid"></section>
+  </main>
+</body>
+
+<!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
   </main>
 
-  <!-- Loading Overlay -->
+<!-- Loading Overlay -->
   <div id="loadingOverlay" class="hidden">
-    <div class="spinner"></div>
-  </div>
-</body>
+     <div class="spinner"></div>
+   </div>
+  </body>
 
 
   <!-- Logout Logic -->
