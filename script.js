@@ -116,9 +116,6 @@ function fetchAndRenderOrders(product = "") {
       showLoadingOverlay(false);
     });
 }
-
-// === Dispatch Handler ===
-
 function markOrderAsDispatched(order) {
   showToast("🔄 Updating status...");
 
@@ -130,6 +127,21 @@ function markOrderAsDispatched(order) {
     rowIndex: order.rowIndex,
     newStatus: "Order-Dispatched"
   };
+
+  // ✅ Disable the button immediately
+  const container = document.getElementById("pendingOrdersContainer");
+  const cards = container.querySelectorAll(".order-card");
+  cards.forEach(card => {
+    if (card.textContent.includes(order.sku)) {
+      const dispatchBtn = card.querySelector(".dispatch-btn");
+      if (dispatchBtn) {
+        dispatchBtn.disabled = true;
+        dispatchBtn.textContent = "Dispatching...";
+        dispatchBtn.style.opacity = "0.7";
+        dispatchBtn.style.cursor = "not-allowed";
+      }
+    }
+  });
 
   fetch(API_URL, {
     method: "POST",
@@ -147,15 +159,21 @@ function markOrderAsDispatched(order) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      // ✅ Animate and remove the card
-      const container = document.getElementById("pendingOrdersContainer");
-      const cards = container.querySelectorAll(".order-card");
+      // ✅ Update button and slide out card
       cards.forEach(card => {
         if (card.textContent.includes(order.sku)) {
-          card.classList.add("fade-out");
+          const dispatchBtn = card.querySelector(".dispatch-btn");
+          if (dispatchBtn) {
+            dispatchBtn.textContent = "✅ Dispatched";
+            dispatchBtn.style.backgroundColor = "#28a745";
+            dispatchBtn.style.cursor = "default";
+            dispatchBtn.style.boxShadow = "none";
+          }
+
           setTimeout(() => {
-            card.remove();
-          }, 500); // match animation duration
+            card.classList.add("fade-out");
+            setTimeout(() => card.remove(), 500); // match animation duration
+          }, 1000); // delay before slide-out
         }
       });
     })
@@ -164,6 +182,7 @@ function markOrderAsDispatched(order) {
       showToast("❌ Failed to update order.");
     });
 }
+
 
 
 // === DOM Ready Handler ===
