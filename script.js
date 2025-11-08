@@ -88,8 +88,7 @@ function fetchAndRenderOrders(product = "") {
   fetch(url)
     .then(res => res.json())
     .then(orders => {
-      renderPendingOrders(orders); // ✅ Render first
-      triggerCardMatchWorkflow(); // ✅ Then match
+      renderPendingOrders(orders); // ✅ Render first      
     })
     .catch(err => {
       console.error("Failed to fetch orders:", err);
