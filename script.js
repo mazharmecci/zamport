@@ -90,7 +90,7 @@ function fetchAndRenderOrders(product = "") {
 }
 
 
-
+// === Login Toast successful logic ===
 
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -101,6 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+
+  // ✅ Show login success toast
+  showToast("✅ Login successful!");
+    
   // === Display Logged-in User ===
   const usernameDisplay = document.getElementById("usernameDisplay");
   const userName = sessionStorage.getItem("zamport-user");
