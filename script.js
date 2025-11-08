@@ -63,7 +63,7 @@ function createDispatchableOrderCard(order) {
     const dispatchBtn = document.createElement("button");
     dispatchBtn.textContent = "Mark as Dispatched";
     dispatchBtn.className = "dispatch-btn";
-    dispatchBtn.onclick = () => markOrderAsDispatched(order);
+   dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
     card.appendChild(dispatchBtn);
   }
 
@@ -119,7 +119,7 @@ function fetchAndRenderOrders(product = "") {
 
 
 
-function markOrderAsDispatched(order) {
+function markOrderAsDispatched(order, dispatchBtn) {
   showToast("🔄 Updating status...");
 
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -131,18 +131,11 @@ function markOrderAsDispatched(order) {
     newStatus: "Order-Dispatched"
   };
 
-  // ✅ Disable button immediately
-  const container = document.getElementById("pendingOrdersContainer");
-  const matchingCard = Array.from(container.querySelectorAll(".order-card"))
-    .find(card => card.textContent.includes(order.sku));
-
-  const dispatchBtn = matchingCard?.querySelector(".dispatch-btn");
-  if (dispatchBtn) {
-    dispatchBtn.disabled = true;
-    dispatchBtn.textContent = "Dispatching...";
-    dispatchBtn.style.opacity = "0.7";
-    dispatchBtn.style.cursor = "not-allowed";
-  }
+  // ✅ Disable the clicked button only
+  dispatchBtn.disabled = true;
+  dispatchBtn.textContent = "Dispatching...";
+  dispatchBtn.style.opacity = "0.7";
+  dispatchBtn.style.cursor = "not-allowed";
 
   fetch(API_URL, {
     method: "POST",
@@ -160,30 +153,27 @@ function markOrderAsDispatched(order) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      // ✅ Update button and fade out card
-      if (dispatchBtn) {
-        dispatchBtn.textContent = "✅ Dispatched";
-        dispatchBtn.style.backgroundColor = "#28a745";
-        dispatchBtn.style.cursor = "default";
-        dispatchBtn.style.boxShadow = "none";
-      }
+      // ✅ Update button and fade out the exact card
+      dispatchBtn.textContent = "✅ Dispatched";
+      dispatchBtn.style.backgroundColor = "#28a745";
+      dispatchBtn.style.cursor = "default";
+      dispatchBtn.style.boxShadow = "none";
 
-      if (matchingCard) {
+      const card = dispatchBtn.closest(".order-card");
+      if (card) {
         setTimeout(() => {
-          matchingCard.classList.add("fade-out");
-          setTimeout(() => matchingCard.remove(), 500); // match animation duration
-        }, 1000); // delay before slide-out
+          card.classList.add("fade-out");
+          setTimeout(() => card.remove(), 500);
+        }, 1000);
       }
     })
     .catch(err => {
       console.error("Dispatch failed:", err);
       showToast("❌ Failed to update order.");
-      if (dispatchBtn) {
-        dispatchBtn.disabled = false;
-        dispatchBtn.textContent = "Mark as Dispatched";
-        dispatchBtn.style.opacity = "1";
-        dispatchBtn.style.cursor = "pointer";
-      }
+      dispatchBtn.disabled = false;
+      dispatchBtn.textContent = "Mark as Dispatched";
+      dispatchBtn.style.opacity = "1";
+      dispatchBtn.style.cursor = "pointer";
     });
 }
 
