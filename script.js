@@ -117,11 +117,11 @@ function fetchAndRenderOrders(product = "") {
     });
 }
 
-// === Dispatch Handler ===
+
 function markOrderAsDispatched(order) {
   showToast("🔄 Updating status...");
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with your new endpoint
+  const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec";
   const payload = {
     sku: order.sku,
     sheetId: order.sheetId,
@@ -146,13 +146,24 @@ function markOrderAsDispatched(order) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      renderPendingOrders(currentOrders);
+      // ✅ Animate and remove the card
+      const container = document.getElementById("pendingOrdersContainer");
+      const cards = container.querySelectorAll(".order-card");
+      cards.forEach(card => {
+        if (card.textContent.includes(order.sku)) {
+          card.classList.add("fade-out");
+          setTimeout(() => {
+            card.remove();
+          }, 500); // match animation duration
+        }
+      });
     })
     .catch(err => {
       console.error("Dispatch failed:", err);
       showToast("❌ Failed to update order.");
     });
 }
+
 
 // === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
