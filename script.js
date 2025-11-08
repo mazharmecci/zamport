@@ -56,7 +56,6 @@ function createOrderCard(order) {
   `;
   return card;
 }
-
 function renderPendingOrders(orders) {
   const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
   if (!pendingOrdersContainer) return;
@@ -81,7 +80,10 @@ function fetchAndRenderOrders(product = "") {
 
   fetch(url)
     .then(res => res.json())
-    .then(orders => renderPendingOrders(orders))
+    .then(orders => {
+      renderPendingOrders(orders);
+      setTimeout(triggerCardMatchWorkflow, 500); // ✅ Trigger match after rendering
+    })
     .catch(err => {
       console.error("Failed to fetch orders:", err);
       showToast("❌ Failed to load orders.");
@@ -91,7 +93,7 @@ function fetchAndRenderOrders(product = "") {
 
 
 
-  function triggerCardMatchWorkflow() {
+function triggerCardMatchWorkflow() {
   const firstCard = document.querySelector(".order-card");
   if (!firstCard) {
     showToast("⚠️ No pending orders to match.");
@@ -130,14 +132,6 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
-  .then(products => {
-  populateProductDropdown(products);
-  fetchAndRenderOrders();
-})
-.finally(() => {
-  showLoadingOverlay(false);
-  setTimeout(triggerCardMatchWorkflow, 500); // slight delay to ensure DOM is ready
-});
 
 
 // === DOM Ready Handler ===
@@ -213,7 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchAndRenderOrders(productFilter?.value || "");
     });
   }
-
  
   // === Logout Button ===
   const logoutBtn = document.getElementById("logoutBtn");
