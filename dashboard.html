@@ -9,10 +9,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
-<body>
+<body class="bg-white text-gray-800">
 
-
-  <!-- SKU Vault -->
+  <!-- SKU Vault Modal -->
   <div id="skuVault" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" onclick="closeVault()">×</span>
@@ -21,100 +20,93 @@
     </div>
   </div>
 
-  <main class="container">
+  <main class="container max-w-screen-sm mx-auto px-4 py-4 space-y-6">
+
     <!-- Logo + Title -->
-    <header class="logo-header">
-      <div class="logo-container">
-        <img src="zamport.png" alt="Zamport Logo" class="logo" />
-      </div>
-      <h2>ZAMPORT</h2>
+    <header class="flex items-center justify-center space-x-3">
+      <img src="zamport.png" alt="Zamport Logo" class="w-10 h-10" />
+      <h2 class="text-xl font-bold">ZAMPORT</h2>
     </header>
 
     <!-- Dashboard Header -->
-    <section class="dashboard-header">
-      <div class="dashboard-title-row">
-        <h2>📊 Dashboard</h2>
-        <div class="user-badge">
-          <img src="user-icon.png" alt="User Icon" class="user-icon" />
-          <span id="usernameDisplay">User</span>
-          <button id="logoutBtn" class="logout-btn">Logout</button>
-        </div>
+    <section class="flex flex-col sm:flex-row justify-between items-center gap-2">
+      <h2 class="text-lg font-semibold">📊 Dashboard</h2>
+      <div class="flex items-center gap-2">
+        <img src="user-icon.png" alt="User Icon" class="w-6 h-6 rounded-full" />
+        <span id="usernameDisplay" class="text-sm">User</span>
+        <button id="logoutBtn" class="text-sm px-3 py-1 bg-red-500 text-white rounded">Logout</button>
       </div>
     </section>
 
     <!-- SKU Submission Form -->
-    <form class="stock-form" onsubmit="event.preventDefault();">
-      <label for="skuInput">Enter SKU</label>
-      <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" />
-      <button type="submit" id="submitSku">
-        <span class="spinner hidden"></span>
+    <form class="flex flex-col sm:flex-row gap-3 items-stretch" onsubmit="event.preventDefault();">
+      <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="flex-1 px-3 py-2 border rounded" />
+      <button type="submit" id="submitSku" class="bg-blue-600 text-white px-4 py-2 rounded flex items-center justify-center">
+        <span class="spinner hidden mr-2"></span>
         Submit
       </button>
     </form>
 
-    <hr class="subtle-divider" />
+    <hr class="border-t border-gray-300" />
 
-<div class="dashboard-section">
-  <div class="filter-panel-wrapper">
-    <!-- Filter and Pending Orders Button -->
-    <div class="filter-actions">
-      <div class="filter-group">
-        <label for="productFilter">Filter by Product</label>
-        <select id="productFilter">
-          <option>All Products</option>
-          <!-- other options -->
-        </select>
+    <!-- Filter + Pending Orders -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch gap-3">
+        <div class="flex-1">
+          <label for="productFilter" class="block text-sm font-medium mb-1">Filter by Product</label>
+          <select id="productFilter" class="w-full px-3 py-2 border rounded">
+            <option>All Products</option>
+            <!-- other options -->
+          </select>
+        </div>
+        <button id="viewStatus" class="bg-green-600 text-white px-4 py-2 rounded flex items-center justify-center">
+          <span class="spinner hidden mr-2" aria-hidden="true"></span>
+          📦 Pending Orders
+        </button>
       </div>
-      <button id="viewStatus" class="action-btn" aria-label="View pending orders">
-        <span class="spinner hidden" aria-hidden="true"></span>
-        <span class="btn-label">📦 Pending Orders</span>
-      </button>
-    </div>
-  </div>
 
-  <!-- 🧾 Pending Orders Container -->
-  <div id="pendingOrdersContainer" class="pending-orders-grid"></div>
-</div>
- 
-  <!-- 🔔 Toast Notification -->
-  <div id="toast" role="alert" aria-live="assertive"></div>
-  
+      <!-- Pending Orders Grid -->
+      <div id="pendingOrdersContainer" class="grid gap-4"></div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" role="alert" aria-live="assertive" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded hidden z-50"></div>
+
   </main>
 
-  <!-- ✅ Logout Logic -->
-<script>
-  function showToast(message) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay hidden fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-40">
+    <div class="spinner"></div>
+  </div>
 
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3000);
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        sessionStorage.clear();
-        showToast("👋 Logged out successfully!");
-        setTimeout(() => {
-          window.location.href = "https://mazharmecci.github.io/zamport/";
-        }, 1000);
-      });
+  <!-- Logout Logic -->
+  <script>
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+        toast.classList.add("hidden");
+      }, 3000);
     }
-  });
-</script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          sessionStorage.clear();
+          showToast("👋 Logged out successfully!");
+          setTimeout(() => {
+            window.location.href = "https://mazharmecci.github.io/zamport/";
+          }, 1000);
+        });
+      }
+    });
+  </script>
 
   <script src="script.js"></script>
-  
-<div id="loadingOverlay" class="loading-overlay hidden">
-  <div class="spinner"></div>
-</div>
-
 </body>
 </html>
