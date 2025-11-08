@@ -27,7 +27,7 @@ function createOrderCard(order) {
   return card;
 }
 
-// === Snappy Card Renderer ===
+// === Snappy Card Renderer (Current Month + Pending Only)
 
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
@@ -55,8 +55,8 @@ function renderPendingOrders(orders) {
   });
 }
 
+// === Fetch Orders + Products
 
-// === Fetch Orders + Products ===
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   const url = product
@@ -78,25 +78,8 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
-// === Dispatch SKU via POST
-async function dispatchSKU(sku) {
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ sku })
-    });
-    const text = await res.text();
-    showToast(text.includes("successfully") ? `✅ ${text}` : `❌ ${text}`);
-    return text;
-  } catch (err) {
-    console.error("Dispatch failed:", err);
-    showToast("❌ Dispatch error");
-    return "Dispatch error";
-  }
-}
-
 // === Product Dropdown Population
+
 function populateProductDropdown(products) {
   const dropdown = document.getElementById("productDropdown");
   if (!dropdown) return;
@@ -110,12 +93,6 @@ function populateProductDropdown(products) {
 }
 
 // === UI Bindings
-document.getElementById("dispatchBtn").addEventListener("click", async () => {
-  const sku = document.getElementById("skuInput").value.trim();
-  if (!sku) return showToast("⚠️ Please enter a SKU");
-  await dispatchSKU(sku);
-  fetchAndRenderOrders(); // Refresh after dispatch
-});
 
 document.getElementById("productDropdown").addEventListener("change", (e) => {
   fetchAndRenderOrders(e.target.value);
@@ -125,7 +102,8 @@ window.addEventListener("DOMContentLoaded", () => {
   fetchAndRenderOrders();
 });
 
-// === Toast + Loading Overlay (assumed available)
+// === Toast + Loading Overlay
+
 function showToast(msg) {
   const toast = document.getElementById("toast");
   if (!toast) return;
