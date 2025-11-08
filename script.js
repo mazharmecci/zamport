@@ -89,9 +89,7 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
-
-// === Login Toast successful logic ===
-
+// === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
@@ -101,10 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-
   // ✅ Show login success toast
   showToast("✅ Login successful!");
-    
+
   // === Display Logged-in User ===
   const usernameDisplay = document.getElementById("usernameDisplay");
   const userName = sessionStorage.getItem("zamport-user");
@@ -167,36 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === Logout Button ===
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
-}); // ✅ This was the missing closing brace
-
-
-
-  // === Logout Button ===
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
-});
-
-  // 🚪 Logout Handler
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (event) => {
