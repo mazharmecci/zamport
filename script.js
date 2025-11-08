@@ -191,6 +191,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .finally(() => toggleSpinner(btn, false));
   });
 
+
+  fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_URL/exec', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    mode: 'dispatch-sku',
+    sku: 'ABC123',
+    product: 'Rotary Cheese Grater',
+    date: '04/11/2025',
+    sheetName: 'Social Operative 3PL Orders'
+  })
+});
+
+  
   document.getElementById("logoutBtn")?.addEventListener("click", e => {
     e.preventDefault();
     sessionStorage.clear();
