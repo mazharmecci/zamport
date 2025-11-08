@@ -78,29 +78,6 @@ function renderPendingOrders(orders) {
   container.appendChild(fragment);
 }
 
-function fetchAndRenderOrders(product = "") {
-  showLoadingOverlay(true);
-  showToast("⏳ Please wait, fetching your orders..."); // ✅ Comfort message
-
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = product
-    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-    : `${API_URL}?mode=3pl-month`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(orders => {
-      renderPendingOrders(orders);
-    })
-    .catch(err => {
-      console.error("Failed to fetch orders:", err);
-      showToast("❌ Failed to load orders.");
-    })
-    .finally(() => {
-      showLoadingOverlay(false);
-    });
-}
-
 // === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -121,24 +98,45 @@ document.addEventListener("DOMContentLoaded", () => {
     usernameDisplay.textContent = userName;
   }
 
-  // === Initial Load Spinner + Toast ===
-  showLoadingOverlay(true);
-  showToast("⏳ Loading your orders...");
-
-  // === Fetch Products + Orders Immediately ===
+  // === Fetch Products First ===
   fetch(`${API_URL}?mode=products`)
     .then(res => res.json())
     .then(products => {
       populateProductDropdown(products);
-      fetchAndRenderOrders(); // fetch all orders
     })
     .catch(err => {
-      console.error("Initial load failed:", err);
+      console.error("Product fetch failed:", err);
       showToast("❌ Failed to load product list.");
+    })
+    .finally(() => {
+      // ✅ Now fetch orders with spinner and toast
+      fetchAndRenderOrders(); // handles its own overlay + toast
+    });
+});
+
+// === Order Fetcher ===
+function fetchAndRenderOrders(product = "") {
+  showLoadingOverlay(true);
+  showToast("⏳ Fetching your orders...");
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  const url = product
+    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+    : `${API_URL}?mode=3pl-month`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(orders => {
+      renderPendingOrders(orders);
+    })
+    .catch(err => {
+      console.error("Order fetch failed:", err);
+      showToast("❌ Failed to load orders.");
     })
     .finally(() => {
       showLoadingOverlay(false);
     });
+}
 
   // === View Status Button ===
   const viewStatusBtn = document.getElementById("viewStatus");
