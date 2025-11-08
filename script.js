@@ -83,6 +83,7 @@ function renderPendingOrders(orders) {
 }
 
 // === Fetch Orders ===
+
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -92,10 +93,17 @@ function fetchAndRenderOrders(product = "") {
 
   fetch(url)
     .then(res => res.json())
-    .then(orders => renderPendingOrders(orders))
+    .then(orders => {
+      renderPendingOrders(orders);
+      return fetch(`${API_URL}?mode=products`);
+    })
+    .then(res => res.json())
+    .then(products => {
+      populateProductDropdown(products);
+    })
     .catch(err => {
-      console.error("Failed to fetch orders:", err);
-      showToast("❌ Failed to load orders.");
+      console.error("Failed to load orders or products:", err);
+      showToast("❌ Failed to load dashboard data.");
     })
     .finally(() => showLoadingOverlay(false));
 }
