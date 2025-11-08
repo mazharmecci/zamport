@@ -1,3 +1,6 @@
+// === Global State ===
+let currentOrders = [];
+
 // === Toast Notification Helper ===
 function showToast(message) {
   const toast = document.getElementById("toast");
@@ -8,19 +11,6 @@ function showToast(message) {
   setTimeout(() => {
     toast.classList.add("hidden");
   }, 3000);
-}
-
-function populateProductDropdown(products = []) {
-  const productFilter = document.getElementById("productFilter");
-  if (!productFilter) return;
-
-  productFilter.innerHTML = `<option value="">All Products</option>`;
-  products.forEach(product => {
-    const option = document.createElement("option");
-    option.value = product;
-    option.textContent = product;
-    productFilter.appendChild(option);
-  });
 }
 
 // === UI Helpers ===
@@ -38,72 +28,20 @@ function showLoadingOverlay(show) {
   }
 }
 
-function createOrderCard(order) {
-  const card = document.createElement("div");
-  card.className = "order-card";
+function populateProductDropdown(products = []) {
+  const productFilter = document.getElementById("productFilter");
+  if (!productFilter) return;
 
-  const statusColor = order.status === "Order-Pending" ? "red" : "green";
-
-  card.innerHTML = `
-    <h4>📦 SKU: ${order.sku}</h4>
-    <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
-    <p>📄 Sheet: ${order.sheetName}</p>
-    <p>📅 Date: ${order.date || "N/A"}</p>
-    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-  `;
-  return card;
-}
-
-function renderPendingOrders(orders) {
-  const container = document.getElementById("pendingOrdersContainer");
-  if (!container) return;
-
-  container.innerHTML = "";
-  if (!orders.length) {
-    container.innerHTML = "<p>No pending orders found.</p>";
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  orders.forEach((order, index) => {
-    const card = createDispatchableOrderCard(order); // or createOrderCard(order)
-    card.style.animationDelay = `${index * 80}ms`;
-    fragment.appendChild(card);
+  productFilter.innerHTML = `<option value="">All Products</option>`;
+  products.forEach(product => {
+    const option = document.createElement("option");
+    option.value = product;
+    option.textContent = product;
+    productFilter.appendChild(option);
   });
-
-  container.appendChild(fragment);
 }
 
-
-function fetchAndRenderOrders(product = "") {
-  showLoadingOverlay(true);
-  showToast("⏳ Fetching your orders...");
-
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = product
-    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-    : `${API_URL}?mode=3pl-month`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(orders => {
-      currentOrders = orders; // ✅ store globally
-      renderPendingOrders(currentOrders);
-    })
-    .catch(err => {
-      console.error("Order fetch failed:", err);
-      showToast("❌ Failed to load orders.");
-    })
-    .finally(() => {
-      showLoadingOverlay(false);
-    });
-}
-
-
+// === Card Renderer with Dispatch Button ===
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -132,10 +70,58 @@ function createDispatchableOrderCard(order) {
   return card;
 }
 
+// === Render Orders ===
+function renderPendingOrders(orders) {
+  const container = document.getElementById("pendingOrdersContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+  if (!orders.length) {
+    container.innerHTML = "<p>No pending orders found.</p>";
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  orders.forEach((order, index) => {
+    const card = createDispatchableOrderCard(order);
+    card.style.animationDelay = `${index * 80}ms`;
+    fragment.appendChild(card);
+  });
+
+  container.appendChild(fragment);
+}
+
+// === Fetch Orders ===
+function fetchAndRenderOrders(product = "") {
+  showLoadingOverlay(true);
+  showToast("⏳ Fetching your orders...");
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  const url = product
+    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+    : `${API_URL}?mode=3pl-month`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(orders => {
+      currentOrders = orders;
+      renderPendingOrders(currentOrders);
+    })
+    .catch(err => {
+      console.error("Order fetch failed:", err);
+      showToast("❌ Failed to load orders.");
+    })
+    .finally(() => {
+      showLoadingOverlay(false);
+    });
+}
+
+// === Dispatch Handler ===
 function markOrderAsDispatched(order) {
   showToast("🔄 Updating status...");
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec"; // Replace with your new endpoint
+  const API_URL = "https://script.google.com/macros/s/YOUR_NEW_SCRIPT_ID/exec"; // Replace with your new endpoint
   const payload = {
     sku: order.sku,
     sheetId: order.sheetId,
@@ -152,7 +138,6 @@ function markOrderAsDispatched(order) {
     .then(data => {
       showToast("✅ Order marked as dispatched!");
 
-      // ✅ Update status in global array
       const updated = currentOrders.find(o =>
         o.sku === order.sku &&
         o.sheetId === order.sheetId &&
@@ -161,7 +146,7 @@ function markOrderAsDispatched(order) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      renderPendingOrders(currentOrders); // ✅ Re-render with updated status
+      renderPendingOrders(currentOrders);
     })
     .catch(err => {
       console.error("Dispatch failed:", err);
@@ -169,45 +154,16 @@ function markOrderAsDispatched(order) {
     });
 }
 
-function createDispatchableOrderCard(order) {
-  const card = document.createElement("div");
-  card.className = "order-card";
-
-  const statusColor = order.status === "Order-Pending" ? "red" : "green";
-
-  card.innerHTML = `
-    <h4>📦 SKU: ${order.sku}</h4>
-    <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
-    <p>📄 Sheet: ${order.sheetName}</p>
-    <p>📅 Date: ${order.date || "N/A"}</p>
-    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-  `;
-
-  if (order.status === "Order-Pending") {
-    const dispatchBtn = document.createElement("button");
-    dispatchBtn.textContent = "Mark as Dispatched";
-    dispatchBtn.className = "dispatch-btn";
-    dispatchBtn.onclick = () => markOrderAsDispatched(order);
-    card.appendChild(dispatchBtn);
-  }
-
-  return card;
-}
-
-
 // === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-  // === Auth Check ===
   if (sessionStorage.getItem("zamport-auth") !== "true") {
     window.location.href = "https://mazharmecci.github.io/zamport/";
     return;
   }
 
+  showLoadingOverlay(true);
   showToast("✅ Login successful!");
 
   const usernameDisplay = document.getElementById("usernameDisplay");
@@ -229,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchAndRenderOrders();
     });
 
-  // === View Status Button ===
   const viewStatusBtn = document.getElementById("viewStatus");
   if (viewStatusBtn) {
     viewStatusBtn.addEventListener("click", () => {
@@ -248,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Product Filter Change ===
   const productFilter = document.getElementById("productFilter");
   if (productFilter) {
     productFilter.addEventListener("change", () => {
@@ -256,7 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Refresh Orders Button ===
   const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
   if (refreshOrdersBtn) {
     refreshOrdersBtn.addEventListener("click", () => {
@@ -264,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Logout Button ===
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (event) => {
