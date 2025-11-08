@@ -81,7 +81,7 @@ function fetchAndRenderOrders(product = "") {
 // === Product Dropdown Population
 
 function populateProductDropdown(products) {
-  const dropdown = document.getElementById("productDropdown");
+  const dropdown = document.getElementById("productFilter");
   if (!dropdown) return;
   dropdown.innerHTML = `<option value="">All Products</option>`;
   products.forEach(p => {
@@ -94,11 +94,16 @@ function populateProductDropdown(products) {
 
 // === UI Bindings
 
-document.getElementById("productDropdown").addEventListener("change", (e) => {
-  fetchAndRenderOrders(e.target.value);
-});
-
 window.addEventListener("DOMContentLoaded", () => {
+  const dropdown = document.getElementById("productFilter");
+  if (dropdown) {
+    dropdown.addEventListener("change", (e) => {
+      fetchAndRenderOrders(e.target.value);
+    });
+  } else {
+    console.warn("⚠️ productFilter not found in DOM.");
+  }
+
   fetchAndRenderOrders();
 });
 
