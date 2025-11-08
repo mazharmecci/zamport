@@ -93,8 +93,6 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
-// === Dispatch SKU Handler ===
-
 function dispatchSKU() {
   const sku = document.getElementById("skuInput")?.value?.trim();
   if (!sku) return showToast("⚠️ Please enter a valid SKU.");
@@ -124,15 +122,19 @@ function dispatchSKU() {
   showLoadingOverlay(true);
   const API = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-  fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode: "dispatch-sku", ...matchedData })
-  })
+  const query = new URLSearchParams({
+    mode: "dispatch-sku",
+    sku: matchedData.sku,
+    product: matchedData.product,
+    date: matchedData.date,
+    sheetName: matchedData.sheetName
+  }).toString();
+
+  fetch(`${API}?${query}`)
     .then(res => res.json())
     .then(response => {
       if (response.success) {
-        showToast(`✅ Dispatched SKU ${sku} from ${matchedData.sheetName}.`);
+        showToast(`✅ Dispatched SKU ${matchedData.sku} from ${matchedData.sheetName}.`);
         matchedCard.classList.add("fade-out");
         setTimeout(() => matchedCard.remove(), 400);
         document.getElementById("skuInput").value = "";
