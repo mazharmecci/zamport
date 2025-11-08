@@ -89,32 +89,46 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
-// === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
-  // 🔐 Auth Check
-  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
-  if (!isAuthenticated) {
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+
+  // === Auth Check ===
+  if (sessionStorage.getItem("zamport-auth") !== "true") {
     window.location.href = "https://mazharmecci.github.io/zamport/";
     return;
   }
 
-  // 👤 Display Logged-in User
+  // === Display Logged-in User ===
   const usernameDisplay = document.getElementById("usernameDisplay");
   const userName = sessionStorage.getItem("zamport-user");
   if (usernameDisplay && userName) {
     usernameDisplay.textContent = userName;
   }
 
-  // 🧼 Hide Spinner on Load
-  showLoadingOverlay(false);
+  // === Initial Load Spinner + Toast ===
+  showLoadingOverlay(true);
+  showToast("⏳ Loading your orders...");
 
-  // 🔘 Pending Orders Button
+  // === Fetch Products + Orders Immediately ===
+  fetch(`${API_URL}?mode=products`)
+    .then(res => res.json())
+    .then(products => {
+      populateProductDropdown(products);
+      fetchAndRenderOrders(); // fetch all orders
+    })
+    .catch(err => {
+      console.error("Initial load failed:", err);
+      showToast("❌ Failed to load product list.");
+    })
+    .finally(() => {
+      showLoadingOverlay(false);
+    });
+
+  // === View Status Button ===
   const viewStatusBtn = document.getElementById("viewStatus");
   if (viewStatusBtn) {
     viewStatusBtn.addEventListener("click", () => {
       toggleSpinner(viewStatusBtn, true);
-      const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-
       fetch(`${API_URL}?mode=products`)
         .then(res => res.json())
         .then(products => {
@@ -122,14 +136,14 @@ document.addEventListener("DOMContentLoaded", () => {
           fetchAndRenderOrders();
         })
         .catch(err => {
-          console.error("Failed to load products:", err);
+          console.error("View status failed:", err);
           showToast("❌ Failed to load product list.");
         })
         .finally(() => toggleSpinner(viewStatusBtn, false));
     });
   }
 
-  // 🔄 Filter by Product
+  // === Product Filter Change ===
   const productFilter = document.getElementById("productFilter");
   if (productFilter) {
     productFilter.addEventListener("change", () => {
@@ -137,13 +151,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔄 Refresh Orders Button
+  // === Refresh Orders Button ===
   const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
   if (refreshOrdersBtn) {
     refreshOrdersBtn.addEventListener("click", () => {
       fetchAndRenderOrders(productFilter?.value || "");
     });
   }
+
+  // === Logout Button ===
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      sessionStorage.clear();
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
+    });
+  }
+});
 
   // 🚪 Logout Handler
   const logoutBtn = document.getElementById("logoutBtn");
