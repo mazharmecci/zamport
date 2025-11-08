@@ -20,60 +20,61 @@
   </div>
 
   <main class="container">
-    <!-- Logo + Title -->
-    <header class="logo-header">
-      <img src="zamport.png" alt="Zamport Logo" class="logo-img" />
-      <h2>ZAMPORT</h2>
-    </header>
+    <form id="dashboardForm" onsubmit="event.preventDefault();">
+      <!-- Logo + Title -->
+      <header class="logo-header">
+        <img src="zamport.png" alt="Zamport Logo" class="logo-img" />
+        <h2>ZAMPORT</h2>
+      </header>
 
-    <!-- Dashboard Header -->
-    <section class="dashboard-header">
-      <h2>📊 Dashboard</h2>
-      <div class="user-info">
-        <img src="user-icon.png" alt="User Icon" class="user-icon" />
-        <span id="usernameDisplay">User</span>
-        <button id="logoutBtn" class="logout-btn">Logout</button>
-      </div>
-    </section>
+      <!-- Dashboard Header -->
+      <section class="dashboard-header">
+        <h2>📊 Dashboard</h2>
+        <div class="user-info">
+          <img src="user-icon.png" alt="User Icon" class="user-icon" />
+          <span id="usernameDisplay">User</span>
+          <button type="button" id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+      </section>
 
-    <!-- SKU Submission Form -->
-    <form class="sku-form" onsubmit="event.preventDefault();">
-      <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="sku-input" />
-      <button type="submit" id="submitSku" class="submit-btn">
-        <span class="spinner hidden"></span>
-        Submit
-      </button>
-    </form>
+      <!-- SKU Input + Filter + Status -->
+      <section class="form-section">
+        <div class="form-row">
+          <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="sku-input" />
+          <button type="submit" id="submitSku" class="submit-btn">
+            <span class="spinner hidden"></span>
+            Submit
+          </button>
+        </div>
 
-    <hr />
-
-    <!-- Filter + Pending Orders -->
-    <section class="orders-section">
-      <div class="filter-row">
-        <div class="filter-group">
+        <div class="form-row">
           <label for="productFilter">Filter by Product</label>
           <select id="productFilter" class="product-filter">
             <option>All Products</option>
           </select>
+          <button type="button" id="viewStatus" class="status-btn">
+            <span class="spinner hidden"></span>
+            📦 Pending Orders
+          </button>
         </div>
-        <button id="viewStatus" class="status-btn">
-          <span class="spinner hidden"></span>
-          📦 Pending Orders
-        </button>
-      </div>
+      </section>
 
-      <div id="pendingOrdersContainer" class="orders-grid"></div>
-    </section>
+      <!-- Pending Orders Grid -->
+      <section class="orders-section">
+        <div id="pendingOrdersContainer" class="orders-grid"></div>
+      </section>
+    </form>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
   </main>
 
   <!-- Loading Overlay -->
-<div id="loadingOverlay" class="hidden">
+  <div id="loadingOverlay" class="hidden">
     <div class="spinner"></div>
   </div>
 </body>
+
 
   <!-- Logout Logic -->
   <script>
