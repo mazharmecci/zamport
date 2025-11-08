@@ -89,6 +89,57 @@ function fetchAndRenderOrders(product = "") {
     .finally(() => showLoadingOverlay(false));
 }
 
+
+
+  function triggerCardMatchWorkflow() {
+  const firstCard = document.querySelector(".order-card");
+  if (!firstCard) {
+    showToast("⚠️ No pending orders to match.");
+    return;
+  }
+
+  const extract = (selector) => firstCard.querySelector(selector)?.textContent?.split(": ")[1]?.trim() || "";
+
+  const payload = {
+    sku: extract("h4"),
+    product: extract("p:nth-of-type(1)"),
+    status: extract("p:nth-of-type(2)"),
+    sheetName: extract("p:nth-of-type(3)"),
+    date: extract("p:nth-of-type(4)"),
+  };
+
+  console.log("🔍 Matching card details:", payload);
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  const url = `${API_URL}?mode=match-card&sku=${encodeURIComponent(payload.sku)}&product=${encodeURIComponent(payload.product)}&sheet=${encodeURIComponent(payload.sheetName)}&date=${encodeURIComponent(payload.date)}`;
+
+  showToast("🔍 Matching card to sheet...");
+  showLoadingOverlay(true);
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ Matched rows:", data);
+      showToast(`✅ Found ${data.length} matching row(s).`);
+      // You can now use `data` to trigger status update or audit logic
+    })
+    .catch(err => {
+      console.error("❌ Match workflow failed:", err);
+      showToast("❌ Failed to match card to sheet.");
+    })
+    .finally(() => showLoadingOverlay(false));
+}
+
+  .then(products => {
+  populateProductDropdown(products);
+  fetchAndRenderOrders();
+})
+.finally(() => {
+  showLoadingOverlay(false);
+  setTimeout(triggerCardMatchWorkflow, 500); // slight delay to ensure DOM is ready
+});
+
+
 // === DOM Ready Handler ===
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -163,55 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function triggerCardMatchWorkflow() {
-  const firstCard = document.querySelector(".order-card");
-  if (!firstCard) {
-    showToast("⚠️ No pending orders to match.");
-    return;
-  }
-
-  const extract = (selector) => firstCard.querySelector(selector)?.textContent?.split(": ")[1]?.trim() || "";
-
-  const payload = {
-    sku: extract("h4"),
-    product: extract("p:nth-of-type(1)"),
-    status: extract("p:nth-of-type(2)"),
-    sheetName: extract("p:nth-of-type(3)"),
-    date: extract("p:nth-of-type(4)"),
-  };
-
-  console.log("🔍 Matching card details:", payload);
-
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = `${API_URL}?mode=match-card&sku=${encodeURIComponent(payload.sku)}&product=${encodeURIComponent(payload.product)}&sheet=${encodeURIComponent(payload.sheetName)}&date=${encodeURIComponent(payload.date)}`;
-
-  showToast("🔍 Matching card to sheet...");
-  showLoadingOverlay(true);
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      console.log("✅ Matched rows:", data);
-      showToast(`✅ Found ${data.length} matching row(s).`);
-      // You can now use `data` to trigger status update or audit logic
-    })
-    .catch(err => {
-      console.error("❌ Match workflow failed:", err);
-      showToast("❌ Failed to match card to sheet.");
-    })
-    .finally(() => showLoadingOverlay(false));
-}
-
-  .then(products => {
-  populateProductDropdown(products);
-  fetchAndRenderOrders();
-})
-.finally(() => {
-  showLoadingOverlay(false);
-  setTimeout(triggerCardMatchWorkflow, 500); // slight delay to ensure DOM is ready
-});
-
-  
+ 
   // === Logout Button ===
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
