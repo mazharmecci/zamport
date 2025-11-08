@@ -1,26 +1,53 @@
-// === Constants ===
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
+// === Toast Notification Helper ===
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
 
-console.log("DOM loaded");
-console.log("productFilter:", document.getElementById("productFilter"));
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  setTimeout(() => {
+    toast.classList.add("hidden");
+  }, 3000);
+}
 
-// === Order Card Creation ===
+// === UI Helpers ===
+function toggleSpinner(button, show) {
+  const spinner = button?.querySelector(".spinner");
+  if (spinner) {
+    spinner.classList.toggle("hidden", !show);
+  }
+}
+
+function showLoadingOverlay(show) {
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  if (loadingOverlay) {
+    loadingOverlay.classList.toggle("hidden", !show);
+  }
+}
+
+function populateProductDropdown(products = []) {
+  const productFilter = document.getElementById("productFilter");
+  if (!productFilter) return;
+
+  productFilter.innerHTML = `<option value="">All Products</option>`;
+  products.forEach(product => {
+    const option = document.createElement("option");
+    option.value = product;
+    option.textContent = product;
+    productFilter.appendChild(option);
+  });
+}
 
 function createOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
-  card.style.opacity = "0";
-  card.style.transition = "opacity 0.4s ease";
 
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
-  const badge = order.status === "Order-Dispatched"
-    ? `<span class="status-badge">✔ Dispatched</span>`
-    : "";
 
   card.innerHTML = `
     <h4>📦 SKU: ${order.sku}</h4>
     <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span> ${badge}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
     <p>📄 Sheet: ${order.sheetName}</p>
     <p>📅 Date: ${order.date || "N/A"}</p>
     <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
@@ -30,111 +57,104 @@ function createOrderCard(order) {
   return card;
 }
 
-// === Snappy Card Renderer (Current Month + Pending Only)
-
 function renderPendingOrders(orders) {
-  const container = document.getElementById("pendingOrdersContainer");
-  if (!container) return;
+  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+  if (!pendingOrdersContainer) return;
 
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+  pendingOrdersContainer.innerHTML = "";
+  if (!orders.length) {
+    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+    return;
+  }
 
-  const filtered = orders.filter(order => {
-    const statusMatch = order.status?.trim().toLowerCase() === "order-pending";
-
-    // Parse MM/DD/YYYY manually
-    const dateStr = order.date?.trim();
-    if (!dateStr || !dateStr.includes("/")) return false;
-
-    const [mm, dd, yyyy] = dateStr.split("/");
-    const parsedDate = new Date(`${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`);
-    if (isNaN(parsedDate)) {
-      console.warn("⚠️ Skipping invalid date:", dateStr);
-      return false;
-    }
-
-    const monthMatch = parsedDate.getMonth() === currentMonth && parsedDate.getFullYear() === currentYear;
-    return statusMatch && monthMatch;
-  });
-
-  container.innerHTML = filtered.length ? "" : "<p>No pending orders for this month.</p>";
-
-  let delay = 0;
-  filtered.forEach(order => {
-    const card = createOrderCard(order);
-    container.appendChild(card);
-    setTimeout(() => (card.style.opacity = "1"), delay);
-    delay += 100;
+  orders.forEach(order => {
+    pendingOrdersContainer.appendChild(createOrderCard(order));
   });
 }
 
-
-// === Fetch Orders + Products
-
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
   const url = product
-    ? `${SCRIPT_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-    : `${SCRIPT_URL}?mode=3pl-month`;
+    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+    : `${API_URL}?mode=3pl-month`;
 
   fetch(url)
     .then(res => res.json())
-    .then(orders => {
-      renderPendingOrders(orders);
-      return fetch(`${SCRIPT_URL}?mode=products`);
-    })
-    .then(res => res.json())
-    .then(products => populateProductDropdown(products))
+    .then(orders => renderPendingOrders(orders))
     .catch(err => {
-      console.error("Dashboard load failed:", err);
-      showToast("❌ Failed to load dashboard data.");
+      console.error("Failed to fetch orders:", err);
+      showToast("❌ Failed to load orders.");
     })
     .finally(() => showLoadingOverlay(false));
 }
 
-// === Product Dropdown Population
-
-function populateProductDropdown(products) {
-  const dropdown = document.getElementById("productFilter");
-  if (!dropdown) return;
-  dropdown.innerHTML = `<option value="">All Products</option>`;
-  products.forEach(p => {
-    const option = document.createElement("option");
-    option.value = p;
-    option.textContent = p;
-    dropdown.appendChild(option);
-  });
-}
-
-// === UI Bindings
-
-window.addEventListener("DOMContentLoaded", () => {
-  const dropdown = document.getElementById("productFilter");
-  if (dropdown) {
-    dropdown.addEventListener("change", (e) => {
-      fetchAndRenderOrders(e.target.value);
-    });
-  } else {
-    console.warn("⚠️ productFilter not found in DOM.");
+// === DOM Ready Handler ===
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔐 Auth Check
+  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
+  if (!isAuthenticated) {
+    window.location.href = "https://mazharmecci.github.io/zamport/";
+    return;
   }
 
-  fetchAndRenderOrders();
+  // 👤 Display Logged-in User
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const userName = sessionStorage.getItem("zamport-user");
+  if (usernameDisplay && userName) {
+    usernameDisplay.textContent = userName;
+  }
+
+  // 🧼 Hide Spinner on Load
+  showLoadingOverlay(false);
+
+  // 🔘 Pending Orders Button
+  const viewStatusBtn = document.getElementById("viewStatus");
+  if (viewStatusBtn) {
+    viewStatusBtn.addEventListener("click", () => {
+      toggleSpinner(viewStatusBtn, true);
+      const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+
+      fetch(`${API_URL}?mode=products`)
+        .then(res => res.json())
+        .then(products => {
+          populateProductDropdown(products);
+          fetchAndRenderOrders();
+        })
+        .catch(err => {
+          console.error("Failed to load products:", err);
+          showToast("❌ Failed to load product list.");
+        })
+        .finally(() => toggleSpinner(viewStatusBtn, false));
+    });
+  }
+
+  // 🔄 Filter by Product
+  const productFilter = document.getElementById("productFilter");
+  if (productFilter) {
+    productFilter.addEventListener("change", () => {
+      fetchAndRenderOrders(productFilter.value);
+    });
+  }
+
+  // 🔄 Refresh Orders Button
+  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
+  if (refreshOrdersBtn) {
+    refreshOrdersBtn.addEventListener("click", () => {
+      fetchAndRenderOrders(productFilter?.value || "");
+    });
+  }
+
+  // 🚪 Logout Handler
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      sessionStorage.clear();
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
+    });
+  }
 });
-
-
-// === Toast + Loading Overlay
-
-function showToast(msg) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-  toast.textContent = msg;
-  toast.style.opacity = "1";
-  setTimeout(() => (toast.style.opacity = "0"), 3000);
-}
-
-function showLoadingOverlay(show) {
-  const overlay = document.getElementById("loadingOverlay");
-  if (!overlay) return;
-  overlay.style.display = show ? "flex" : "none";
-}
