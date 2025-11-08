@@ -42,8 +42,22 @@ function renderPendingOrders(orders) {
 
   const filtered = orders.filter(order => {
     const statusMatch = order.status?.trim().toLowerCase() === "order-pending";
-    const dateObj = new Date(order.date);
-    const monthMatch = dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear;
+
+    // Robust MM/DD/YYYY parsing
+    const dateParts = (order.date || "").split("/");
+    if (dateParts.length !== 3) {
+      console.warn("⚠️ Skipping malformed date:", order.date);
+      return false;
+    }
+
+    const [mm, dd, yyyy] = dateParts;
+    const parsedDate = new Date(`${yyyy}-${mm}-${dd}`);
+    if (isNaN(parsedDate)) {
+      console.warn("⚠️ Invalid date object:", order.date);
+      return false;
+    }
+
+    const monthMatch = parsedDate.getMonth() === currentMonth && parsedDate.getFullYear() === currentYear;
     return statusMatch && monthMatch;
   });
 
@@ -57,6 +71,7 @@ function renderPendingOrders(orders) {
     delay += 100;
   });
 }
+
 
 // === Fetch Orders + Products
 
