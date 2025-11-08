@@ -81,12 +81,17 @@ function fetchAndRenderOrders(product = "") {
 
   fetch(url)
     .then(res => res.json())
-    .then(orders => renderPendingOrders(orders))
+    .then(orders => {
+      renderPendingOrders(orders); // ✅ Render first
+      triggerCardMatchWorkflow(); // ✅ Then match
+    })
     .catch(err => {
       console.error("Failed to fetch orders:", err);
       showToast("❌ Failed to load orders.");
     })
-    .finally(() => showLoadingOverlay(false));
+    .finally(() => {
+      showLoadingOverlay(false); // ✅ Hide only after render + match
+    });
 }
 
 // === DOM Ready Handler ===
