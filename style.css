@@ -5,6 +5,34 @@ body {
   background-color: #f4f6f8;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.logo,
+.user-icon,
+.login-logo {
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-container,
+.user-badge {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 .container {
   max-width: 800px;
   margin: 20px auto;
