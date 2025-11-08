@@ -36,6 +36,10 @@ function populateProductDropdown(products = []) {
     option.textContent = product;
     productFilter.appendChild(option);
   });
+
+  // Trigger animation
+  productFilter.classList.add("animate");
+  setTimeout(() => productFilter.classList.remove("animate"), 500);
 }
 
 // === Order Card Creation ===
