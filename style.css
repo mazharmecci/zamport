@@ -135,45 +135,184 @@
 /* === Other workflows don't delete === */
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #fff;
-  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
   margin: 0;
   padding: 0;
 }
 
+.dashboard-wrapper {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 20px 25px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-logo {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+}
+
+.dashboard-header h2 {
+  font-size: 1.4rem;
+  color: #333;
+  margin: 0;
+}
+
+.dashboard-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-form label {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.dashboard-form input,
+.dashboard-form select {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  width: 100%;
+}
+
+.dashboard-form button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-form button:hover {
+  background-color: #0056b3;
+}
+
+.orders-grid {
+  margin-top: 20px;
+}
 .container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 480px; /* tighter and more focused */
+  margin: 40px auto;
+  padding: 20px 25px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .logo-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 6px; /* reduced from 10px */
-  margin-bottom: 10px; /* optional: reduce vertical spacing */
+  margin-bottom: 20px;
 }
 
 .logo-header h2 {
-  font-size: 1.1rem; /* reduced from 1.25rem */
-  font-weight: bold;
-  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 10px;
 }
 
 .logo-img {
-  width: 58px; /* reduced from 40px */
-  height: 58px;
+  width: 48px;
+  height: 48px;
 }
 
 .dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 40px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
+/* === Layout Containers === */
+.form-section,
+.orders-section {
+  margin-bottom: 30px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+/* === Inputs & Selects === */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="password"],
+select,
+textarea {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#productFilter {
+  min-width: 220px;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* === Buttons === */
+.btn {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-blue {
+  background-color: #007bff;
+}
+
+.btn-blue:hover {
+  background-color: #0056b3;
+}
+
+.btn-green {
+  background-color: #28a745;
+}
+
+.btn-green:hover {
+  background-color: #1e7e34;
+}
+
+.btn-red {
+  background-color: #d9534f;
+}
+
+.btn-red:hover {
+  background-color: #c9302c;
+}
+
+/* === User Info === */
 .user-info {
   display: flex;
   align-items: center;
@@ -181,89 +320,18 @@ body {
 }
 
 .user-icon {
-  display: flex;
   width: 24px;
   height: 24px;
   border-radius: 50%;
 }
 
-.logout-btn {
-  padding: 5px 10px;
-  background-color: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-section {
-  margin-bottom: 20px;
-}
-
-.form-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.sku-form {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.sku-input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.submit-btn {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.orders-section {
-  margin-top: 30px;
-}
-
-.filter-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.filter-group {
-  flex: 1;
-}
-
-.product-filter {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.status-btn {
-  padding: 8px 16px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
+/* === Orders Grid === */
 .orders-grid {
   display: grid;
   gap: 20px;
 }
 
+/* === Toast Notification === */
 .toast {
   position: fixed;
   bottom: 20px;
@@ -276,10 +344,7 @@ body {
   z-index: 1000;
 }
 
-.hidden {
-  display: none !important;
-}
-
+/* === Spinner === */
 .spinner {
   width: 20px;
   height: 20px;
@@ -295,6 +360,7 @@ body {
   }
 }
 
+/* === Loading Overlay === */
 #loadingOverlay {
   position: fixed;
   top: 0;
@@ -308,7 +374,12 @@ body {
   z-index: 9999;
 }
 
-/* === Action Buttons === */
+/* === Utility === */
+.hidden {
+  display: none !important;
+}
+
+/* === Action Row === */
 .action-row {
   display: flex;
   flex-wrap: wrap;
@@ -331,25 +402,6 @@ body {
   justify-content: center;
   align-items: center;
   gap: 40px;
-}
-
-.filter-group,
-#viewStatus {
-  display: flex;
-  align-items: center;
-  height: 40px;
-}
-
-#productFilter {
-  padding: 10px 14px;
-  font-size: 16px;
-  min-width: 220px;
-  max-width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fff;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* === Cards === */
@@ -381,11 +433,11 @@ body {
   margin: 0;
 }
 
-/* === Spinners === */
+/* === Spinner === */
 .spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ccc;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ccc;
   border-top-color: #0078D4;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -395,7 +447,23 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Loading Overlay === */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 /* === Toast Notification === */
@@ -415,47 +483,16 @@ body {
   z-index: 9999;
 }
 
-.toast.visible,
 .toast.show {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
 }
 
-/* === Loading Overlay === */
-
-#loadingOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #3498db;
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* === Utility === */
 .hidden {
   display: none !important;
 }
-
 
 /* === Divider === */
 .subtle-divider {
@@ -506,4 +543,3 @@ body.login-body {
   font-size: 1.25rem;
   color: #333;
 }
-
