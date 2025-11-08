@@ -4,45 +4,13 @@ function showToast(message) {
   if (!toast) return;
 
   toast.textContent = message;
-  toast.classList.add("show");
-
+  toast.classList.remove("hidden");
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.add("hidden");
   }, 3000);
 }
 
-// === DOM Ready Handler ===
-document.addEventListener("DOMContentLoaded", () => {
-  // 🔐 Auth Check
-  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
-  if (!isAuthenticated) {
-    window.location.href = "https://mazharmecci.github.io/zamport/";
-    return;
-  }
-
-  // 👤 Display Logged-in User
-  const usernameDisplay = document.getElementById("usernameDisplay");
-  const userName = sessionStorage.getItem("zamport-user");
-  if (usernameDisplay && userName) {
-    usernameDisplay.textContent = userName;
-  }
-
-  // === Constants ===
-const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-
-// === DOM Elements ===
-const viewStatusBtn = document.getElementById("viewStatus");
-const productFilter = document.getElementById("productFilter");
-const loadingOverlay = document.getElementById("loadingOverlay");
-const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
-const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
-
-// === Global Variables ===
-  
-let pendingOrders = [];
-
 // === UI Helpers ===
-  
 function toggleSpinner(button, show) {
   const spinner = button?.querySelector(".spinner");
   if (spinner) {
@@ -51,12 +19,14 @@ function toggleSpinner(button, show) {
 }
 
 function showLoadingOverlay(show) {
+  const loadingOverlay = document.getElementById("loadingOverlay");
   if (loadingOverlay) {
     loadingOverlay.classList.toggle("hidden", !show);
   }
 }
 
 function populateProductDropdown(products = []) {
+  const productFilter = document.getElementById("productFilter");
   if (!productFilter) return;
 
   productFilter.innerHTML = `<option value="">All Products</option>`;
@@ -68,12 +38,6 @@ function populateProductDropdown(products = []) {
   });
 }
 
-// === Spinner Reset on Page Load ===
-window.addEventListener("DOMContentLoaded", () => {
-  showLoadingOverlay(false); // Ensure spinner is hidden on initial load
-});
-
-  
 function createOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -93,48 +57,69 @@ function createOrderCard(order) {
   return card;
 }
 
-// === Spinner Reset on Load ===
-window.addEventListener("DOMContentLoaded", () => {
-  showLoadingOverlay(false); // Ensure spinner is hidden on initial load
-});
+function renderPendingOrders(orders) {
+  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
+  if (!pendingOrdersContainer) return;
 
-  function renderPendingOrders(orders) {
-    pendingOrdersContainer.innerHTML = "";
-    if (!orders.length) {
-      pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
-      return;
-    }
-    orders.forEach(order => {
-      pendingOrdersContainer.appendChild(createOrderCard(order));
-    });
+  pendingOrdersContainer.innerHTML = "";
+  if (!orders.length) {
+    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+    return;
   }
 
-  function fetchAndRenderOrders(product = "") {
-    showLoadingOverlay(true);
-    const url = product
-      ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-      : `${API_URL}?mode=3pl-month`;
+  orders.forEach(order => {
+    pendingOrdersContainer.appendChild(createOrderCard(order));
+  });
+}
 
-    fetch(url)
-      .then(res => res.json())
-      .then(orders => renderPendingOrders(orders))
-      .catch(err => {
-        console.error("Failed to fetch orders:", err);
-        showToast("❌ Failed to load orders.");
-      })
-      .finally(() => showLoadingOverlay(false));
+function fetchAndRenderOrders(product = "") {
+  showLoadingOverlay(true);
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  const url = product
+    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+    : `${API_URL}?mode=3pl-month`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(orders => renderPendingOrders(orders))
+    .catch(err => {
+      console.error("Failed to fetch orders:", err);
+      showToast("❌ Failed to load orders.");
+    })
+    .finally(() => showLoadingOverlay(false));
+}
+
+// === DOM Ready Handler ===
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔐 Auth Check
+  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
+  if (!isAuthenticated) {
+    window.location.href = "https://mazharmecci.github.io/zamport/";
+    return;
   }
 
-  // === 🔘 Pending Orders Button Click ===
+  // 👤 Display Logged-in User
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const userName = sessionStorage.getItem("zamport-user");
+  if (usernameDisplay && userName) {
+    usernameDisplay.textContent = userName;
+  }
+
+  // 🧼 Hide Spinner on Load
+  showLoadingOverlay(false);
+
+  // 🔘 Pending Orders Button
+  const viewStatusBtn = document.getElementById("viewStatus");
   if (viewStatusBtn) {
     viewStatusBtn.addEventListener("click", () => {
       toggleSpinner(viewStatusBtn, true);
+      const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
       fetch(`${API_URL}?mode=products`)
         .then(res => res.json())
         .then(products => {
           populateProductDropdown(products);
-          fetchAndRenderOrders(); // Load all pending orders
+          fetchAndRenderOrders();
         })
         .catch(err => {
           console.error("Failed to load products:", err);
@@ -142,22 +127,34 @@ window.addEventListener("DOMContentLoaded", () => {
         })
         .finally(() => toggleSpinner(viewStatusBtn, false));
     });
-  } else {
-    console.warn("viewStatus button not found in DOM");
   }
 
-  // === 🔄 Filter by Product ===
+  // 🔄 Filter by Product
+  const productFilter = document.getElementById("productFilter");
   if (productFilter) {
     productFilter.addEventListener("change", () => {
-      const selectedProduct = productFilter.value;
-      fetchAndRenderOrders(selectedProduct);
+      fetchAndRenderOrders(productFilter.value);
     });
   }
 
-  // === 🔄 Refresh Orders Button ===
+  // 🔄 Refresh Orders Button
+  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
   if (refreshOrdersBtn) {
     refreshOrdersBtn.addEventListener("click", () => {
       fetchAndRenderOrders(productFilter?.value || "");
+    });
+  }
+
+  // 🚪 Logout Handler
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      sessionStorage.clear();
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
     });
   }
 });
