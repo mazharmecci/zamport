@@ -79,6 +79,10 @@
     <div class="spinner"></div>
   </div>
 
+  window.addEventListener("DOMContentLoaded", () => {
+  showLoadingOverlay(false); // Ensure spinner is hidden
+});
+
   <!-- Logout Logic -->
   <script>
     function showToast(message) {
@@ -106,9 +110,7 @@
       }
     });
   </script>
-
-  <img src="zamport.png" alt="Logo" class="responsive-img" />
-
+  
   <script src="script.js"></script>
 </body>
 </html>
