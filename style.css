@@ -160,8 +160,8 @@ body {
 
 .dashboard-header {
   display: flex;
-  flex-direction: column;
-  align-items: right;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
@@ -172,12 +172,21 @@ body {
 }
 
 .logo-block {
-  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .btn-black {
   background-color: #000;
-  color: #fff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-black:hover {
+  background-color: #333;
 }
 
 .btn-black:hover {
@@ -187,7 +196,6 @@ body {
 .dashboard-logo {
   width: 48px;
   height: 48px;
-  margin-bottom: 10px;
 }
 
 .dashboard-header h2 {
@@ -297,6 +305,19 @@ body {
   100% { transform: scale(1); }
 }
 
+@media (max-width: 480px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-info {
+    margin-top: 10px;
+    justify-content: flex-start;
+  }
+}
+
+
 /* === Layout Containers === */
 .form-section,
 .orders-section {
@@ -380,6 +401,7 @@ textarea {
 }
 
 /* === User Info === */
+
 .user-info {
   display: flex;
   align-items: center;
@@ -392,7 +414,13 @@ textarea {
   border-radius: 50%;
 }
 
+#usernameDisplay {
+  font-weight: 500;
+  color: #333;
+}
+
 /* === Orders Grid === */
+
 .orders-grid {
   display: grid;
   gap: 20px;
