@@ -657,25 +657,27 @@ body.login-body {
 /* === Beautify dispatch button logic === */
 
 .dispatch-btn {
-  background-color: #007bff;
+  background-color: orange;
   color: white;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 6px 10px; /* Reduced size */
+  font-size: 12px;
   font-weight: 500;
+  border-radius: 5px;
   cursor: pointer;
+  display: block;           /* Makes it centerable */
+  margin: 10px auto;        /* Centers horizontally */
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dispatch-btn:hover {
-  background-color: #0056b3;
+  background-color: darkorange;
   transform: translateY(-1px);
 }
 
 .dispatch-btn:active {
-  background-color: #004494;
+  background-color: #cc7000;
   transform: scale(0.98);
 }
 
