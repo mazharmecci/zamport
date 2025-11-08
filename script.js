@@ -38,19 +38,27 @@ const pendingOrdersContainer = document.getElementById("pendingOrdersContainer")
 const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
 
 // === Global Variables ===
+  
 let pendingOrders = [];
 
 // === UI Helpers ===
+  
 function toggleSpinner(button, show) {
-  const spinner = button.querySelector(".spinner");
-  if (spinner) spinner.classList.toggle("hidden", !show);
+  const spinner = button?.querySelector(".spinner");
+  if (spinner) {
+    spinner.classList.toggle("hidden", !show);
+  }
 }
 
 function showLoadingOverlay(show) {
-  loadingOverlay.classList.toggle("hidden", !show);
+  if (loadingOverlay) {
+    loadingOverlay.classList.toggle("hidden", !show);
+  }
 }
 
-function populateProductDropdown(products) {
+function populateProductDropdown(products = []) {
+  if (!productFilter) return;
+
   productFilter.innerHTML = `<option value="">All Products</option>`;
   products.forEach(product => {
     const option = document.createElement("option");
@@ -60,6 +68,12 @@ function populateProductDropdown(products) {
   });
 }
 
+// === Spinner Reset on Page Load ===
+window.addEventListener("DOMContentLoaded", () => {
+  showLoadingOverlay(false); // Ensure spinner is hidden on initial load
+});
+
+  
 function createOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
