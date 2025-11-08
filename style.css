@@ -1,14 +1,23 @@
-/* === Base Layout === */
+/* === Global Reset === */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f4f6f8;
 }
 
-img {
+/* === Responsive Images === */
+img,
+.responsive-img {
   max-width: 100%;
   height: auto;
   display: block;
+  object-fit: contain;
 }
 
 .logo,
@@ -16,27 +25,25 @@ img {
 .login-logo {
   max-width: 100px;
   height: auto;
-  object-fit: contain;
 }
 
-.logo-container,
-.user-badge {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.responsive-img {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
+/* === Layout Containers === */
 .container {
   max-width: 800px;
   margin: 20px auto;
   padding: 16px;
+}
+
+.dashboard-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.dashboard-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
 /* === Typography === */
@@ -45,7 +52,21 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* === Logo === */
+.dashboard-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-title-row h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* === Logo Header === */
 .logo-header {
   display: flex;
   flex-direction: column;
@@ -53,33 +74,65 @@ h2 {
   text-align: center;
 }
 
-.logo-container {
-  max-width: 150px;
+.logo-container,
+.user-badge {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.logo {
-  max-width: 120px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
+/* === User Badge === */
+.user-badge {
+  gap: 0.6rem;
+  background-color: #f0f4ff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.user-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #0078d4;
+  padding: 4px;
+}
+
+#usernameDisplay {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* === Logout Button === */
+.logout-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
 }
 
 /* === Form === */
 .stock-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  gap: 12px;
+  width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  padding: 16px;
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .stock-form label {
@@ -87,39 +140,30 @@ h2 {
   color: #333;
 }
 
-.stock-form input {
-  padding: 8px;
+#skuInput {
   width: 100%;
+  font-size: 14px;
+  padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  transition: all 0.3s ease;
 }
 
-.stock-form input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-  outline: none;
-}
-
-.stock-form button {
-  background-color: #6b4f2c;
+#submitSku {
+  padding: 8px 14px;
+  font-size: 14px;
+  background-color: #8B4513;
   color: white;
   border: none;
-  padding: 10px 18px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: 100px;
-  max-width: 150px;
-  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
-.stock-form button:hover {
-  background-color: #836953;
+#submitSku:hover {
+  background-color: #5c3310;
 }
 
 /* === Action Buttons === */
-
 .action-row {
   display: flex;
   flex-wrap: wrap;
@@ -129,30 +173,23 @@ h2 {
   max-width: 600px;
 }
 
-@media (max-width: 600px) {
-  .action-row {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .action-btn {
-    width: 100%;
-  }
-}
-
-.action-btn {
-  position: relative;
-  padding: 0.75rem 1.5rem;
+.action-btn,
+#viewStatus,
+#threePLSummaryBtn {
+  padding: 10px 16px;
   font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border: none;
-  border-radius: 6px;
+}
+
+.action-btn {
   background-color: #333;
   color: #fff;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
 .action-btn:hover {
@@ -160,19 +197,8 @@ h2 {
 }
 
 #viewStatus {
-  display: block;              /* Ensures it takes full width if needed */
-  margin-left: 0;              /* Aligns to the left */
-  background-color: #007bff;   /* Change to any desired color (e.g., blue) */
-  color: white;                /* Text color */
-  border: none;                /* Optional: remove border */
-  padding: 10px 16px;          /* Optional: adjust spacing */
-  border-radius: 4px;          /* Optional: rounded corners */
-  cursor: pointer;             /* Pointer on hover */
-}
-
-#viewStatus {
-  margin-left: 0 !important;
-  background-color: #007bff !important;
+  background-color: #007bff;
+  color: white;
 }
 
 #viewStatus:hover {
@@ -188,84 +214,26 @@ h2 {
   background-color: #e67e22;
 }
 
-/* === Spinner === */
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #fff;
-  border-top: 2px solid #000;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-right: 6px;
-  vertical-align: middle;
+/* === Filter Panel === */
+.filter-panel-wrapper {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-.spinner.hidden {
-  display: none !important;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* === Toast Notification === */
-
-.toast {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 4px;
-  z-index: 1000;
-}
-
-.toast.show {
-  visibility: visible;
-  opacity: 1;
-}
-
-
-/* === Loading Overlay === */
-.loader-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(255, 255, 255, 0.85);
+.filter-actions {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  gap: 40px;
 }
 
-.loader-spinner {
-  width: 32px;
-  height: 32px;
-  border: 4px solid #ccc;
-  border-top: 4px solid #333;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  margin-bottom: 10px;
-}
-
-/* === Product Filter === */
-.product-filter {
-  margin-bottom: 1.5rem;
-}
-
-.product-filter-row {
+.filter-group,
+#viewStatus {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
   align-items: center;
+  height: 40px;
 }
 
 #productFilter {
@@ -280,43 +248,32 @@ h2 {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.dropdown-caption {
-  text-align: center;
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-.reload-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.reload-btn:hover {
-  background-color: #555;
-}
-
-/* === Card Grid === */
-.card-container {
+/* === Cards === */
+.pending-orders-grid,
+#pendingOrdersContainer {
   display: grid;
-  gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  margin-top: 1rem;
+  gap: 20px;
+  margin-top: 32px;
 }
 
-.card {
-  background: #e3f2fd;
-  padding: 12px;
+.order-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  text-align: center;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 160px;
+}
+
+.order-card h4,
+.order-card p {
+  margin: 0;
 }
 
 /* === Tables === */
@@ -349,6 +306,60 @@ h2 {
   background-color: #f9f9f9;
 }
 
+/* === Spinners === */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-top-color: #0078D4;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === Toast Notification === */
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+}
+
+.toast.visible,
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* === Loading Overlay === */
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
 /* === Divider === */
 .subtle-divider {
   border: none;
@@ -358,36 +369,15 @@ h2 {
   opacity: 0.6;
 }
 
-/* === Utility === */
-.hidden {
-  display: none !important;
-}
-
-/* === Mobile Responsiveness === */
-@media (max-width: 600px) {
-  .action-row {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .action-btn {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-/* === Base Layout === */
+/* === Login Page === */
 body.login-body {
-  margin: 0;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #f0f2f5;
-  font-family: 'Segoe UI', sans-serif;
 }
 
-/* === Login Container === */
 .login-container {
   display: flex;
   flex-direction: column;
@@ -409,22 +399,19 @@ body.login-body {
   }
 }
 
-/* === Logo === */
 .login-logo {
   width: 60px;
   margin-bottom: 1rem;
 }
 
-/* === Headline === */
 .login-container h2 {
   margin-bottom: 1rem;
   font-size: 1.25rem;
   color: #333;
 }
 
-/* === Input Group === */
+/* === Login Form === */
 .input-group {
-  position: relative;
   display: flex;
   align-items: center;
   background-color: #f9f9f9;
@@ -453,7 +440,6 @@ body.login-body {
   object-fit: contain;
 }
 
-/* === Login Button === */
 .login-btn {
   width: 100%;
   padding: 0.6rem;
@@ -470,315 +456,10 @@ body.login-body {
   background-color: #005fa3;
 }
 
-/* === Error Message === */
 .error-msg {
   color: red;
   margin-top: 0.5rem;
   font-size: 0.9rem;
-}
-
-/* === Toast Notification === */
-.toast {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #e74c3c;
-  color: white;
-  padding: 0.8rem 1.2rem;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-  z-index: 9999;
-}
-
-.toast.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* === Utility === */
-.hidden {
-  display: none !important;
-}
-
-.dashboard-header {
-  padding: 1rem 1.5rem;
-  background-color: #fefefe;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-}
-
-.dashboard-title-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-@media (max-width: 600px) {
-  .dashboard-title-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .user-badge {
-    align-self: flex-end;
-  }
-}
-
-.dashboard-title-row h2 {
-  font-size: 1.5rem;
-  color: #2c3e50;
-  margin: 0;
-}
-
-/* === User Badge === */
-
-.user-badge {
- align-items: center;
-  gap: 0.6rem;
-  background-color: #f0f4ff;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.user-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: contain;
-  background-color: #0078d4;
-  padding: 4px;
-}
-
-#usernameDisplay {
-  font-weight: 600;
-  color: #333;
-  font-size: 0.95rem;
-}
-
-/* === Logout Button === */
-.logout-btn {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.logout-btn:hover {
-  background-color: #c0392b;
-}
-
-@media (max-width: 600px) {
-  .dashboard-title-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .user-badge {
-    align-self: flex-end;
-  }
-}
-
-.order-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #fff;
-  font-size: 14px;
-  line-height: 1.4;
-  min-height: 160px; /* Optional: enforce consistent height */
-}
-
-.order-card h4,
-.order-card p {
-  margin: 0;
-}
-
-.button-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 8px 0;
-  border-bottom: 1px solid #ccc;
-}
-
-.button-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* === Base Button Styles === */
-.action-btn {
-  padding: 8px 14px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.action-btn:hover {
-  background-color: #0056b3;
-}
-
-/* === Spinner Styles === */
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid #ccc;
-  border-top-color: #0078D4;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-button .spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ccc;
-  border-top-color: #0078D4;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.hidden {
-  display: none;
-}
-
-/* === Loading Overlay === */
-
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-/* === Layout Containers === */
-
-.dashboard-layout {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-/* === Optional: Section Wrapper for Centering === */
-
-.dashboard-section {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px;
-}
-
-.pending-orders-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 32px;
-}
-
-/* === Global Box Sizing Reset === */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* === SKU Form Styling === */
-
-.stock-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 16px;
-  background-color: #fafafa;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-/* === Input Field Styling === */
-
-#skuInput {
-  width: 100%;
-  font-size: 14px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* === Submit Button Styling === */
-#submitSku {
-  padding: 8px 14px;
-  font-size: 14px;
-  background-color: #8B4513; /* Brown color */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-#submitSku:hover {
-  background-color: #5c3310;
-}
-
-.filter-panel-wrapper {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-.filter-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-}
-
-.filter-group,
-#viewStatus {
-  display: flex;
-  align-items: center;
-  height: 40px;
 }
 
 /* === Responsive Layout === */
@@ -793,13 +474,27 @@ button .spinner {
     width: 100%;
     justify-content: center;
   }
+
+  .dashboard-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .user-badge {
+    align-self: flex-end;
+  }
+
+  .action-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-btn {
+    width: 100%;
+    max-width: none;
+  }
 }
 
-// Don't delete this - This is for the cards
 
-#pendingOrdersContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
 
