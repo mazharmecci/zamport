@@ -1,6 +1,9 @@
 // === Constants ===
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec';
 
+console.log("DOM loaded");
+console.log("productFilter:", document.getElementById("productFilter"));
+
 // === Order Card Creation ===
 
 function createOrderCard(order) {
@@ -106,6 +109,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   fetchAndRenderOrders();
 });
+
 
 // === Toast + Loading Overlay
 
