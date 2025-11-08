@@ -1,17 +1,7 @@
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
-
 function validateLogin(event) {
   event.preventDefault();
+
+  showLoadingOverlay(true); // Show spinner immediately
 
   const username = document.getElementById("username").value.trim().toLowerCase();
   const password = document.getElementById("password").value;
@@ -30,10 +20,13 @@ function validateLogin(event) {
     sessionStorage.setItem("zamport-last-active", Date.now().toString());
 
     showToast("✅ Login successful!");
+
     setTimeout(() => {
+      showLoadingOverlay(false); // Hide spinner before redirect
       window.location.href = "dashboard.html";
     }, 1000);
   } else {
     showToast("❌ Invalid credentials. Please try again.");
+    showLoadingOverlay(false); // Hide spinner on failure
   }
 }
