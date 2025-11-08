@@ -153,12 +153,27 @@ body {
 .dashboard-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: right;
   margin-bottom: 20px;
+}
+
+.user-actions {
+  display: flex;
+  align-items: right;
+  gap: 10px;
 }
 
 .logo-block {
   margin-bottom: 10px;
+}
+
+.btn-black {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-black:hover {
+  background-color: #333;
 }
 
 .dashboard-logo {
@@ -243,6 +258,18 @@ body {
 .dashboard-header {
   margin-bottom: 20px;
   text-align: center;
+}
+
+#submitSku {
+  width: 50%;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 /* === Layout Containers === */
