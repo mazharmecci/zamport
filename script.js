@@ -80,6 +80,8 @@ function renderPendingOrders(orders) {
 
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
+  showToast("⏳ Please wait, fetching your orders..."); // ✅ Comfort message
+
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
   const url = product
     ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
@@ -88,14 +90,14 @@ function fetchAndRenderOrders(product = "") {
   fetch(url)
     .then(res => res.json())
     .then(orders => {
-      renderPendingOrders(orders); // ✅ Render cards
+      renderPendingOrders(orders);
     })
     .catch(err => {
       console.error("Failed to fetch orders:", err);
       showToast("❌ Failed to load orders.");
     })
     .finally(() => {
-      showLoadingOverlay(false); // ✅ Hide overlay after rendering
+      showLoadingOverlay(false);
     });
 }
 
