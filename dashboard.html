@@ -9,8 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
-<body class="bg-white text-gray-800">
-
+<body>
   <!-- SKU Vault Modal -->
   <div id="skuVault" class="modal hidden">
     <div class="modal-content">
@@ -20,64 +19,61 @@
     </div>
   </div>
 
-  <main class="container max-w-screen-sm mx-auto px-4 py-4 space-y-6">
-
+  <main class="container">
     <!-- Logo + Title -->
-    <header class="flex items-center justify-center space-x-3">
-      <img src="zamport.png" alt="Zamport Logo" class="w-8 h-8 sm:w-10 sm:h-10" />
-      <h2 class="text-xl font-bold">ZAMPORT</h2>
+    <header class="logo-header">
+      <img src="zamport.png" alt="Zamport Logo" class="logo-img" />
+      <h2>ZAMPORT</h2>
     </header>
 
     <!-- Dashboard Header -->
-    <section class="flex flex-col sm:flex-row justify-between items-center gap-2">
-      <h2 class="text-lg font-semibold">📊 Dashboard</h2>
-      <div class="flex items-center gap-2">
-        <img src="user-icon.png" alt="User Icon" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full" />
-        <span id="usernameDisplay" class="text-sm">User</span>
-        <button id="logoutBtn" class="text-sm px-3 py-1 bg-red-500 text-white rounded">Logout</button>
+    <section class="dashboard-header">
+      <h2>📊 Dashboard</h2>
+      <div class="user-info">
+        <img src="user-icon.png" alt="User Icon" class="user-icon" />
+        <span id="usernameDisplay">User</span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
       </div>
     </section>
 
     <!-- SKU Submission Form -->
-    <form class="flex flex-col sm:flex-row gap-3 items-stretch" onsubmit="event.preventDefault();">
-      <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="flex-1 px-3 py-2 border rounded" />
-      <button type="submit" id="submitSku" class="bg-blue-600 text-white px-4 py-2 rounded flex items-center justify-center">
-        <span class="spinner hidden mr-2"></span>
+    <form class="sku-form" onsubmit="event.preventDefault();">
+      <input type="text" id="skuInput" name="sku" placeholder="Scan or type SKU" class="sku-input" />
+      <button type="submit" id="submitSku" class="submit-btn">
+        <span class="spinner hidden"></span>
         Submit
       </button>
     </form>
 
-    <hr class="border-t border-gray-300" />
+    <hr />
 
     <!-- Filter + Pending Orders -->
-    <section class="space-y-4">
-      <div class="flex flex-col sm:flex-row items-stretch gap-3">
-        <div class="flex-1">
-          <label for="productFilter" class="block text-sm font-medium mb-1">Filter by Product</label>
-          <select id="productFilter" class="w-full px-3 py-2 border rounded">
+    <section class="orders-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="productFilter">Filter by Product</label>
+          <select id="productFilter" class="product-filter">
             <option>All Products</option>
-            <!-- other options -->
           </select>
         </div>
-        <button id="viewStatus" class="bg-green-600 text-white px-4 py-2 rounded flex items-center justify-center">
-          <span class="spinner hidden mr-2" aria-hidden="true"></span>
+        <button id="viewStatus" class="status-btn">
+          <span class="spinner hidden"></span>
           📦 Pending Orders
         </button>
       </div>
 
-      <!-- Pending Orders Grid -->
-      <div id="pendingOrdersContainer" class="grid gap-4"></div>
+      <div id="pendingOrdersContainer" class="orders-grid"></div>
     </section>
 
     <!-- Toast Notification -->
-    <div id="toast" role="alert" aria-live="assertive" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded hidden z-50"></div>
-
+    <div id="toast" class="toast hidden"></div>
   </main>
 
   <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="hidden">Loading...</div>
+<div id="loadingOverlay" class="hidden">
     <div class="spinner"></div>
   </div>
+</body>
 
   <!-- Logout Logic -->
   <script>
