@@ -131,7 +131,7 @@ function markOrderAsDispatched(order, dispatchBtn) {
     newStatus: "Order-Dispatched"
   };
 
-  // ✅ Disable the clicked button only
+  // ✅ Disable immediately to prevent double clicks
   dispatchBtn.disabled = true;
   dispatchBtn.textContent = "Dispatching...";
   dispatchBtn.style.opacity = "0.7";
@@ -153,12 +153,14 @@ function markOrderAsDispatched(order, dispatchBtn) {
       );
       if (updated) updated.status = "Order-Dispatched";
 
-      // ✅ Update button and fade out the exact card
+      // ✅ Update button to success state and keep it disabled
       dispatchBtn.textContent = "✅ Dispatched";
       dispatchBtn.style.backgroundColor = "#28a745";
       dispatchBtn.style.cursor = "default";
       dispatchBtn.style.boxShadow = "none";
+      dispatchBtn.style.opacity = "1";
 
+      // ✅ Slide out and remove the card
       const card = dispatchBtn.closest(".order-card");
       if (card) {
         setTimeout(() => {
