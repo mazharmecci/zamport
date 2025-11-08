@@ -4,9 +4,9 @@ function showToast(message) {
   if (!toast) return;
 
   toast.textContent = message;
-  toast.classList.remove("hidden");
+  toast.classList.add("show");
   setTimeout(() => {
-    toast.classList.add("hidden");
+    toast.classList.remove("show");
   }, 3000);
 }
 
@@ -38,9 +38,12 @@ function populateProductDropdown(products = []) {
   });
 }
 
+// === Order Card Creation ===
 function createOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
+  card.style.opacity = "0";
+  card.style.transition = "opacity 0.4s ease";
 
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
 
@@ -57,21 +60,29 @@ function createOrderCard(order) {
   return card;
 }
 
+// === Snappy Card Renderer ===
 function renderPendingOrders(orders) {
-  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
-  if (!pendingOrdersContainer) return;
+  const container = document.getElementById("pendingOrdersContainer");
+  if (!container) return;
 
-  pendingOrdersContainer.innerHTML = "";
+  container.innerHTML = "";
   if (!orders.length) {
-    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+    container.innerHTML = "<p>No pending orders found.</p>";
     return;
   }
 
+  let delay = 0;
   orders.forEach(order => {
-    pendingOrdersContainer.appendChild(createOrderCard(order));
+    const card = createOrderCard(order);
+    container.appendChild(card);
+    setTimeout(() => {
+      card.style.opacity = "1";
+    }, delay);
+    delay += 100;
   });
 }
 
+// === Fetch Orders ===
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -108,7 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🧼 Hide Spinner on Load
   showLoadingOverlay(false);
 
-  // 🔘 Pending Orders Button
+  // ✅ Fetch orders immediately after login
+  fetchAndRenderOrders();
+
+  // 🔘 View Status Button
   const viewStatusBtn = document.getElementById("viewStatus");
   if (viewStatusBtn) {
     viewStatusBtn.addEventListener("click", () => {
