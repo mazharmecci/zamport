@@ -1,45 +1,35 @@
-// === Toast Notification Helper ===
+// === Toast Notification ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   if (!toast) return;
-
   toast.textContent = message;
   toast.classList.add("show");
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
 // === UI Helpers ===
 function toggleSpinner(button, show) {
   const spinner = button?.querySelector(".spinner");
-  if (spinner) {
-    spinner.classList.toggle("hidden", !show);
-  }
+  if (spinner) spinner.classList.toggle("hidden", !show);
 }
 
 function showLoadingOverlay(show) {
-  const loadingOverlay = document.getElementById("loadingOverlay");
-  if (loadingOverlay) {
-    loadingOverlay.classList.toggle("hidden", !show);
-  }
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.classList.toggle("hidden", !show);
 }
 
 function populateProductDropdown(products = []) {
-  const productFilter = document.getElementById("productFilter");
-  if (!productFilter) return;
-
-  productFilter.innerHTML = `<option value="">All Products</option>`;
-  products.forEach(product => {
+  const dropdown = document.getElementById("productFilter");
+  if (!dropdown) return;
+  dropdown.innerHTML = `<option value="">All Products</option>`;
+  products.forEach(p => {
     const option = document.createElement("option");
-    option.value = product;
-    option.textContent = product;
-    productFilter.appendChild(option);
+    option.value = p;
+    option.textContent = p;
+    dropdown.appendChild(option);
   });
-
-  // Trigger animation
-  productFilter.classList.add("animate");
-  setTimeout(() => productFilter.classList.remove("animate"), 500);
+  dropdown.classList.add("animate");
+  setTimeout(() => dropdown.classList.remove("animate"), 500);
 }
 
 // === Order Card Creation ===
@@ -50,11 +40,14 @@ function createOrderCard(order) {
   card.style.transition = "opacity 0.4s ease";
 
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  const badge = order.status === "Order-Dispatched"
+    ? `<span class="status-badge">✔ Dispatched</span>`
+    : "";
 
   card.innerHTML = `
     <h4>📦 SKU: ${order.sku}</h4>
     <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span> ${badge}</p>
     <p>📄 Sheet: ${order.sheetName}</p>
     <p>📅 Date: ${order.date || "N/A"}</p>
     <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
@@ -68,119 +61,115 @@ function createOrderCard(order) {
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
-
-  container.innerHTML = "";
-  if (!orders.length) {
-    container.innerHTML = "<p>No pending orders found.</p>";
-    return;
-  }
+  container.innerHTML = orders.length ? "" : "<p>No pending orders found.</p>";
 
   let delay = 0;
   orders.forEach(order => {
     const card = createOrderCard(order);
     container.appendChild(card);
-    setTimeout(() => {
-      card.style.opacity = "1";
-    }, delay);
+    setTimeout(() => (card.style.opacity = "1"), delay);
     delay += 100;
   });
 }
 
-// === Fetch Orders ===
-
+// === Fetch Orders + Products ===
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = product
-    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-    : `${API_URL}?mode=3pl-month`;
+  const API = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  const url = product ? `${API}?mode=3pl-month&product=${encodeURIComponent(product)}` : `${API}?mode=3pl-month`;
 
   fetch(url)
     .then(res => res.json())
     .then(orders => {
       renderPendingOrders(orders);
-      return fetch(`${API_URL}?mode=products`);
+      return fetch(`${API}?mode=products`);
     })
     .then(res => res.json())
-    .then(products => {
-      populateProductDropdown(products);
-    })
+    .then(products => populateProductDropdown(products))
     .catch(err => {
-      console.error("Failed to load orders or products:", err);
+      console.error("Dashboard load failed:", err);
       showToast("❌ Failed to load dashboard data.");
     })
     .finally(() => showLoadingOverlay(false));
 }
 
-// === DOM Ready Handler ===
+// === Dispatch SKU Handler ===
+function dispatchSKU() {
+  const sku = document.getElementById("skuInput")?.value?.trim();
+  if (!sku) return showToast("⚠️ Please enter a valid SKU.");
+
+  showLoadingOverlay(true);
+  const API = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+
+  fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode: "dispatch-sku", sku })
+  })
+    .then(res => res.json())
+    .then(response => {
+      if (response.success) {
+        showToast(`✅ SKU ${sku} marked as dispatched.`);
+        document.getElementById("skuInput").value = "";
+        fetchAndRenderOrders();
+      } else {
+        showToast(`❌ ${response.message || "SKU not found or already dispatched."}`);
+      }
+    })
+    .catch(err => {
+      console.error("Dispatch error:", err);
+      showToast("❌ Failed to update order status.");
+    })
+    .finally(() => showLoadingOverlay(false));
+}
+
+// === DOM Ready ===
 document.addEventListener("DOMContentLoaded", () => {
-  // 🔐 Auth Check
-  const isAuthenticated = sessionStorage.getItem("zamport-auth") === "true";
-  if (!isAuthenticated) {
+  if (sessionStorage.getItem("zamport-auth") !== "true") {
     window.location.href = "https://mazharmecci.github.io/zamport/";
     return;
   }
 
-  // 👤 Display Logged-in User
   const usernameDisplay = document.getElementById("usernameDisplay");
   const userName = sessionStorage.getItem("zamport-user");
-  if (usernameDisplay && userName) {
-    usernameDisplay.textContent = userName;
-  }
+  if (usernameDisplay && userName) usernameDisplay.textContent = userName;
 
-  // 🧼 Hide Spinner on Load
   showLoadingOverlay(false);
-
-  // ✅ Fetch orders immediately after login
   fetchAndRenderOrders();
 
-  // 🔘 View Status Button
-  const viewStatusBtn = document.getElementById("viewStatus");
-  if (viewStatusBtn) {
-    viewStatusBtn.addEventListener("click", () => {
-      toggleSpinner(viewStatusBtn, true);
-      const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+  document.getElementById("submitSku")?.addEventListener("click", dispatchSKU);
+  document.getElementById("productFilter")?.addEventListener("change", e => {
+    fetchAndRenderOrders(e.target.value);
+  });
 
-      fetch(`${API_URL}?mode=products`)
-        .then(res => res.json())
-        .then(products => {
-          populateProductDropdown(products);
-          fetchAndRenderOrders();
-        })
-        .catch(err => {
-          console.error("Failed to load products:", err);
-          showToast("❌ Failed to load product list.");
-        })
-        .finally(() => toggleSpinner(viewStatusBtn, false));
-    });
-  }
+  document.getElementById("refreshOrdersBtn")?.addEventListener("click", () => {
+    fetchAndRenderOrders(document.getElementById("productFilter")?.value || "");
+  });
 
-  // 🔄 Filter by Product
-  const productFilter = document.getElementById("productFilter");
-  if (productFilter) {
-    productFilter.addEventListener("change", () => {
-      fetchAndRenderOrders(productFilter.value);
-    });
-  }
+  document.getElementById("viewStatus")?.addEventListener("click", () => {
+    const btn = document.getElementById("viewStatus");
+    toggleSpinner(btn, true);
+    const API = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
-  // 🔄 Refresh Orders Button
-  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
-  if (refreshOrdersBtn) {
-    refreshOrdersBtn.addEventListener("click", () => {
-      fetchAndRenderOrders(productFilter?.value || "");
-    });
-  }
+    fetch(`${API}?mode=products`)
+      .then(res => res.json())
+      .then(products => {
+        populateProductDropdown(products);
+        fetchAndRenderOrders();
+      })
+      .catch(err => {
+        console.error("Product load failed:", err);
+        showToast("❌ Failed to load product list.");
+      })
+      .finally(() => toggleSpinner(btn, false));
+  });
 
-  // 🚪 Logout Handler
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
+  document.getElementById("logoutBtn")?.addEventListener("click", e => {
+    e.preventDefault();
+    sessionStorage.clear();
+    showToast("👋 Logged out successfully!");
+    setTimeout(() => {
+      window.location.href = "https://mazharmecci.github.io/zamport/";
+    }, 1000);
+  });
 });
