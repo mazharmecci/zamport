@@ -58,18 +58,24 @@ function createOrderCard(order) {
 }
 
 function renderPendingOrders(orders) {
-  const pendingOrdersContainer = document.getElementById("pendingOrdersContainer");
-  if (!pendingOrdersContainer) return;
+  const container = document.getElementById("pendingOrdersContainer");
+  if (!container) return;
 
-  pendingOrdersContainer.innerHTML = "";
+  container.innerHTML = "";
   if (!orders.length) {
-    pendingOrdersContainer.innerHTML = "<p>No pending orders found.</p>";
+    container.innerHTML = "<p>No pending orders found.</p>";
     return;
   }
 
-  orders.forEach(order => {
-    pendingOrdersContainer.appendChild(createOrderCard(order));
+  const fragment = document.createDocumentFragment();
+
+  orders.forEach((order, index) => {
+    const card = createOrderCard(order);
+    card.style.animationDelay = `${index * 80}ms`; // staggered delay
+    fragment.appendChild(card);
   });
+
+  container.appendChild(fragment);
 }
 
 function fetchAndRenderOrders(product = "") {
