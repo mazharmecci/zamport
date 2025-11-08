@@ -667,18 +667,12 @@ body.login-body {
   cursor: pointer;
   display: block;           /* Makes it centerable */
   margin: 10px auto;        /* Centers horizontally */
-  transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dispatch-btn:hover {
-  background-color: darkorange;
+  background-color: green;
   transform: translateY(-1px);
-}
-
-.dispatch-btn:active {
-  background-color: #cc7000;
-  transform: scale(0.98);
 }
 
 
