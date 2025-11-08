@@ -78,43 +78,6 @@ function renderPendingOrders(orders) {
   container.appendChild(fragment);
 }
 
-// === DOM Ready Handler ===
-document.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-
-  // === Auth Check ===
-  if (sessionStorage.getItem("zamport-auth") !== "true") {
-    window.location.href = "https://mazharmecci.github.io/zamport/";
-    return;
-  }
-
-  // ✅ Show login success toast
-  showToast("✅ Login successful!");
-
-  // === Display Logged-in User ===
-  const usernameDisplay = document.getElementById("usernameDisplay");
-  const userName = sessionStorage.getItem("zamport-user");
-  if (usernameDisplay && userName) {
-    usernameDisplay.textContent = userName;
-  }
-
-  // === Fetch Products First ===
-  fetch(`${API_URL}?mode=products`)
-    .then(res => res.json())
-    .then(products => {
-      populateProductDropdown(products);
-    })
-    .catch(err => {
-      console.error("Product fetch failed:", err);
-      showToast("❌ Failed to load product list.");
-    })
-    .finally(() => {
-      // ✅ Now fetch orders with spinner and toast
-      fetchAndRenderOrders(); // handles its own overlay + toast
-    });
-});
-
-// === Order Fetcher ===
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   showToast("⏳ Fetching your orders...");
@@ -137,6 +100,37 @@ function fetchAndRenderOrders(product = "") {
       showLoadingOverlay(false);
     });
 }
+
+// === DOM Ready Handler ===
+document.addEventListener("DOMContentLoaded", () => {
+  const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
+
+  // === Auth Check ===
+  if (sessionStorage.getItem("zamport-auth") !== "true") {
+    window.location.href = "https://mazharmecci.github.io/zamport/";
+    return;
+  }
+
+  showToast("✅ Login successful!");
+
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const userName = sessionStorage.getItem("zamport-user");
+  if (usernameDisplay && userName) {
+    usernameDisplay.textContent = userName;
+  }
+
+  fetch(`${API_URL}?mode=products`)
+    .then(res => res.json())
+    .then(products => {
+      populateProductDropdown(products);
+    })
+    .catch(err => {
+      console.error("Product fetch failed:", err);
+      showToast("❌ Failed to load product list.");
+    })
+    .finally(() => {
+      fetchAndRenderOrders();
+    });
 
   // === View Status Button ===
   const viewStatusBtn = document.getElementById("viewStatus");
