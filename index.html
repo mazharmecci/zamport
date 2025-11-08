@@ -26,8 +26,14 @@
     <p id="error" class="error-msg"></p>
   </form>
 
-  <!-- 🔔 Toast Notification -->
-  <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden">
+    <div class="spinner"></div>
+  </div>
+</body>
 
   <!-- ✅ Login Logic -->
   <script>
@@ -72,10 +78,5 @@
     }
   </script>
   
-<!-- 🔄 Loading Overlay -->
-<div id="loadingOverlay" class="hidden">
-  <div class="spinner"></div>
-</div>
-
 </body>
 </html>
