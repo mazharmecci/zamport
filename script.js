@@ -41,7 +41,8 @@ function populateProductDropdown(products = []) {
   });
 }
 
-// === Card Renderer with Dispatch Button ===
+// === Card Renderer with Dispatch Button + Image Preview ===
+
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -59,18 +60,49 @@ function createDispatchableOrderCard(order) {
     ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
   `;
 
+  // === Image Preview Logic ===
+  if (order.imageUrl) {
+    const previewContainer = document.createElement("div");
+    previewContainer.className = "image-preview-container";
+
+    const previewLink = document.createElement("a");
+    previewLink.href = order.imageUrl;
+    previewLink.textContent = "🖼️ View Product Image";
+    previewLink.target = "_blank";
+
+    const previewImage = document.createElement("img");
+    previewImage.src = order.imageUrl;
+    previewImage.className = "image-preview";
+    previewImage.alt = "Product Image";
+
+    previewLink.addEventListener("mouseenter", () => {
+      previewImage.style.display = "block";
+    });
+
+    previewLink.addEventListener("mouseleave", () => {
+      previewImage.style.display = "none";
+    });
+
+    previewContainer.appendChild(previewLink);
+    previewContainer.appendChild(previewImage);
+    card.appendChild(previewContainer);
+  }
+
+  // === Dispatch Button ===
   if (order.status === "Order-Pending") {
     const dispatchBtn = document.createElement("button");
     dispatchBtn.textContent = "Mark as Dispatched";
     dispatchBtn.className = "dispatch-btn";
-   dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
+    dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
     card.appendChild(dispatchBtn);
   }
 
   return card;
 }
 
+
 // === Render Orders ===
+
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
@@ -93,6 +125,7 @@ function renderPendingOrders(orders) {
 }
 
 // === Fetch Orders ===
+
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   showToast("⏳ Fetching your orders...");
