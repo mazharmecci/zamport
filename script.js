@@ -60,7 +60,6 @@ function createDispatchableOrderCard(order) {
     ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
   `;
 
-  // === Image Preview Logic ===
   if (order.imageUrl) {
     const previewContainer = document.createElement("div");
     previewContainer.className = "image-preview-container";
@@ -88,7 +87,21 @@ function createDispatchableOrderCard(order) {
     card.appendChild(previewContainer);
   }
 
+  if (order.status === "Order-Pending") {
+    const dispatchBtn = document.createElement("button");
+    dispatchBtn.textContent = "Mark as Dispatched";
+    dispatchBtn.className = "dispatch-btn";
+    dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
+    card.appendChild(dispatchBtn);
+  }
+
+  return card;
+}
+
+
+
   // === Dispatch Button ===
+
   if (order.status === "Order-Pending") {
     const dispatchBtn = document.createElement("button");
     dispatchBtn.textContent = "Mark as Dispatched";
@@ -210,6 +223,7 @@ function markOrderAsDispatched(order, dispatchBtn) {
 
 
 // === DOM Ready Handler ===
+
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
