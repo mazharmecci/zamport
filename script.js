@@ -239,6 +239,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
+  // imagePreview.js
+
+function attachImagePreview(cardElement, imageUrl) {
+  if (!imageUrl) return;
+
+  const previewContainer = document.createElement('div');
+  previewContainer.className = 'image-preview-container';
+
+  const previewLink = document.createElement('a');
+  previewLink.href = imageUrl;
+  previewLink.textContent = 'View Image';
+  previewLink.target = '_blank';
+
+  const previewImage = document.createElement('img');
+  previewImage.src = imageUrl;
+  previewImage.className = 'image-preview';
+  previewImage.alt = 'Product Image';
+
+  previewLink.addEventListener('mouseenter', () => {
+    previewImage.style.display = 'block';
+  });
+
+  previewLink.addEventListener('mouseleave', () => {
+    previewImage.style.display = 'none';
+  });
+
+  previewContainer.appendChild(previewLink);
+  previewContainer.appendChild(previewImage);
+  cardElement.appendChild(previewContainer);
+}
+
+
+  
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (event) => {
