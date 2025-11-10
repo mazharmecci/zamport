@@ -26,13 +26,15 @@
     <form class="dashboard-form" onsubmit="event.preventDefault();">
       <div class="barcode-scan-section">
         <label for="barcodeId" class="form-label">Scanned Barcode ID:</label>
-        <input type="text" id="barcodeId" name="barcodeId" placeholder="This is an optional field" class="form-input" />
+        <input type="text" id="barcodeId" name="barcodeId" placeholder="Auto-filled after scan" class="form-input" readonly />
       
-        <h3 class="section-title">📷 Scan Barcodes</h3>
+        <h3 class="section-title">📦 USPS Dispatch Scan</h3>
         <div class="barcode-actions">
-          <button onclick="startBarcodeCameraScan()" class="btn-primary">🎥 Use Camera</button>
-          <button onclick="scanBarcodeFromImage()" class="btn-secondary">🖼️ Upload Image</button>
+          <button onclick="startBarcodeScan()" class="btn-primary">🎥 Scan with Camera</button>
+          <button onclick="uploadBarcodeImage()" class="btn-secondary">🖼️ Upload Barcode Image</button>
         </div>
+      
+        <input type="file" id="barcodeImageInput" accept="image/*" style="display:none" onchange="handleBarcodeImage(this.files[0])" />
       </div>
 
       <label for="productFilter">Filter by Product</label>
