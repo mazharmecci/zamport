@@ -70,6 +70,47 @@ function normalizeOrder(order) {
 }
 
 
+// === Top summary card ===
+
+function renderOrderSummary(summaryMap, totalRevenue = 0, averageCost = 0) {
+  const container = document.getElementById("pendingOrdersContainer");
+  if (!container) return;
+
+  const summaryCard = document.createElement("div");
+  summaryCard.className = "summary-card";
+  summaryCard.style.padding = "12px";
+  summaryCard.style.marginBottom = "16px";
+  summaryCard.style.border = "1px solid #ccc";
+  summaryCard.style.borderRadius = "8px";
+  summaryCard.style.backgroundColor = "#f9f9f9";
+
+  const title = document.createElement("h3");
+  title.textContent = "📊 Order Summary";
+  title.style.marginBottom = "8px";
+  summaryCard.appendChild(title);
+
+  Object.entries(summaryMap).forEach(([sheetName, count]) => {
+    const line = document.createElement("p");
+    line.textContent = `📄 ${sheetName}: ${count} orders`;
+    line.style.margin = "4px 0";
+    summaryCard.appendChild(line);
+  });
+
+  const revenueLine = document.createElement("p");
+  revenueLine.textContent = `💰 Total Revenue: $${totalRevenue.toFixed(2)}`;
+  revenueLine.style.marginTop = "12px";
+  revenueLine.style.fontWeight = "bold";
+  summaryCard.appendChild(revenueLine);
+
+  const avgLine = document.createElement("p");
+  avgLine.textContent = `📈 Avg Cost per Order: $${averageCost.toFixed(2)}`;
+  avgLine.style.marginTop = "4px";
+  summaryCard.appendChild(avgLine);
+
+  container.appendChild(summaryCard);
+}
+
+
 // === Card Builder ===
 
 function buildOrderCardHTML(order) {
@@ -119,6 +160,7 @@ function createDispatchableOrderCard(rawOrder) {
 }
 
 // === Render Orders ===
+
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
@@ -137,16 +179,33 @@ function renderPendingOrders(orders) {
 }
 
 // === Fetch Orders ===
+
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   showToast("⏳ Fetching your orders...");
+
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = product ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}` : `${API_URL}?mode=3pl-month`;
+  const url = product
+    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
+    : `${API_URL}?mode=3pl-month`;
+
   fetch(url)
     .then(res => res.json())
-    .then(orders => {
+    .then(data => {
+      const orders = Array.isArray(data) ? data : data.orders || [];
+      const summary = data.summary || {};
+
       currentOrders = orders;
-      renderPendingOrders(currentOrders);
+
+      // 💰 Revenue Calculations
+      const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.cost) || 0), 0);
+      const averageCost = orders.length ? totalRevenue / orders.length : 0;
+
+      const container = document.getElementById("pendingOrdersContainer");
+      if (container) container.innerHTML = "";
+
+      renderOrderSummary(summary, totalRevenue, averageCost); // 🆕 Pass revenue stats
+      renderPendingOrders(currentOrders);                     // Render order cards
     })
     .catch(err => {
       console.error("Order fetch failed:", err);
@@ -154,6 +213,8 @@ function fetchAndRenderOrders(product = "") {
     })
     .finally(() => showLoadingOverlay(false));
 }
+
+
 
 // === Dispatch Logic ===
 function markOrderAsDispatched(order, btn) {
