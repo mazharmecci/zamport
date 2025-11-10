@@ -21,103 +21,114 @@
   
 <body>
   <main class="dashboard-wrapper">
+
+    <!-- === Header === -->
     <header class="dashboard-header">
       <div class="logo-block">
         <img src="zamport.png" alt="Zamport Logo" class="dashboard-logo" />
       </div>
-    
       <div class="user-info">
         <img src="user-icon.png" alt="User Icon" class="user-icon" />
         <span id="usernameDisplay">User</span>
         <button id="logoutBtn" class="btn btn-black">Logout</button>
       </div>
     </header>
-    
 
-<!-- 📦 Scanned QR ID Field -->
-    
-<div style="margin-top: 10px;">
-  <label for="qr-result">Scanned QR ID:</label>
-  <small style="color: grey; display: block; margin-top: 6px; margin-bottom: 10px;">This is an optional field</small>
-  <input
-    type="text"
-    id="qr-result"
-    name="qr-result"
-    readonly
-    style="font-weight: bold; background: #f0f0f0;"
-  />
-</div>
+    <!-- === QR Scan Section === -->
+    <section class="qr-scan-section">
+      <div style="margin-top: 10px;">
+        <label for="qr-result">📦 Scanned QR ID:</label>
+        <small style="color: grey; display: block; margin-top: 6px; margin-bottom: 10px;">This is an optional field</small>
+        <input
+          type="text"
+          id="qr-result"
+          name="qr-result"
+          readonly
+          style="font-weight: bold; background: #f0f0f0;"
+        />
+      </div>
 
-<!-- 📷 QR Scanner UI -->
-<div class="container" style="margin-top: 20px;">
-  <h3>Scan QR Codes</h3>
-  <div class="section">
-    <div id="my-qr-reader"></div>
-  </div>
-</div>
+      <div style="margin-top: 20px;">
+        <h3>📷 Scan QR Codes</h3>
+        <div id="my-qr-reader"></div>
+      </div>
+    </section>
 
-<!-- 📜 QR Scanner Script -->
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script>
-  function domReady(fn) {
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-      setTimeout(fn, 1000);
-    } else {
-      document.addEventListener("DOMContentLoaded", fn);
-    }
-  }
+    <!-- === Product Filter === -->
+    <div style="margin-top: 16px;"></div>
+    <label for="productFilter">Filter by Product</label>
+    <select id="productFilter">
+      <option value="">All Products</option>
+    </select>
 
-domReady(function () {
-  loadItemNames(); // ✅ This ensures item names load on page render
+    <div style="margin-top: 16px;"></div>
 
-  const scanner = new Html5QrcodeScanner("my-qr-reader", {
-    fps: 10,
-    qrbox: 250
-  });
-
-  function onScanSuccess(decodedText, decodedResult) {
-    const qrField = document.getElementById("qr-result");
-    if (qrField) qrField.value = decodedText;
-
-    alert("✅ QR Code scanned: " + decodedText);
-
-    scanner.clear().then(() => {
-      document.getElementById("my-qr-reader").innerHTML = "";
-    }).catch((err) => {
-      console.error("Failed to clear scanner:", err);
-    });
-  }
-
-  scanner.render(onScanSuccess);
-});
-
-</script>
-    
-      <div style="margin-top: 16px;"></div> <!-- One line gap -->    
-     
-      <label for="productFilter">Filter by Product</label>
-      <select id="productFilter">
-        <option value="">All Products</option>        
-      </select>
-
-    <div style="margin-top: 16px;"></div> <!-- One line gap -->
-    
-      <button type="submit" id="submitSku">Submit</button>
-    </form>
+    <!-- === Order Cards === -->
     <section id="pendingOrdersContainer" class="orders-grid"></section>
-  </main>
-</body>
 
-<!-- Toast Notification -->
+    <!-- === Toast Notification === -->
     <div id="toast" class="toast hidden"></div>
+
+    <!-- === Loading Overlay === -->
+    <div id="loadingOverlay" class="hidden">
+      <div class="spinner"></div>
+      <p>Loading pending order cards to dispatch....</p>
+    </div>
+
   </main>
 
-<!-- Loading Overlay -->
-  <div id="loadingOverlay" class="hidden">
-     <div class="spinner"></div>
-    <p>Loading pending order cards to dispatch....</p>
-   </div>
-  </body>
+  <!-- === QR Scanner Script === -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    function domReady(fn) {
+      if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(fn, 1000);
+      } else {
+        document.addEventListener("DOMContentLoaded", fn);
+      }
+    }
+
+    domReady(function () {
+      const scanner = new Html5QrcodeScanner("my-qr-reader", { fps: 10, qrbox: 250 });
+
+      function onScanSuccess(decodedText) {
+        const qrField = document.getElementById("qr-result");
+        if (qrField) qrField.value = decodedText;
+        showToast("✅ QR Code scanned: " + decodedText);
+
+        scanner.clear().then(() => {
+          document.getElementById("my-qr-reader").innerHTML = "";
+        }).catch(err => {
+          console.error("Failed to clear scanner:", err);
+        });
+      }
+
+      scanner.render(onScanSuccess);
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+        toast.classList.add("hidden");
+      }, 3000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          showToast("👋 Logged out");
+          // Add logout logic here
+        });
+      }
+    });
+  </script>
+</body>
 
 
   <!-- Logout Logic -->
