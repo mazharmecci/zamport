@@ -24,8 +24,16 @@
     </header>
 
     <form class="dashboard-form" onsubmit="event.preventDefault();">
-      <label for="skuInput">Scan or Type SKU</label>
-      <input type="text" id="skuInput" placeholder="Enter SKU" required />
+      <div class="barcode-scan-section">
+        <label for="barcodeId" class="form-label">Scanned Barcode ID:</label>
+        <input type="text" id="barcodeId" name="barcodeId" placeholder="This is an optional field" class="form-input" />
+      
+        <h3 class="section-title">📷 Scan Barcodes</h3>
+        <div class="barcode-actions">
+          <button onclick="startBarcodeCameraScan()" class="btn-primary">🎥 Use Camera</button>
+          <button onclick="scanBarcodeFromImage()" class="btn-secondary">🖼️ Upload Image</button>
+        </div>
+      </div>
 
       <label for="productFilter">Filter by Product</label>
       <select id="productFilter">
