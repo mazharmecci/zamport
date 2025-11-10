@@ -41,21 +41,36 @@ function populateProductDropdown(products = []) {
   });
 }
 
-// === Card Renderer with Dispatch Button ===
-
+// === HTML Escaper ===
 function escapeHTML(str) {
-  return str?.replace(/[&<>"']/g, tag => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[tag])) || '';
+  return typeof str === "string"
+    ? str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[tag]))
+    : '';
 }
 
+// === Card Renderer with Dispatch Button ===
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
 
+  card.innerHTML = buildOrderCardHTML(order);
+
+  if (order.status === "Order-Pending") {
+    card.appendChild(createDispatchButton(order));
+  } else {
+    card.appendChild(createDispatchedBadge());
+  }
+
+  return card;
+}
+
+// === Card HTML Builder ===
+function buildOrderCardHTML(order) {
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
 
-  card.innerHTML = `
+  return `
     <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
     <p>🧪 Product: ${escapeHTML(order.product)}</p>
     <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${escapeHTML(order.status)}</span></p>
@@ -64,27 +79,31 @@ function createDispatchableOrderCard(order) {
     <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
     <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
-    ${order.imageUrl ? `<img src="${escapeHTML(order.imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" />` : ""}
+    ${typeof order.imageUrl === "string" && order.imageUrl.startsWith("http")
+      ? `<img src="${escapeHTML(order.imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" />`
+      : ""}
   `;
+}
 
-  if (order.status === "Order-Pending") {
-    const dispatchBtn = document.createElement("button");
-    dispatchBtn.textContent = "Mark as Dispatched";
-    dispatchBtn.className = "dispatch-btn";
-    dispatchBtn.onclick = () => {
-      dispatchBtn.disabled = true;
-      dispatchBtn.textContent = "Dispatching...";
-      markOrderAsDispatched(order, dispatchBtn);
-    };
-    card.appendChild(dispatchBtn);
-  } else {
-    const badge = document.createElement("span");
-    badge.className = "dispatched-badge";
-    badge.textContent = "✅ Dispatched";
-    card.appendChild(badge);
-  }
+// === Dispatch Button Creator ===
+function createDispatchButton(order) {
+  const button = document.createElement("button");
+  button.textContent = "Mark as Dispatched";
+  button.className = "dispatch-btn";
+  button.onclick = () => {
+    button.disabled = true;
+    button.textContent = "Dispatching...";
+    markOrderAsDispatched(order, button);
+  };
+  return button;
+}
 
-  return card;
+// === Dispatched Badge Creator ===
+function createDispatchedBadge() {
+  const badge = document.createElement("span");
+  badge.className = "dispatched-badge";
+  badge.textContent = "✅ Dispatched";
+  return badge;
 }
 
 // === Render Orders ===
