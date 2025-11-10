@@ -42,6 +42,7 @@ function populateProductDropdown(products = []) {
 }
 
 // === Card Renderer with Dispatch Button ===
+
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -57,13 +58,14 @@ function createDispatchableOrderCard(order) {
     <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
     <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
     ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+    ${order.imageUrl ? `<img src="${order.imageUrl}" alt="Product Image" class="product-image" />` : ""}
   `;
 
   if (order.status === "Order-Pending") {
     const dispatchBtn = document.createElement("button");
     dispatchBtn.textContent = "Mark as Dispatched";
     dispatchBtn.className = "dispatch-btn";
-   dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
+    dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
     card.appendChild(dispatchBtn);
   }
 
@@ -71,6 +73,7 @@ function createDispatchableOrderCard(order) {
 }
 
 // === Render Orders ===
+
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
@@ -93,6 +96,7 @@ function renderPendingOrders(orders) {
 }
 
 // === Fetch Orders ===
+
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   showToast("⏳ Fetching your orders...");
@@ -116,7 +120,6 @@ function fetchAndRenderOrders(product = "") {
       showLoadingOverlay(false);
     });
 }
-
 
 
 function markOrderAsDispatched(order, dispatchBtn) {
