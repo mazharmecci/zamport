@@ -233,29 +233,39 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderOrders(selectedProduct);
   });
 
-  // === QR Scanner Setup ===
-  const scanner = new Html5QrcodeScanner("my-qr-reader", {
+  
+// === QR Scanner Setup ===
+let scannerInstance = null;
+
+function startQRScanner() {
+  if (scannerInstance) return; // Prevent multiple renders
+
+  scannerInstance = new Html5QrcodeScanner("my-qr-reader", {
     fps: 10,
     qrbox: 250,
   });
 
-  function onScanSuccess(decodedText, decodedResult) {
-    const qrField = document.getElementById("qr-result");
-    if (qrField) {
-      qrField.value = decodedText;
-      showToast("✅ QR Code scanned: " + decodedText);
-    } else {
-      console.warn("QR result field not found in DOM.");
-    }
+  scannerInstance.render(onScanSuccess);
+}
 
-    scanner.clear().then(() => {
-      document.getElementById("my-qr-reader").innerHTML = "";
-    }).catch(err => {
-      console.error("Failed to clear scanner:", err);
-    });
+function onScanSuccess(decodedText, decodedResult) {
+  const qrField = document.getElementById("qr-result");
+  if (qrField) {
+    qrField.value = decodedText;
+    showToast("✅ QR Code scanned: " + decodedText);
+  } else {
+    console.warn("QR result field not found in DOM.");
   }
 
-  scanner.render(onScanSuccess);
+  // Optional: stop scanning after success
+  scannerInstance.clear().then(() => {
+    document.getElementById("my-qr-reader").innerHTML = "";
+    scannerInstance = null;
+  }).catch(err => {
+    console.error("Failed to clear scanner:", err);
+  });
+}
+
 
   // === Logout Handler ===
   const logoutBtn = document.getElementById("logoutBtn");
