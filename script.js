@@ -61,8 +61,9 @@ function normalizeOrder(order) {
     sheetId: order.sheetId || order.SheetID || "",
     rowIndex: order.rowIndex || order.RowIndex || 0,
     date: order.date || order.Date || "",
-    totalLabels: order.TotalLabels || order.totalLabels || order.Labels || "",
-    totalUnits: order.TotalUnits || order.totalUnits || order.Units || "",
+    totalLabels: order.totalLabels || order.TotalLabels || order.Labels || "NA",
+    totalUnits: order.totalUnits || order.TotalUnits || order.Units || "NA",
+    labelLink: order.labelLink || order.LabelLink || "",
     labelLink: order.labelLink || order.LabelLink || "",
     imageLink,
     cost  // 💰 Added for revenue calculation
@@ -123,8 +124,8 @@ function buildOrderCardHTML(order) {
     <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${escapeHTML(order.status)}</span></p>
     <p>📄 Sheet: ${escapeHTML(order.sheetName)}</p>
     <p>📅 Date: ${escapeHTML(order.date || "N/A")}</p>
-    <p>🔢 Total Labels: ${escapeHTML(order.TotalLabels || "N/A")}</p>
-    <p>📦 Total Units: ${escapeHTML(order.TotalUnits || "N/A")}</p>
+    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
     <p>💰 Revenue: $${order.cost?.toFixed(2) || "0.00"}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
     ${order.imageLink ? `<p><a href="${escapeHTML(order.imageLink)}" target="_blank">🖼️ Image Link</a></p>${imagePreview}` : ""}
