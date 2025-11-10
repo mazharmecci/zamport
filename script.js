@@ -59,6 +59,7 @@ function createDispatchableOrderCard(order) {
     <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
     ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
     ${order.imageUrl ? `<img src="${order.imageUrl}" alt="Product Image" class="product-image" />` : ""}
+    <img src="${order.imageUrl}" alt="Product Image" class="product-image fade-in" loading="lazy" onerror="this.src='fallback.png';" />    
   `;
 
   if (order.status === "Order-Pending") {
