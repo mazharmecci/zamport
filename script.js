@@ -1,4 +1,3 @@
-
 // === Global State ===
 let currentOrders = [];
 
@@ -42,94 +41,37 @@ function populateProductDropdown(products = []) {
   });
 }
 
-// === Scan logic ===
-
-function domReady(fn) {
-  if (
-    document.readyState === "complete" ||
-    document.readyState === "interactive"
-  ) {
-    setTimeout(fn, 1000);
-  } else {
-    document.addEventListener("DOMContentLoaded", fn);
-  }
-}
-
-domReady(function () {
-  const scanner = new Html5QrcodeScanner("my-qr-reader", {
-    fps: 10,
-    qrbox: 250,
-  });
-
-function onScanSuccess(decodedText, decodedResult) {
-  const qrField = document.getElementById("qr-result");
-
-  if (qrField) {
-    qrField.value = decodedText;
-  } else {
-    console.warn("QR result field not found in DOM.");
-  }
-
-  alert("✅ QR Code scanned: " + decodedText);
-
-  scanner.clear().then(() => {
-    document.getElementById("my-qr-reader").innerHTML = "";
-  }).catch((err) => {
-    console.error("Failed to clear scanner:", err);
-  });
-}
-
-const toast = document.createElement("div");
-toast.textContent = "QR scanned: " + decodedText;
-toast.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:10px 20px;border-radius:5px;z-index:9999;";
-document.body.appendChild(toast);
-setTimeout(() => toast.remove(), 3000);
-  
-// === HTML Escaper ===
-
-function escapeHTML(str) {
-  return typeof str === "string"
-    ? str.replace(/[&<>"']/g, tag => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[tag]))
-    : '';
-}
-
-function createDispatchButton(order) {
-  const button = document.createElement("button");
-  button.textContent = "Mark as Dispatched";
-  button.className = "dispatch-btn";
-  button.onclick = () => {
-    button.disabled = true;
-    button.textContent = "Dispatching...";
-    markOrderAsDispatched(order, button);
-  };
-  return button;
-}
-
-
-function createDispatchedBadge() {
-  const badge = document.createElement("span");
-  badge.className = "dispatched-badge";
-  badge.textContent = "✅ Dispatched";
-  return badge;
-}
-
+// === Card Renderer with Dispatch Button ===
 
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
-  card.innerHTML = buildOrderCardHTML(order);
+
+  const statusColor = order.status === "Order-Pending" ? "red" : "green";
+
+  card.innerHTML = `
+    <h4>📦 SKU: ${order.sku}</h4>
+    <p>🧪 Product: ${order.product}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
+    <p>📄 Sheet: ${order.sheetName}</p>
+    <p>📅 Date: ${order.date || "N/A"}</p>
+    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
+    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
+    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
+  `;
 
   if (order.status === "Order-Pending") {
-    card.appendChild(createDispatchButton(order));
-  } else {
-    card.appendChild(createDispatchedBadge());
+    const dispatchBtn = document.createElement("button");
+    dispatchBtn.textContent = "Mark as Dispatched";
+    dispatchBtn.className = "dispatch-btn";
+   dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
+    card.appendChild(dispatchBtn);
   }
 
   return card;
 }
 
+// === Render Orders ===
 
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
@@ -151,9 +93,6 @@ function renderPendingOrders(orders) {
 
   container.appendChild(fragment);
 }
-
-
-
 
 // === Fetch Orders ===
 
@@ -183,7 +122,6 @@ function fetchAndRenderOrders(product = "") {
 
 
 function markOrderAsDispatched(order, dispatchBtn) {
-  
   showToast("🔄 Updating status...");
 
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
@@ -239,7 +177,6 @@ function markOrderAsDispatched(order, dispatchBtn) {
 
 
 // === DOM Ready Handler ===
-
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
@@ -303,6 +240,50 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  // === Scan logic ===
+
+function domReady(fn) {
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    setTimeout(fn, 1000);
+  } else {
+    document.addEventListener("DOMContentLoaded", fn);
+  }
+}
+
+domReady(function () {
+  const scanner = new Html5QrcodeScanner("my-qr-reader", {
+    fps: 10,
+    qrbox: 250,
+  });
+
+function onScanSuccess(decodedText, decodedResult) {
+  const qrField = document.getElementById("qr-result");
+
+  if (qrField) {
+    qrField.value = decodedText;
+  } else {
+    console.warn("QR result field not found in DOM.");
+  }
+
+  alert("✅ QR Code scanned: " + decodedText);
+
+  scanner.clear().then(() => {
+    document.getElementById("my-qr-reader").innerHTML = "";
+  }).catch((err) => {
+    console.error("Failed to clear scanner:", err);
+  });
+}
+
+const toast = document.createElement("div");
+toast.textContent = "QR scanned: " + decodedText;
+toast.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:10px 20px;border-radius:5px;z-index:9999;";
+document.body.appendChild(toast);
+setTimeout(() => toast.remove(), 3000);
+
+  
   // === Logout ===
   
   const logoutBtn = document.getElementById("logoutBtn");
