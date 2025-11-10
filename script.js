@@ -177,7 +177,7 @@ function markOrderAsDispatched(order, btn) {
       console.error("Dispatch failed:", err);
       showToast("❌ Failed to update order.");
       btn.disabled = false;
-      btn.textContent = "Mark as Dispatched";
+      btn.textContent = "Marked as Dispatched";
       btn.style.opacity = "1";
       btn.style.cursor = "pointer";
     });
