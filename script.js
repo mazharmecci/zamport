@@ -281,20 +281,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // === Barcode scanning ===
+// === Barcode Scanning Module ===
 
 function startBarcodeScan() {
   showToast("🎥 Starting barcode scan...");
-  // Initialize camera scanner (e.g., ZXing or QuaggaJS)
-  // On successful scan:
-  const scannedCode = "9400111899223857234567"; // Example
+  simulateScan(); // Replace with actual scanner integration when ready
+}
+
+function simulateScan() {
+  const scannedCode = "9400111899223857234567"; // Simulated result
   const cleanCode = sanitizeBarcode(scannedCode);
-  document.getElementById("barcodeId").value = cleanCode;
+  autofillBarcode(cleanCode);
 }
 
 function sanitizeBarcode(code) {
-  return code.replace(/\D/g, ""); // Remove non-numeric characters
+  return typeof code === "string" ? code.replace(/\D/g, "") : "";
 }
+
+function autofillBarcode(cleanCode) {
+  const input = document.getElementById("barcodeId");
+  if (input) {
+    input.value = cleanCode;
+    showToast(`✅ Barcode captured: ${cleanCode}`);
+  } else {
+    console.warn("barcodeId input not found");
+    showToast("⚠️ Barcode input field missing");
+  }
+}
+
+  // === Logout ===
   
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
