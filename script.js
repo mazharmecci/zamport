@@ -177,36 +177,9 @@ function markOrderAsDispatched(order, dispatchBtn) {
 }
 
 
-// === Barcode scanning ===
-
-function startBarcodeScan() {
-  showToast("🎥 Starting barcode scan...");
-  // Initialize camera scanner (e.g., ZXing or QuaggaJS)
-  // On successful scan:
-  const scannedCode = "9400111899223857234567"; // Example
-  const cleanCode = sanitizeBarcode(scannedCode);
-  document.getElementById("barcodeId").value = cleanCode;
-}
-
-function uploadBarcodeImage() {
-  document.getElementById("barcodeImageInput").click();
-}
-
-function handleBarcodeImage(file) {
-  showToast("🖼️ Scanning barcode from image...");
-  // Use barcode library to decode image
-  // On success:
-  const scannedCode = "9400111899223857234567"; // Example
-  const cleanCode = sanitizeBarcode(scannedCode);
-  document.getElementById("barcodeId").value = cleanCode;
-}
-
-function sanitizeBarcode(code) {
-  return code.replace(/\D/g, ""); // Remove non-numeric characters
-}
-
 
 // === DOM Ready Handler ===
+
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
@@ -269,6 +242,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
+  // === Barcode scanning ===
+
+function startBarcodeScan() {
+  showToast("🎥 Starting barcode scan...");
+  // Initialize camera scanner (e.g., ZXing or QuaggaJS)
+  // On successful scan:
+  const scannedCode = "9400111899223857234567"; // Example
+  const cleanCode = sanitizeBarcode(scannedCode);
+  document.getElementById("barcodeId").value = cleanCode;
+}
+
+function sanitizeBarcode(code) {
+  return code.replace(/\D/g, ""); // Remove non-numeric characters
+}
+  
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (event) => {
