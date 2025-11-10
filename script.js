@@ -42,6 +42,7 @@ function populateProductDropdown(products = []) {
 }
 
 // === HTML Escaper ===
+
 function escapeHTML(str) {
   return typeof str === "string"
     ? str.replace(/[&<>"']/g, tag => ({
@@ -50,49 +51,6 @@ function escapeHTML(str) {
     : '';
 }
 
-// === Card Renderer with Dispatch Button ===
-
-function createDispatchableOrderCard(order) {
-  const card = document.createElement("div");
-  card.className = "order-card";
-
-  card.innerHTML = buildOrderCardHTML(order);
-
-  if (order.status === "Order-Pending") {
-    card.appendChild(createDispatchButton(order));
-  } else {
-    card.appendChild(createDispatchedBadge());
-  }
-
-  return card;
-}
-
-// === Card HTML Builder ===
-
-function buildOrderCardHTML(order) {
-  const statusColor = order.status === "Order-Pending" ? "red" : "green";
-  const imageUrl = typeof order.imageUrl === "string" ? order.imageUrl.trim() : "";
-
-  const imageHTML = imageUrl.startsWith("http")
-    ? `<img src="${escapeHTML(imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/160?text=No+Image';" />`
-    : imageUrl
-      ? `<p>🖼️ Image URL: <a href="${escapeHTML(imageUrl)}" target="_blank">${escapeHTML(imageUrl)}</a></p>`
-      : `<p>🖼️ No image available</p>`;
-
-  return `
-    <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
-    <p>🧪 Product: ${escapeHTML(order.product)}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${escapeHTML(order.status)}</span></p>
-    <p>📄 Sheet: ${escapeHTML(order.sheetName)}</p>
-    <p>📅 Date: ${escapeHTML(order.date || "N/A")}</p>
-    <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
-    <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
-    ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
-    ${imageHTML}
-  `;
-}
-
-// === Dispatch Button Creator ===
 
 function createDispatchButton(order) {
   const button = document.createElement("button");
@@ -106,7 +64,6 @@ function createDispatchButton(order) {
   return button;
 }
 
-// === Dispatched Badge Creator ===
 
 function createDispatchedBadge() {
   const badge = document.createElement("span");
@@ -115,7 +72,21 @@ function createDispatchedBadge() {
   return badge;
 }
 
-// === Render Orders ===
+
+function createDispatchableOrderCard(order) {
+  const card = document.createElement("div");
+  card.className = "order-card";
+  card.innerHTML = buildOrderCardHTML(order);
+
+  if (order.status === "Order-Pending") {
+    card.appendChild(createDispatchButton(order));
+  } else {
+    card.appendChild(createDispatchedBadge());
+  }
+
+  return card;
+}
+
 
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
@@ -137,6 +108,9 @@ function renderPendingOrders(orders) {
 
   container.appendChild(fragment);
 }
+
+
+
 
 // === Fetch Orders ===
 
