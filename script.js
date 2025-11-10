@@ -71,6 +71,13 @@ function createDispatchableOrderCard(order) {
 
 function buildOrderCardHTML(order) {
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  const imageUrl = typeof order.imageUrl === "string" ? order.imageUrl.trim() : "";
+
+  const imageHTML = imageUrl.startsWith("http")
+    ? `<img src="${escapeHTML(imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/160?text=No+Image';" />`
+    : imageUrl
+      ? `<p>🖼️ Image URL: <a href="${escapeHTML(imageUrl)}" target="_blank">${escapeHTML(imageUrl)}</a></p>`
+      : `<p>🖼️ No image available</p>`;
 
   return `
     <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
@@ -81,9 +88,7 @@ function buildOrderCardHTML(order) {
     <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
     <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
-    ${typeof order.imageUrl === "string" && order.imageUrl.startsWith("http")
-      ? `<img src="${escapeHTML(order.imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" />`
-      : ""}
+    ${imageHTML}
   `;
 }
 
