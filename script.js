@@ -54,7 +54,8 @@ function normalizeOrder(order) {
     date: order.date || order.Date || "",
     totalLabels: order.totalLabels || order.Labels || "",
     totalUnits: order.totalUnits || order.Units || "",
-    labelLink: order.labelLink || order.LabelLink || ""
+    labelLink: order.labelLink || order.LabelLink || "",
+    imageLink: order.imageLink || order.ImageLink || order.imageURL || order.ImageURL || ""
   };
 }
 
@@ -70,8 +71,10 @@ function buildOrderCardHTML(order) {
     <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
     <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
+    ${order.imageLink ? `<p><a href="${escapeHTML(order.imageLink)}" target="_blank">🖼️ Image Link</a></p>` : ""}
   `;
 }
+
 
 // === Dispatch Button ===
 function createDispatchButton(order) {
