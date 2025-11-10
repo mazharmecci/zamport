@@ -43,7 +43,13 @@ function populateProductDropdown(products = []) {
 }
 
 // === Normalize Order Keys ===
+
 function normalizeOrder(order) {
+  const rawImageLink = order.imageLink || order.ImageLink || order.imageURL || order.ImageURL || "";
+
+  // Extract from IMAGE(...) formula if needed
+  const imageLink = rawImageLink.startsWith('=IMAGE("') ? rawImageLink.slice(8, -2) : rawImageLink;
+
   return {
     sku: order.sku || order.SKU || "",
     product: order.product || order.Product || "",
@@ -55,13 +61,17 @@ function normalizeOrder(order) {
     totalLabels: order.totalLabels || order.Labels || "",
     totalUnits: order.totalUnits || order.Units || "",
     labelLink: order.labelLink || order.LabelLink || "",
-    imageLink: order.imageLink || order.ImageLink || order.imageURL || order.ImageURL || ""
+    imageLink
   };
 }
 
+
 // === Card Builder ===
+
 function buildOrderCardHTML(order) {
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  const imagePreview = order.imageLink ? `<img src="${escapeHTML(order.imageLink)}" alt="Product Image" style="max-width:120px; margin-top:6px;" />` : "";
+
   return `
     <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
     <p>🧪 Product: ${escapeHTML(order.product)}</p>
@@ -71,7 +81,7 @@ function buildOrderCardHTML(order) {
     <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
     <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
-    ${order.imageLink ? `<p><a href="${escapeHTML(order.imageLink)}" target="_blank">🖼️ Image Link</a></p>` : ""}
+    ${order.imageLink ? `<p><a href="${escapeHTML(order.imageLink)}" target="_blank">🖼️ Image Link</a></p>${imagePreview}` : ""}
   `;
 }
 
