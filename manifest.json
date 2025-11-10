@@ -1,0 +1,26 @@
+{
+  "name": "zamport | zamport",
+  "short_name": "zamport",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0055a5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "zamport.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "zamport.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "zamport.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
