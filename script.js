@@ -288,16 +288,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // === Barcode Scanning Module ===
 
-function startBarcodeScan() {
+window.startBarcodeScan = function () {
   showToast("🎥 Starting barcode scan...");
-  simulateScan(); // Replace with actual scanner integration when ready
-}
-
-function simulateScan() {
-  const scannedCode = "9400111899223857234567"; // Simulated result
+  const scannedCode = "9400111899223857234567"; // Simulated
   const cleanCode = sanitizeBarcode(scannedCode);
   autofillBarcode(cleanCode);
-}
+};
 
 function sanitizeBarcode(code) {
   return typeof code === "string" ? code.replace(/\D/g, "") : "";
@@ -313,6 +309,15 @@ function autofillBarcode(cleanCode) {
     showToast("⚠️ Barcode input field missing");
   }
 }
+
+// Attach event listener after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  const scanBtn = document.getElementById("scanBtn");
+  if (scanBtn) {
+    scanBtn.addEventListener("click", startBarcodeScan);
+  }
+});
+
 
   // === Logout ===
   
