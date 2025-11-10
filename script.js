@@ -190,26 +190,43 @@ function fetchAndRenderOrders(product = "") {
     : `${API_URL}?mode=3pl-month`;
 
   fetch(url)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
     .then(data => {
       const orders = Array.isArray(data) ? data : data.orders || [];
       const summary = data.summary || {};
 
       currentOrders = orders;
 
+      const container = document.getElementById("pendingOrdersContainer");
+      if (!container) {
+        console.warn("Missing #pendingOrdersContainer element.");
+        return;
+      }
+
+      container.innerHTML = "";
+
+      if (!orders.length) {
+        container.innerHTML = `<p style="padding:12px; border:1px solid #ccc; border-radius:8px; background:#fff3f3;">⚠️ No pending orders found.</p>`;
+        return;
+      }
+
       // 💰 Revenue Calculations
       const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.cost) || 0), 0);
       const averageCost = orders.length ? totalRevenue / orders.length : 0;
 
-      const container = document.getElementById("pendingOrdersContainer");
-      if (container) container.innerHTML = "";
-
-      renderOrderSummary(summary, totalRevenue, averageCost); // 🆕 Pass revenue stats
-      renderPendingOrders(currentOrders);                     // Render order cards
+      renderOrderSummary(summary, totalRevenue, averageCost); // 🧾 Summary card
+      renderPendingOrders(currentOrders);                     // 📦 Order cards
     })
     .catch(err => {
       console.error("Order fetch failed:", err);
       showToast("❌ Failed to load orders.");
+      const container = document.getElementById("pendingOrdersContainer");
+      if (container) {
+        container.innerHTML = `<p style="padding:12px; border:1px solid #ccc; border-radius:8px; background:#fff3f3;">❌ Error loading orders. Please try again.</p>`;
+      }
     })
     .finally(() => showLoadingOverlay(false));
 }
