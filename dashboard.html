@@ -22,24 +22,29 @@
         <button id="logoutBtn" class="btn btn-black">Logout</button>
       </div>
     </header>
-
-<form class="dashboard-form" onsubmit="event.preventDefault();">
-    <h5 class="section-title">📦 USPS Dispatch Scan</h5>
+    
+    <form class="dashboard-form" onsubmit="event.preventDefault();">
+      <h5 class="section-title">📦 USPS Dispatch Scan</h5>
+    
       <div class="barcode-actions">
-         <button onclick="startBarcodeScan()" class="btn-primary">🎥 Scan Barcode</button>
-        </div>
+        <button type="button" id="scanBtn" class="btn-primary">🎥 Scan Barcode</button>
       </div>
-      
+    
+      <div style="margin-top: 16px;"></div> <!-- One line gap -->
+    
       <div class="barcode-scan-section">
         <label for="barcodeId" class="form-label">Barcode ID Captured:</label>
         <input type="text" id="barcodeId" name="barcodeId" placeholder="Auto-filled after scan" class="form-input" readonly />
+      </div>
+    </form>
       
       <label for="productFilter">Filter by Product</label>
       <select id="productFilter">
-        <option value="">All Products</option>
-        <div style="margin-top: 16px;"></div> <!-- One line gap -->
+        <option value="">All Products</option>        
       </select>
 
+    <div style="margin-top: 16px;"></div> <!-- One line gap -->
+    
       <button type="submit" id="submitSku">Submit</button>
     </form>
     <section id="pendingOrdersContainer" class="orders-grid"></section>
