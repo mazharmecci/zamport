@@ -51,6 +51,7 @@ function escapeHTML(str) {
 }
 
 // === Card Renderer with Dispatch Button ===
+
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -67,6 +68,7 @@ function createDispatchableOrderCard(order) {
 }
 
 // === Card HTML Builder ===
+
 function buildOrderCardHTML(order) {
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
 
@@ -86,6 +88,7 @@ function buildOrderCardHTML(order) {
 }
 
 // === Dispatch Button Creator ===
+
 function createDispatchButton(order) {
   const button = document.createElement("button");
   button.textContent = "Mark as Dispatched";
@@ -99,6 +102,7 @@ function createDispatchButton(order) {
 }
 
 // === Dispatched Badge Creator ===
+
 function createDispatchedBadge() {
   const badge = document.createElement("span");
   badge.className = "dispatched-badge";
@@ -157,6 +161,7 @@ function fetchAndRenderOrders(product = "") {
 
 
 function markOrderAsDispatched(order, dispatchBtn) {
+  
   showToast("🔄 Updating status...");
 
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
