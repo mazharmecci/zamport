@@ -60,24 +60,29 @@
     </header>
 
     <!-- === QR Scan Section === -->
-    <section class="qr-scan-section">
-      <div style="margin-top: 10px;">
-        <label for="qr-result">📦 Scanned QR ID:</label>
-        <small style="color: grey; display: block; margin-top: 6px; margin-bottom: 10px;">This is an optional field</small>
-        <input
-          type="text"
-          id="qr-result"
-          name="qr-result"
-          readonly
-          style="font-weight: bold; background: #f0f0f0;"
-        />
-      </div>
 
-      <div style="margin-top: 20px;">
-        <h3>📷 Scan QR Codes</h3>
-        <div id="my-qr-reader"></div>
-      </div>
-    </section>
+    <!-- === QR Scan Section === -->
+<section class="qr-scan-section">
+  <div class="qr-input-block">
+    <label for="qr-result" class="form-label">📦 Scanned QR ID:</label>
+    <small class="form-hint">This is an optional field</small>
+    <input
+      type="text"
+      id="qr-result"
+      name="qr-result"
+      class="form-input scanned-id"
+      placeholder="Auto-filled after scan"
+      readonly
+    />
+  </div>
+
+  <div class="qr-scanner-block">
+    <h3 class="section-title">📷 Scan QR Codes</h3>
+    <button onclick="startQRScanner()" class="btn-primary">🎥 Start QR Scan</button>
+    <div id="my-qr-reader" class="qr-reader-container"></div>
+  </div>
+</section>
+
 
     <!-- === Product Filter === -->
     <div style="margin-top: 16px;"></div>
