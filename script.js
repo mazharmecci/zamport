@@ -43,6 +43,12 @@ function populateProductDropdown(products = []) {
 
 // === Card Renderer with Dispatch Button ===
 
+function escapeHTML(str) {
+  return str?.replace(/[&<>"']/g, tag => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[tag])) || '';
+}
+
 function createDispatchableOrderCard(order) {
   const card = document.createElement("div");
   card.className = "order-card";
@@ -50,23 +56,32 @@ function createDispatchableOrderCard(order) {
   const statusColor = order.status === "Order-Pending" ? "red" : "green";
 
   card.innerHTML = `
-    <h4>📦 SKU: ${order.sku}</h4>
-    <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
-    <p>📄 Sheet: ${order.sheetName}</p>
-    <p>📅 Date: ${order.date || "N/A"}</p>
-    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-    ${order.imageUrl ? `<img src="${order.imageUrl}" alt="Product Image" class="product-image" />` : ""}      
+    <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
+    <p>🧪 Product: ${escapeHTML(order.product)}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${escapeHTML(order.status)}</span></p>
+    <p>📄 Sheet: ${escapeHTML(order.sheetName)}</p>
+    <p>📅 Date: ${escapeHTML(order.date || "N/A")}</p>
+    <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
+    <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
+    ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
+    ${order.imageUrl ? `<img src="${escapeHTML(order.imageUrl)}" alt="Image for ${escapeHTML(order.product)}" class="product-image" />` : ""}
   `;
 
   if (order.status === "Order-Pending") {
     const dispatchBtn = document.createElement("button");
     dispatchBtn.textContent = "Mark as Dispatched";
     dispatchBtn.className = "dispatch-btn";
-    dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
+    dispatchBtn.onclick = () => {
+      dispatchBtn.disabled = true;
+      dispatchBtn.textContent = "Dispatching...";
+      markOrderAsDispatched(order, dispatchBtn);
+    };
     card.appendChild(dispatchBtn);
+  } else {
+    const badge = document.createElement("span");
+    badge.className = "dispatched-badge";
+    badge.textContent = "✅ Dispatched";
+    card.appendChild(badge);
   }
 
   return card;
