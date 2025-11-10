@@ -23,17 +23,17 @@
       </div>
     </header>
 
-    <form class="dashboard-form" onsubmit="event.preventDefault();">
+<form class="dashboard-form" onsubmit="event.preventDefault();">
+    <h5 class="section-title">📦 USPS Dispatch Scan</h5>
+      <div class="barcode-actions">
+         <button onclick="startBarcodeScan()" class="btn-primary">🎥 Scan the barcode</button>
+        </div>
+      </div>
+      
       <div class="barcode-scan-section">
         <label for="barcodeId" class="form-label">Scanned Barcode ID:</label>
         <input type="text" id="barcodeId" name="barcodeId" placeholder="Auto-filled after scan" class="form-input" readonly />
       
-        <h4 class="section-title">📦 USPS Dispatch Scan</h4>
-        <div class="barcode-actions">
-          <button onclick="startBarcodeScan()" class="btn-primary">🎥 Scan the barcode</button>
-        </div>
-      </div>
-
       <label for="productFilter">Filter by Product</label>
       <select id="productFilter">
         <option value="">All Products</option>
@@ -41,7 +41,6 @@
 
       <button type="submit" id="submitSku">Submit</button>
     </form>
-
     <section id="pendingOrdersContainer" class="orders-grid"></section>
   </main>
 </body>
