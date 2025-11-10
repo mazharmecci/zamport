@@ -260,39 +260,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-// === Barcode Scanning Module ===
-
-window.startBarcodeScan = function () {
-  showToast("🎥 Starting barcode scan...");
-  const scannedCode = "9400111899223857234567"; // Simulated
-  const cleanCode = sanitizeBarcode(scannedCode);
-  autofillBarcode(cleanCode);
-};
-
-function sanitizeBarcode(code) {
-  return typeof code === "string" ? code.replace(/\D/g, "") : "";
-}
-
-function autofillBarcode(cleanCode) {
-  const input = document.getElementById("barcodeId");
-  if (input) {
-    input.value = cleanCode;
-    showToast(`✅ Barcode captured: ${cleanCode}`);
-  } else {
-    console.warn("barcodeId input not found");
-    showToast("⚠️ Barcode input field missing");
-  }
-}
-
-// Attach event listener after DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  const scanBtn = document.getElementById("scanBtn");
-  if (scanBtn) {
-    scanBtn.addEventListener("click", startBarcodeScan);
-  }
-});
-
-
   // === Logout ===
   
   const logoutBtn = document.getElementById("logoutBtn");
