@@ -50,6 +50,9 @@ function normalizeOrder(order) {
   // Extract from IMAGE(...) formula if needed
   const imageLink = rawImageLink.startsWith('=IMAGE("') ? rawImageLink.slice(8, -2) : rawImageLink;
 
+  // Parse cost as float for revenue calculation
+  const cost = parseFloat(order.cost || order.Cost || order["3PL Cost"] || 0);
+
   return {
     sku: order.sku || order.SKU || "",
     product: order.product || order.Product || "",
@@ -61,7 +64,8 @@ function normalizeOrder(order) {
     totalLabels: order.totalLabels || order.Labels || "",
     totalUnits: order.totalUnits || order.Units || "",
     labelLink: order.labelLink || order.LabelLink || "",
-    imageLink
+    imageLink,
+    cost  // 💰 Added for revenue calculation
   };
 }
 
@@ -80,6 +84,7 @@ function buildOrderCardHTML(order) {
     <p>📅 Date: ${escapeHTML(order.date || "N/A")}</p>
     <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
     <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
+    <p>💰 Revenue: $${order.cost?.toFixed(2) || "0.00"}</p>
     ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
     ${order.imageLink ? `<p><a href="${escapeHTML(order.imageLink)}" target="_blank">🖼️ Image Link</a></p>${imagePreview}` : ""}
   `;
