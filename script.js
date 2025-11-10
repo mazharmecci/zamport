@@ -242,46 +242,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === Scan logic ===
 
-function domReady(fn) {
-  if (
-    document.readyState === "complete" ||
-    document.readyState === "interactive"
-  ) {
-    setTimeout(fn, 1000);
-  } else {
-    document.addEventListener("DOMContentLoaded", fn);
-  }
-}
-
-domReady(function () {
+  // === Scan logic ===
   const scanner = new Html5QrcodeScanner("my-qr-reader", {
     fps: 10,
     qrbox: 250,
   });
 
-function onScanSuccess(decodedText, decodedResult) {
-  const qrField = document.getElementById("qr-result");
+  function onScanSuccess(decodedText, decodedResult) {
+    const qrField = document.getElementById("qr-result");
 
-  if (qrField) {
-    qrField.value = decodedText;
-  } else {
-    console.warn("QR result field not found in DOM.");
+    if (qrField) {
+      qrField.value = decodedText;
+    } else {
+      console.warn("QR result field not found in DOM.");
+    }
+
+    showToast("✅ QR Code scanned: " + decodedText);
+
+    scanner.clear().then(() => {
+      document.getElementById("my-qr-reader").innerHTML = "";
+    }).catch((err) => {
+      console.error("Failed to clear scanner:", err);
+    });
   }
 
-  alert("✅ QR Code scanned: " + decodedText);
+  scanner.render(onScanSuccess);
 
-  scanner.clear().then(() => {
-    document.getElementById("my-qr-reader").innerHTML = "";
-  }).catch((err) => {
-    console.error("Failed to clear scanner:", err);
-  });
-}
-
-const toast = document.createElement("div");
-toast.textContent = "QR scanned: " + decodedText;
-toast.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4caf50;color:white;padding:10px 20px;border-radius:5px;z-index:9999;";
-document.body.appendChild(toast);
-setTimeout(() => toast.remove(), 3000);
+  // === Logout ===
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      sessionStorage.clear();
+      showToast("👋 Logged out successfully!");
+      setTimeout(() => {
+        window.location.href = "https://mazharmecci.github.io/zamport/";
+      }, 1000);
+    });
+  }
+}); // ✅ Closes DOMContentLoaded
 
   
   // === Logout ===
