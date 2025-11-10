@@ -1,110 +1,129 @@
 // === Global State ===
 let currentOrders = [];
 
-// === Toast Notification Helper ===
+// === Escape Helper ===
+function escapeHTML(str) {
+  return typeof str === "string"
+    ? str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[tag]))
+    : '';
+}
+
+// === Toast Notification ===
 function showToast(message) {
   const toast = document.getElementById("toast");
   if (!toast) return;
-
   toast.textContent = message;
   toast.classList.remove("hidden");
-  setTimeout(() => {
-    toast.classList.add("hidden");
-  }, 3000);
+  setTimeout(() => toast.classList.add("hidden"), 3000);
 }
 
 // === UI Helpers ===
 function toggleSpinner(button, show) {
   const spinner = button?.querySelector(".spinner");
-  if (spinner) {
-    spinner.classList.toggle("hidden", !show);
-  }
+  if (spinner) spinner.classList.toggle("hidden", !show);
 }
 
 function showLoadingOverlay(show) {
-  const loadingOverlay = document.getElementById("loadingOverlay");
-  if (loadingOverlay) {
-    loadingOverlay.classList.toggle("hidden", !show);
-  }
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.classList.toggle("hidden", !show);
 }
 
 function populateProductDropdown(products = []) {
-  const productFilter = document.getElementById("productFilter");
-  if (!productFilter) return;
-
-  productFilter.innerHTML = `<option value="">All Products</option>`;
-  products.forEach(product => {
+  const filter = document.getElementById("productFilter");
+  if (!filter) return;
+  filter.innerHTML = `<option value="">All Products</option>`;
+  products.forEach(p => {
     const option = document.createElement("option");
-    option.value = product;
-    option.textContent = product;
-    productFilter.appendChild(option);
+    option.value = p;
+    option.textContent = p;
+    filter.appendChild(option);
   });
 }
 
-// === Card Renderer with Dispatch Button ===
+// === Normalize Order Keys ===
+function normalizeOrder(order) {
+  return {
+    sku: order.sku || order.SKU || "",
+    product: order.product || order.Product || "",
+    status: order.status || order.Status || "",
+    sheetName: order.sheetName || order.Sheet || "",
+    sheetId: order.sheetId || order.SheetID || "",
+    rowIndex: order.rowIndex || order.RowIndex || 0,
+    date: order.date || order.Date || "",
+    totalLabels: order.totalLabels || order.Labels || "",
+    totalUnits: order.totalUnits || order.Units || "",
+    labelLink: order.labelLink || order.LabelLink || ""
+  };
+}
 
-function createDispatchableOrderCard(order) {
+// === Card Builder ===
+function buildOrderCardHTML(order) {
+  const statusColor = order.status === "Order-Pending" ? "red" : "green";
+  return `
+    <h4>📦 SKU: ${escapeHTML(order.sku)}</h4>
+    <p>🧪 Product: ${escapeHTML(order.product)}</p>
+    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${escapeHTML(order.status)}</span></p>
+    <p>📄 Sheet: ${escapeHTML(order.sheetName)}</p>
+    <p>📅 Date: ${escapeHTML(order.date || "N/A")}</p>
+    <p>🔢 Total Labels: ${escapeHTML(order.totalLabels || "N/A")}</p>
+    <p>📦 Total Units: ${escapeHTML(order.totalUnits || "N/A")}</p>
+    ${order.labelLink ? `<p><a href="${escapeHTML(order.labelLink)}" target="_blank">🔗 Label Link</a></p>` : ""}
+  `;
+}
+
+// === Dispatch Button ===
+function createDispatchButton(order) {
+  const btn = document.createElement("button");
+  btn.textContent = "Mark as Dispatched";
+  btn.className = "dispatch-btn";
+  btn.onclick = () => markOrderAsDispatched(order, btn);
+  return btn;
+}
+
+// === Dispatched Badge ===
+function createDispatchedBadge() {
+  const badge = document.createElement("span");
+  badge.className = "dispatched-badge";
+  badge.textContent = "✅ Dispatched";
+  return badge;
+}
+
+// === Card Renderer ===
+function createDispatchableOrderCard(rawOrder) {
+  const order = normalizeOrder(rawOrder);
   const card = document.createElement("div");
   card.className = "order-card";
-
-  const statusColor = order.status === "Order-Pending" ? "red" : "green";
-
-  card.innerHTML = `
-    <h4>📦 SKU: ${order.sku}</h4>
-    <p>🧪 Product: ${order.product}</p>
-    <p>📌 Status: <span style="color:${statusColor}; font-weight:bold;">${order.status}</span></p>
-    <p>📄 Sheet: ${order.sheetName}</p>
-    <p>📅 Date: ${order.date || "N/A"}</p>
-    <p>🔢 Total Labels: ${order.totalLabels || "N/A"}</p>
-    <p>📦 Total Units: ${order.totalUnits || "N/A"}</p>
-    ${order.labelLink ? `<p><a href="${order.labelLink}" target="_blank">🔗 Label Link</a></p>` : ""}
-  `;
-
-  if (order.status === "Order-Pending") {
-    const dispatchBtn = document.createElement("button");
-    dispatchBtn.textContent = "Mark as Dispatched";
-    dispatchBtn.className = "dispatch-btn";
-   dispatchBtn.onclick = () => markOrderAsDispatched(order, dispatchBtn);
-    card.appendChild(dispatchBtn);
-  }
-
+  card.innerHTML = buildOrderCardHTML(order);
+  card.appendChild(order.status === "Order-Pending" ? createDispatchButton(order) : createDispatchedBadge());
   return card;
 }
 
 // === Render Orders ===
-
 function renderPendingOrders(orders) {
   const container = document.getElementById("pendingOrdersContainer");
   if (!container) return;
-
   container.innerHTML = "";
   if (!orders.length) {
     container.innerHTML = "<p>No pending orders found.</p>";
     return;
   }
-
   const fragment = document.createDocumentFragment();
-
-  orders.forEach((order, index) => {
+  orders.forEach((order, i) => {
     const card = createDispatchableOrderCard(order);
-    card.style.animationDelay = `${index * 80}ms`;
+    card.style.animationDelay = `${i * 80}ms`;
     fragment.appendChild(card);
   });
-
   container.appendChild(fragment);
 }
 
 // === Fetch Orders ===
-
 function fetchAndRenderOrders(product = "") {
   showLoadingOverlay(true);
   showToast("⏳ Fetching your orders...");
-
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
-  const url = product
-    ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}`
-    : `${API_URL}?mode=3pl-month`;
-
+  const url = product ? `${API_URL}?mode=3pl-month&product=${encodeURIComponent(product)}` : `${API_URL}?mode=3pl-month`;
   fetch(url)
     .then(res => res.json())
     .then(orders => {
@@ -115,15 +134,12 @@ function fetchAndRenderOrders(product = "") {
       console.error("Order fetch failed:", err);
       showToast("❌ Failed to load orders.");
     })
-    .finally(() => {
-      showLoadingOverlay(false);
-    });
+    .finally(() => showLoadingOverlay(false));
 }
 
-
-function markOrderAsDispatched(order, dispatchBtn) {
+// === Dispatch Logic ===
+function markOrderAsDispatched(order, btn) {
   showToast("🔄 Updating status...");
-
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
   const payload = {
     sku: order.sku,
@@ -132,21 +148,18 @@ function markOrderAsDispatched(order, dispatchBtn) {
     rowIndex: order.rowIndex,
     newStatus: "Order-Dispatched"
   };
-
-  // ✅ Disable button immediately
-  dispatchBtn.disabled = true;
-  dispatchBtn.textContent = "Dispatching...";
-  dispatchBtn.style.opacity = "0.7";
-  dispatchBtn.style.cursor = "not-allowed";
+  btn.disabled = true;
+  btn.textContent = "Dispatching...";
+  btn.style.opacity = "0.7";
+  btn.style.cursor = "not-allowed";
 
   fetch(API_URL, {
     method: "POST",
     body: new URLSearchParams(payload)
   })
     .then(res => res.json())
-    .then(data => {
+    .then(() => {
       showToast("✅ Order marked as dispatched!");
-
       const updated = currentOrders.find(o =>
         o.sku === order.sku &&
         o.sheetId === order.sheetId &&
@@ -154,29 +167,23 @@ function markOrderAsDispatched(order, dispatchBtn) {
         o.rowIndex === order.rowIndex
       );
       if (updated) updated.status = "Order-Dispatched";
-
-      // ✅ Update button to show tick and keep it disabled
-      dispatchBtn.textContent = "✅ Dispatched";
-      dispatchBtn.style.backgroundColor = "#28a745";
-      dispatchBtn.style.opacity = "1";
-      dispatchBtn.style.cursor = "default";
-      dispatchBtn.style.boxShadow = "none";
+      btn.textContent = "✅ Dispatched";
+      btn.style.backgroundColor = "#28a745";
+      btn.style.opacity = "1";
+      btn.style.cursor = "default";
+      btn.style.boxShadow = "none";
     })
     .catch(err => {
       console.error("Dispatch failed:", err);
       showToast("❌ Failed to update order.");
-
-      // Re-enable button if dispatch fails
-      dispatchBtn.disabled = false;
-      dispatchBtn.textContent = "Mark as Dispatched";
-      dispatchBtn.style.opacity = "1";
-      dispatchBtn.style.cursor = "pointer";
+      btn.disabled = false;
+      btn.textContent = "Mark as Dispatched";
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     });
 }
 
-
-
-// === DOM Ready Handler ===
+// === DOM Ready ===
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbwoThlNNF7dSuIM5ciGP0HILQ9PsCtuUnezgzh-0CMgpTdZeZPdqymHiOGMK_LL5txy7A/exec";
 
@@ -190,59 +197,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const usernameDisplay = document.getElementById("usernameDisplay");
   const userName = sessionStorage.getItem("zamport-user");
-  if (usernameDisplay && userName) {
-    usernameDisplay.textContent = userName;
-  }
+  if (usernameDisplay && userName) usernameDisplay.textContent = userName;
 
   fetch(`${API_URL}?mode=products`)
     .then(res => res.json())
-    .then(products => {
-      populateProductDropdown(products);
-    })
+    .then(products => populateProductDropdown(products))
     .catch(err => {
       console.error("Product fetch failed:", err);
       showToast("❌ Failed to load product list.");
     })
-    .finally(() => {
-      fetchAndRenderOrders();
-    });
+    .finally(() => fetchAndRenderOrders());
 
-  const viewStatusBtn = document.getElementById("viewStatus");
-  if (viewStatusBtn) {
-    viewStatusBtn.addEventListener("click", () => {
-      toggleSpinner(viewStatusBtn, true);
-      fetch(`${API_URL}?mode=products`)
-        .then(res => res.json())
-        .then(products => {
-          populateProductDropdown(products);
-          fetchAndRenderOrders();
-        })
-        .catch(err => {
-          console.error("View status failed:", err);
-          showToast("❌ Failed to load product list.");
-        })
-        .finally(() => toggleSpinner(viewStatusBtn, false));
-    });
-  }
+  document.getElementById("viewStatus")?.addEventListener("click", () => {
+    const btn = document.getElementById("viewStatus");
+    toggleSpinner(btn, true);
+    fetch(`${API_URL}?mode=products`)
+      .then(res => res.json())
+      .then(products => {
+        populateProductDropdown(products);
+        fetchAndRenderOrders();
+      })
+      .catch(err => {
+        console.error("View status failed:", err);
+        showToast("❌ Failed to load product list.");
+      })
+      .finally(() => toggleSpinner(btn, false));
+  });
 
-  const productFilter = document.getElementById("productFilter");
-  if (productFilter) {
-    productFilter.addEventListener("change", () => {
-      fetchAndRenderOrders(productFilter.value);
-    });
-  }
+  document.getElementById("productFilter")?.addEventListener("change", e => {
+    fetchAndRenderOrders(e.target.value);
+  });
 
-  const refreshOrdersBtn = document.getElementById("refreshOrdersBtn");
-  if (refreshOrdersBtn) {
-    refreshOrdersBtn.addEventListener("click", () => {
-      fetchAndRenderOrders(productFilter?.value || "");
-    });
-  }
+    document.getElementById("refreshOrdersBtn")?.addEventListener("click", () => {
+    const selectedProduct = document.getElementById("productFilter")?.value || "";
+    fetchAndRenderOrders(selectedProduct);
+  });
 
-
-  // === Scan logic ===
-
-  // === Scan logic ===
+  // === QR Scanner Setup ===
   const scanner = new Html5QrcodeScanner("my-qr-reader", {
     fps: 10,
     qrbox: 250,
@@ -250,44 +241,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function onScanSuccess(decodedText, decodedResult) {
     const qrField = document.getElementById("qr-result");
-
     if (qrField) {
       qrField.value = decodedText;
+      showToast("✅ QR Code scanned: " + decodedText);
     } else {
       console.warn("QR result field not found in DOM.");
     }
 
-    showToast("✅ QR Code scanned: " + decodedText);
-
     scanner.clear().then(() => {
       document.getElementById("my-qr-reader").innerHTML = "";
-    }).catch((err) => {
+    }).catch(err => {
       console.error("Failed to clear scanner:", err);
     });
   }
 
   scanner.render(onScanSuccess);
 
-  // === Logout ===
+  // === Logout Handler ===
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      sessionStorage.clear();
-      showToast("👋 Logged out successfully!");
-      setTimeout(() => {
-        window.location.href = "https://mazharmecci.github.io/zamport/";
-      }, 1000);
-    });
-  }
-}); // ✅ Closes DOMContentLoaded
-
-  
-  // === Logout ===
-  
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
+    logoutBtn.addEventListener("click", event => {
       event.preventDefault();
       sessionStorage.clear();
       showToast("👋 Logged out successfully!");
