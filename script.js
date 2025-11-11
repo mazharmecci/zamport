@@ -1,3 +1,63 @@
+// 🔐 Session Enforcement for ZAMPORT
+(function initZamportSession() {
+  const SESSION_KEY = "zamport-auth";
+  const LAST_ACTIVE_KEY = "zamport-last-active";
+  const USER_KEY = "zamport-user";
+  const MAX_IDLE_TIME = 15 * 60 * 1000; // 15 minutes
+
+  // ✅ Toast Fallback (replace with branded toast if available)
+  function showToast(message) {
+    alert(message); // Replace with custom toast logic if needed
+  }
+
+  // 🔍 Enforce Session Validity
+  function enforceSession() {
+    const now = Date.now();
+    const isLoggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
+    const lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY), 10);
+    const isExpired = !lastActive || (now - lastActive > MAX_IDLE_TIME);
+
+    if (!isLoggedIn || isExpired) {
+      sessionStorage.clear();
+      showToast("Session expired. Redirecting...");
+      setTimeout(() => window.location.href = "index.html", 1000);
+      return;
+    }
+
+    sessionStorage.setItem(LAST_ACTIVE_KEY, now); // 🔄 Refresh activity timestamp
+  }
+
+  // 👤 Display Username
+  function displayUsername() {
+    const username = sessionStorage.getItem(USER_KEY);
+    const display = document.getElementById("usernameDisplay");
+    if (username && display) {
+      display.textContent = username.charAt(0).toUpperCase() + username.slice(1);
+    }
+  }
+
+  // 🚪 Logout Handler
+  function logout() {
+    showToast("Logging out...");
+    setTimeout(() => {
+      sessionStorage.clear();
+      window.location.href = "index.html";
+    }, 800);
+  }
+
+  // 🚀 Initialize on DOM Ready
+  window.addEventListener("DOMContentLoaded", () => {
+    enforceSession();
+    displayUsername();
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", logout);
+    }
+  });
+})();
+
+
 // === Global State ===
 let currentOrders = [];
 
